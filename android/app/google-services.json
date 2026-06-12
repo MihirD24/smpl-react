@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "720158094545",
+    "project_id": "jatayu-technologies",
+    "storage_bucket": "jatayu-technologies.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720158094545:android:a37b261e5cdcaeb72c01f0",
+        "android_client_info": {
+          "package_name": "com.jatayutechnologies"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiCIJZst6g07-YsigS80N1CA-NMwkzyIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
