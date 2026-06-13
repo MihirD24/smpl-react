@@ -1,7 +1,0 @@
-{
-  "entry": ["App.tsx"],
-
-  "project": ["src/**/*.{ts,tsx,js,jsx}", "src/assets/**/*"],
-
-  "ignore": ["android/**", "ios/**", "node_modules/**"]
-}
