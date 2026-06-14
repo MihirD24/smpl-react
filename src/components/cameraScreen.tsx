@@ -13,6 +13,7 @@ import {
   useCameraPermission,
 } from 'react-native-vision-camera';
 import AppIcon from './appIcon';
+import { moderateScale } from 'react-native-size-matters';
 
 const CameraScreen = ({ onCapture, onClose }) => {
   const cameraRef = useRef<Camera>(null);
@@ -32,10 +33,50 @@ const CameraScreen = ({ onCapture, onClose }) => {
   return (
     <>
       {device === undefined ? (
-        // eslint-disable-next-line react-native/no-inline-styles
-        <View style={ { justifyContent: 'center', alignItems: 'center' , marginTop:'auto', marginBottom:'auto'} }>
-          <Text>Camera not available</Text>
-        </View>
+          <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+      }}
+    >
+      {/* Back Button */}
+      <TouchableOpacity
+        onPress={onClose}
+        style={{
+          position: 'absolute',
+          top: 50,
+          left: 20,
+          padding: 10,
+        }}
+      >
+        <AppIcon name="ArrowLeft" size={30} color="#000" />
+      </TouchableOpacity>
+
+      {/* Message */}
+      <Text
+        style={{
+          fontSize: 18,
+          color: '#000',
+          marginBottom: 10,
+        }}
+      >
+        Camera not available
+      </Text>
+
+      <Text
+        style={{
+          fontSize: 14,
+          color: '#666',
+          textAlign: 'center',
+          paddingHorizontal: 20,
+        }}
+      >
+        iOS Simulator does not support VisionCamera.{"\n"}
+        Please test on a real iPhone.
+      </Text>
+    </View>
       ) : (
         <View style={styles.container}>
           <Camera
