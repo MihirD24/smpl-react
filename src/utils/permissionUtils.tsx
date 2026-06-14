@@ -1,0 +1,124 @@
+import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import messaging from '@react-native-firebase/messaging';
+import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+
+// Notification Permission
+export const requestNotificationPermission = async () => {
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      } else {
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  } else if (Platform.OS === 'ios') {
+    try {
+      // const authStatus = await messaging().requestPermission();
+      // const enabled =
+      //   authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      //   authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      // if (enabled) {
+      //   console.log('Authorization status:', authStatus);
+      // } else {
+      // }
+    } catch (err) {
+      console.warn('Notification permission request failed:', err);
+    }
+  }
+};
+
+// Location Permission
+export const requestLocationPermission = async () => {
+  try {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message:
+            'This app needs access to your location to function properly.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } else if (Platform.OS === 'ios') {
+      const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      return result === RESULTS.GRANTED;
+    }
+  } catch (error) {
+    console.error('Error requesting location permission:', error);
+    return false;
+  }
+};
+
+// Camera Permission
+export const requestCameraPermission = async () => {
+  try {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Camera Permission',
+          message: 'This app needs access to your camera for taking photos.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } else if (Platform.OS === 'ios') {
+      const result = await request(PERMISSIONS.IOS.CAMERA);
+      // console.log('Camera permission result:', result);
+      return result === RESULTS.GRANTED;
+    }
+  } catch (error) {
+    console.error('Error requesting camera permission:', error);
+    return false;
+  }
+};
+
+// Microphone Permission
+export const requestMicrophonePermission = async () => {
+  try {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: 'Microphone Permission',
+          message:
+            'This app needs access to your microphone for recording audio.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } else if (Platform.OS === 'ios') {
+      const result = await request(PERMISSIONS.IOS.MICROPHONE);
+      return result === RESULTS.GRANTED;
+    }
+  } catch (error) {
+    console.error('Error requesting microphone permission:', error);
+    return false;
+  }
+};
+
+// Show Alert for Permissions Denied
+export const showPermissionAlert = (
+  title: string,
+  message: string | undefined,
+) => {
+  Alert.alert(
+    title,
+    message,
+    [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+    { cancelable: false },
+  );
+};
