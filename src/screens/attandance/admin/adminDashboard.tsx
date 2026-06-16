@@ -773,24 +773,24 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
       const response = await getDashboardCount();
       if (response) {
         setStatsCards([
-          {
-            id: 1,
-            label: 'Remain',
-            value: response?.project_remain_points_count,
-            icon: 'Target',
-            color: 'orange',
-            bg: '#FFF7ED',
-            screen: 'ProjectRemainingScreen',
-          },
-          {
-            id: 2,
-            label: 'Reminders',
-            value: response?.reminder_count,
-            icon: 'Bell',
-            color: 'red',
-            bg: '#FEF2F2',
-            screen: 'ProjectReminder',
-          },
+          // {
+          //   id: 1,
+          //   label: 'Remain',
+          //   value: response?.project_remain_points_count,
+          //   icon: 'Target',
+          //   color: 'orange',
+          //   bg: '#FFF7ED',
+          //   screen: 'ProjectRemainingScreen',
+          // },
+          // {
+          //   id: 2,
+          //   label: 'Reminders',
+          //   value: response?.reminder_count,
+          //   icon: 'Bell',
+          //   color: 'red',
+          //   bg: '#FEF2F2',
+          //   screen: 'ProjectReminder',
+          // },
           {
             id: 3,
             label: 'Employees',
@@ -798,15 +798,15 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
             icon: 'Users',
             color: 'blue',
             bg: '#EFF6FF',
-          },
-          {
-            id: 4,
-            label: 'Projects',
-            value: response?.running_projects_count,
-            icon: 'Rocket',
-            color: 'green',
-            bg: '#F0FDF4',
-          },
+          }
+          // {
+          //   id: 4,
+          //   label: 'Projects',
+          //   value: response?.running_projects_count,
+          //   icon: 'Rocket',
+          //   color: 'green',
+          //   bg: '#F0FDF4',
+          // },
         ]);
       }
     } finally {
@@ -1029,7 +1029,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
           )}
 
           {/* ── EMERGENCY CONTROL CENTER ─────────────────────────────────────── */}
-          <View style={[styles.controlCard, dynCard]}>
+          {/* <View style={[styles.controlCard, dynCard]}>
             <View style={styles.controlHeader}>
               <View style={styles.controlTitleRow}>
                 <View style={styles.controlIconWrap}>
@@ -1077,10 +1077,10 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                 <Text style={styles.punchBtnText}>Punch Out</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </View> */}
 
           {/* ── RUNNING TASKS ────────────────────────────────────────────────── */}
-          {loadingTasks ? (
+          {/* {loadingTasks ? (
             <RunningTasksSkeleton isDark={isDark} />
           ) : (
             <View style={[styles.card, dynCard]}>
@@ -1141,7 +1141,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                         { borderBottomColor: colors.cardBorder },
                       ]}
                     >
-                      {/* Row 1: Employee + Time */}
                       <View style={styles.runningTaskTopRow}>
                         <View style={styles.runningEmployeeLine}>
                           <View
@@ -1211,7 +1210,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                         </View>
                       </View>
 
-                      {/* Row 2: Task info (full width) */}
                       <View style={styles.runningTaskCell}>
                         <Text
                           style={[styles.runningProjectName, { color: 'blue' }]}
@@ -1240,7 +1238,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                 />
               )}
             </View>
-          )}
+          )} */}
           {/* ── ATTENDANCE SNAPSHOT ──────────────────────────────────────────── */}
           {loadingAttendance ? (
             <AttendanceSkeleton isDark={isDark} />
@@ -1436,15 +1434,13 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
           )}
 
           {/* ── FINANCIAL SUMMARY ────────────────────────────────────────────── */}
-          {loadingFinancial ? (
+          {/* {loadingFinancial ? (
             <FinancialSkeleton isDark={isDark} />
           ) : (
             <View style={[styles.card, dynCard]}>
               <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
                 Financial Summary
               </Text>
-
-              {/* Upcoming Payments */}
               <View
                 style={[
                   styles.upcomingCard,
@@ -1552,8 +1548,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                   />
                 )}
               </View>
-
-              {/* Pending Receipts */}
+            
               <View style={styles.pendingReceiptsCard}>
                 <View style={styles.financialHeaderRow}>
                   <Text style={styles.pendingReceiptsLabel}>
@@ -1623,7 +1618,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                 )}
               </View>
             </View>
-          )}
+          )} */}
         </View>
       </ScrollView>
 

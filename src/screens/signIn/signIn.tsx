@@ -110,7 +110,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
               ]}
             >
               <Image
-                source={require('../../assets/images/login_logo.png')}
+                source={require('../../assets/images/login_logo.jpeg')}
                 style={styles.logo}
                 resizeMode="contain"
               />
@@ -119,7 +119,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
             {/* Title */}
             <Text style={styles.title}>
               <Text style={[styles.titleBold, { color: theme.title }]}>
-                SMPL{' '}
+                Shantinath Motors Pvt Ltd{' '}
               </Text>
             </Text>
             <Text style={[styles.subtitle, { color: theme.subtitle }]}>

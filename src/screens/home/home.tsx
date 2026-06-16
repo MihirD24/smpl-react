@@ -1371,7 +1371,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
 
           {/* Branding */}
           <Text style={[styles.brandName, { color: t.border }]}>
-            Smpl
+            Shantinath Motors Pvt Ltd
           </Text>
         </ScrollView>
 

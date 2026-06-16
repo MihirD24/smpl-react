@@ -487,7 +487,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
           <AnimatedCard delay={100}>
             <View style={styles.statsGrid}>
               {/* My Leaves */}
-              <View
+              {/* <View
                 style={[
                   styles.statGridCard,
                   {
@@ -512,10 +512,10 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
                     left
                   </Text>
                 </View>
-              </View>
+              </View> */}
 
               {/* Time Difference */}
-              <View
+              {/* <View
                 style={[
                   styles.statGridCard,
                   {
@@ -559,7 +559,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
                     {statusConfig.label}
                   </Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           </AnimatedCard>
         )}
@@ -620,14 +620,14 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             { backgroundColor: theme.cardBg, borderColor: theme.cardBorder },
           ]}
         >
-          <MenuRow
+          {/* <MenuRow
             iconName="ClipboardList"
             label="Work Logs"
             textColor={theme.text}
             iconBoxBackgroundColor={theme.quickIconBg}
             chevronColor={theme.muted}
             onPress={() => navigation.navigate('WorkLog')}
-          />
+          /> */}
           <RowDivider color={theme.divider} />
           {!isAdmin && (
             <>
@@ -642,7 +642,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
               <RowDivider color={theme.divider} />
             </>
           )}
-          <MenuRow
+          {/* <MenuRow
             iconName="Laptop"
             label="Projects"
             textColor={theme.text}
@@ -667,7 +667,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             textColor={theme.text}
             iconBoxBackgroundColor={theme.quickIconBg}
             chevronColor={theme.muted}
-          />
+          /> */}
         </AnimatedCard>
 
         {/* ── System ── */}

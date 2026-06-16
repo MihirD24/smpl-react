@@ -96,7 +96,7 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
             { color: isDarkMode ? '#FFFFFF' : '#1E1E2E' },
           ]}
         >
-          Jatayu
+          Shantinath 
         </Text>
         <Text
           style={[
@@ -104,7 +104,7 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
             { color: isDarkMode ? '#FFFFFF' : '#1E1E2E' },
           ]}
         >
-          Technologies
+          Motors Pvt. Ltd.
         </Text>
       </Animated.View>
     </Animated.View>
