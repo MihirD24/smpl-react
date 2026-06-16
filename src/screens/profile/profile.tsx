@@ -700,7 +700,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
 
         {/* Footer */}
         <Text style={[styles.versionText, { color: theme.subMuted }]}>
-          JATAYU TECHNOLOGIES {VersionCheck.getCurrentVersion()}
+          Shantinath Motors Pvt Ltd {VersionCheck.getCurrentVersion()}
         </Text>
       </ScrollView>
     </>
