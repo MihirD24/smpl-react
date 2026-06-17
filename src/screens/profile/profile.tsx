@@ -620,15 +620,6 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             { backgroundColor: theme.cardBg, borderColor: theme.cardBorder },
           ]}
         >
-          {/* <MenuRow
-            iconName="ClipboardList"
-            label="Work Logs"
-            textColor={theme.text}
-            iconBoxBackgroundColor={theme.quickIconBg}
-            chevronColor={theme.muted}
-            onPress={() => navigation.navigate('WorkLog')}
-          /> */}
-          <RowDivider color={theme.divider} />
           {!isAdmin && (
             <>
               <MenuRow
@@ -639,35 +630,8 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
                 chevronColor={theme.muted}
                 onPress={() => navigation.navigate('Salary')}
               />
-              <RowDivider color={theme.divider} />
             </>
           )}
-          {/* <MenuRow
-            iconName="Laptop"
-            label="Projects"
-            textColor={theme.text}
-            iconBoxBackgroundColor={theme.quickIconBg}
-            chevronColor={theme.muted}
-            onPress={() => navigation.navigate('Project')}
-          />
-          <RowDivider color={theme.divider} />
-          <MenuRow
-            iconName="AlarmClock"
-            label="Reminder"
-            onPress={() => navigation.navigate('ProjectReminder')}
-            textColor={theme.text}
-            iconBoxBackgroundColor={theme.quickIconBg}
-            chevronColor={theme.muted}
-          />
-          <RowDivider color={theme.divider} />
-          <MenuRow
-            iconName="FolderClock"
-            label="Project Remaining"
-            onPress={() => navigation.navigate('ProjectRemainingScreen')}
-            textColor={theme.text}
-            iconBoxBackgroundColor={theme.quickIconBg}
-            chevronColor={theme.muted}
-          /> */}
         </AnimatedCard>
 
         {/* ── System ── */}

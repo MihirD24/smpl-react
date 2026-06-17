@@ -13,7 +13,6 @@ interface UserInfo {
   profile_pic: string;
   email: string | null;
   role: string;
-  is_task_creator: number;
   mobile_no: number;
   staff_time_diff: number;
 }

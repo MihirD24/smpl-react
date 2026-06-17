@@ -18,26 +18,11 @@ export type AppStackParamList = {
   TabNavigator: {
     screen: keyof BottomTabParamList;
   };
-  TaskList: {
-    task_status: 'Pending' | 'Working' | 'Completed By Developer' | 'Re Open';
-  };
-  TaskDetail: {
-    data: {
-      id: string;
-      status: string;
-      priority?: 'High' | 'Medium' | 'Low';
-    };
-  };
-  TaskDiscussion: {
-    task_id: string;
-  };
-  UpdateTask: { data: any };
   Attendancelist: undefined;
   LeaveList: undefined;
   AddLeave: {};
   AddProjectReminder: undefined;
 
-  WorkLog: undefined;
   AdminDashboard: undefined;
   AdminAttendancelist: undefined;
   AttendanceFilter:
@@ -52,16 +37,12 @@ export type AppStackParamList = {
     currentDateLabel: string;
     punchLabel: 'Punch_in' | 'Punch_out';
   };
-  AddTask: undefined;
   NotificationScreen: undefined;
   Project: undefined;
   ModuleList: {
     projectData: {
       project_id: number;
     };
-  };
-  ModuelTaskList: {
-    module_id: number;
   };
   AddModule: {
     ProjectId: number;
@@ -75,9 +56,7 @@ export type AppStackParamList = {
     long: number;
   };
   PerformanceReport: undefined;
-  // ProjectList: undefined;
   Salary: undefined;
-  ModuleTaskList: undefined;
   ProjectReminder: undefined;
   AddProjectReminderScreen: undefined;
   AddProjectRemainingScreen: undefined;
