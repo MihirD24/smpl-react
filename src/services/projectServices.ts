@@ -53,10 +53,10 @@ export const addModule = async (formData: FormData) => {
     }
   } catch (error) {
     if (error instanceof Error)
-      console.error('Error creating task:', error.message);
+      console.error('Error adding module:', error.message);
     return {
       success: false,
-      message: 'An error occurred while creating the task.',
+      message: 'An error occurred while adding module.',
     };
   }
 };

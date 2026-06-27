@@ -15,10 +15,10 @@ export const getLeaveRequest = async (loginuserId: string) => {
     }
   } catch (error) {
     if (error instanceof Error)
-      console.error('Error creating task:', error.message);
+      console.error('Error fetching leave request:', error.message);
     return {
       success: false,
-      message: 'An error occurred while creating the task.',
+      message: 'An error occurred while fetching leave request.',
     };
   }
 };
@@ -34,10 +34,10 @@ export const addLeave = async (formData: FormData) => {
     }
   } catch (error) {
     if (error instanceof Error)
-      console.error('Error creating task:', error.message);
+      console.error('Error adding leave:', error.message);
     return {
       success: false,
-      message: 'An error occurred while creating the task.',
+      message: 'An error occurred while adding leave.',
     };
   }
 };
@@ -53,10 +53,10 @@ export const handleApproval = async (formData: FormData) => {
     }
   } catch (error) {
     if (error instanceof Error)
-      console.error('Error creating task:', error.message);
+      console.error('Error handling leave approval:', error.message);
     return {
       success: false,
-      message: 'An error occurred while creating the task.',
+      message: 'An error occurred while handling leave approval.',
     };
   }
 };

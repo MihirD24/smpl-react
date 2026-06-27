@@ -30,16 +30,6 @@ export const API_ENDPOINTS = {
   PROJECT_MODULE_LIST: 'get-project-by-work-module-name',
   ADD_PROJECT_MODULE: 'add-project-module',
 
-  // ================= WORK LOG / TASK =================
-  WORK_LOG_ADD: 'work-log-add',
-  WORK_LOG_LIST: 'work-logs-list',
-  WORK_LOG_SINGLE_DETAIL: 'work-log-single-detail',
-  WORK_LOG_STATUS_UPDATE: 'work-log-status-update',
-  WORK_LOG_START_STOP: 'work-log-detail-work-start-stop',
-  ACTIVE_TASK_DETAIL: 'active-task-detail',
-  WORK_LOG_COUNT_BY_STATUS: 'work-log-count-by-status',
-  STOP_ALL_STAFF_WORK: 'stop-all-staff-work',
-
   // ================= ACCOUNT =================
   ACCOUNT_BOOK_LIST: 'account-book-list',
   PARTY_LIST: 'party-list',
@@ -69,9 +59,7 @@ export const API_ENDPOINTS = {
   HOLIDAY_LIST: 'holiday-list',
 
   //============Admin Dashboard================
-  UPDATE_TASK_STOP_PUNCH_OUT_BY_TYPE: 'update-task-stop-and-puch-out-by-type',
   ATTENDANCE_DATA: 'attendance-data',
-  GET_RUNNING_TASK: 'get-running-task',
   DASHBOARD_SALES: 'dashboard-sales',
   DASHBOARD_PURCHASE: 'dashboard-purchases',
   GET_DASHBOARD_COUNT: 'get-dashboard-count',

@@ -12,10 +12,10 @@ export const getNotificationData = async () => {
     }
   } catch (error) {
     if (error instanceof Error)
-      console.error('Error creating task:', error.message);
+      console.error('Error fetching notification data:', error.message);
     return {
       success: false,
-      message: 'An error occurred while creating the task.',
+      message: 'An error occurred while fetching notification data.',
     };
   }
 };

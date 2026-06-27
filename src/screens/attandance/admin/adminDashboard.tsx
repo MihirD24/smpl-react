@@ -18,10 +18,7 @@ import AppIcon from '../../../components/appIcon';
 import {
   getDashboardPurchaseData,
   getDashboardSalesData,
-  getRunningTask,
   getStaffAttendanceData,
-  updateTaskStopPunchOutByType,
-  EmergencyActionType,
   getDashboardCount,
 } from '../../../services/adminDashboardServices';
 import NetInfoComponent from '../../../components/netinfoComponent';
@@ -90,10 +87,6 @@ const useTheme = () => {
       badgeEarlyExit: '#FFE4E6',
       badgeLeave: '#DBEAFE',
       badgeWorking: '#DBEAFE',
-
-      // Task card
-      taskCardBg: isDark ? '#1E293B' : '#FFFFFF',
-      taskCardBorder: isDark ? '#334155' : '#E2E8F0',
     },
   };
 };
@@ -351,91 +344,6 @@ const AttendanceSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
   </View>
 );
 
-// ─── Skeleton: Running Tasks ──────────────────────────────────────────────────
-
-const RunningTasksSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
-  <View
-    style={{
-      backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-      borderWidth: 1,
-      borderColor: isDark ? '#334155' : '#E2E8F0',
-      borderRadius: scale(16),
-      padding: scale(20),
-      marginBottom: scale(16),
-    }}
-  >
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: scale(16),
-      }}
-    >
-      <SkeletonBox width={scale(130)} height={scale(16)} isDark={isDark} />
-      <SkeletonBox width={scale(50)} height={scale(12)} isDark={isDark} />
-    </View>
-    {[1, 2, 3, 4].map(i => (
-      <View
-        key={i}
-        style={{
-          minHeight: scale(52),
-          flexDirection: 'row',
-          alignItems: 'center',
-          borderBottomWidth: 1,
-          borderBottomColor: isDark ? '#334155' : '#E2E8F0',
-          paddingVertical: scale(8),
-          gap: scale(8),
-        }}
-      >
-        <View style={{ flex: 1.05 }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <SkeletonBox
-              width={scale(26)}
-              height={scale(26)}
-              borderRadius={scale(13)}
-              style={{ marginRight: scale(7) }}
-              isDark={isDark}
-            />
-            <View style={{ flex: 1 }}>
-              <SkeletonBox width="86%" height={scale(11)} isDark={isDark} />
-              <SkeletonBox
-                width="52%"
-                height={scale(8)}
-                style={{ marginTop: scale(5) }}
-                isDark={isDark}
-              />
-            </View>
-          </View>
-        </View>
-        <View style={{ flex: 1.45 }}>
-          <SkeletonBox width="92%" height={scale(11)} isDark={isDark} />
-          <SkeletonBox
-            width="72%"
-            height={scale(9)}
-            style={{ marginTop: scale(5) }}
-            isDark={isDark}
-          />
-        </View>
-        <View style={{ flex: 0.7, alignItems: 'flex-end' }}>
-          <SkeletonBox width="72%" height={scale(11)} isDark={isDark} />
-          <SkeletonBox
-            width="94%"
-            height={scale(8)}
-            style={{ marginTop: scale(5) }}
-            isDark={isDark}
-          />
-        </View>
-      </View>
-    ))}
-  </View>
-);
-
 // ─── Skeleton: Financial Summary ──────────────────────────────────────────────
 
 const FinancialSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
@@ -579,25 +487,17 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
   const { isDark, colors } = useTheme();
 
   const [showAllAttendance, setShowAllAttendance] = useState(false);
-  const [emergencyModal, setEmergencyModal] = useState<{
-    visible: boolean;
-    type: EmergencyActionType | null;
-  }>({ visible: false, type: null });
-  const [emergencyLoading, setEmergencyLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const [attendanceData, setAttendanceData] = useState([]);
-  const [runningTaskData, setRunningTaskData] = useState([]);
   const [salesData, setSalesData] = useState([]);
   const [purchaseData, setPurchaseData] = useState([]);
   const [showAllPayments, setShowAllPayments] = useState(false);
   const [showAllSales, setShowAllSales] = useState(false);
-  const [showAllTasks, setShowAllTasks] = useState(false);
   const [statsCards, setStatsCards] = useState([]);
 
   // Per-section loading
   const [loadingAttendance, setLoadingAttendance] = useState(true);
-  const [loadingTasks, setLoadingTasks] = useState(true);
   const [loadingFinancial, setLoadingFinancial] = useState(true);
   const [loadingStats, setLoadingStats] = useState(true);
 
@@ -757,40 +657,12 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
     }
   };
 
-  const fetchRunningTaskData = async () => {
-    setLoadingTasks(true);
-    try {
-      const response = await getRunningTask();
-      setRunningTaskData(response?.length ? response : []);
-    } finally {
-      setLoadingTasks(false);
-    }
-  };
-
   const fetchDashboardCount = async () => {
     setLoadingStats(true);
     try {
       const response = await getDashboardCount();
       if (response) {
         setStatsCards([
-          // {
-          //   id: 1,
-          //   label: 'Remain',
-          //   value: response?.project_remain_points_count,
-          //   icon: 'Target',
-          //   color: 'orange',
-          //   bg: '#FFF7ED',
-          //   screen: 'ProjectRemainingScreen',
-          // },
-          // {
-          //   id: 2,
-          //   label: 'Reminders',
-          //   value: response?.reminder_count,
-          //   icon: 'Bell',
-          //   color: 'red',
-          //   bg: '#FEF2F2',
-          //   screen: 'ProjectReminder',
-          // },
           {
             id: 3,
             label: 'Employees',
@@ -799,14 +671,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
             color: 'blue',
             bg: '#EFF6FF',
           }
-          // {
-          //   id: 4,
-          //   label: 'Projects',
-          //   value: response?.running_projects_count,
-          //   icon: 'Rocket',
-          //   color: 'green',
-          //   bg: '#F0FDF4',
-          // },
         ]);
       }
     } finally {
@@ -824,7 +688,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
     try {
       await Promise.all([
         fetchAttendanceData(),
-        fetchRunningTaskData(),
         fetchDashboardCount(),
         Promise.all([fetchSalesData(), fetchPurchaseData()]),
       ]);
@@ -850,25 +713,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
     setRefreshing(true);
     await fetchAllDataRef.current();
     setRefreshing(false);
-  };
-
-  const handleEmergencyAction = async () => {
-    if (!emergencyModal.type) {
-      Alert.alert('Error', 'No action type selected.');
-      return;
-    }
-    setEmergencyLoading(true);
-    const result = await updateTaskStopPunchOutByType(emergencyModal.type);
-    setEmergencyLoading(false);
-    if (result.success) {
-      setEmergencyModal({ visible: false, type: null });
-      Alert.alert(
-        'Success',
-        result.message || 'Action completed successfully.',
-      );
-    } else {
-      Alert.alert('Failed', result.message || 'Something went wrong.');
-    }
   };
 
   const statCardIconColor = (color: string) => {
@@ -932,13 +776,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
   const visibleAttendance = showAllAttendance
     ? attendanceData
     : attendanceData.slice(0, 8);
-  const displayedTasks = showAllTasks
-    ? runningTaskData
-    : runningTaskData.slice(0, 5);
-  const overTimeTaskCount = runningTaskData.filter(
-    (task: any) =>
-      Number(task.total_minutes) > parseInt(task.estimated_minutes),
-  ).length;
 
   // Dynamic styles
   const dynCard = {
@@ -1026,221 +863,10 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          )}
+            )}
 
-          {/* ── EMERGENCY CONTROL CENTER ─────────────────────────────────────── */}
-          {/* <View style={[styles.controlCard, dynCard]}>
-            <View style={styles.controlHeader}>
-              <View style={styles.controlTitleRow}>
-                <View style={styles.controlIconWrap}>
-                  <AppIcon
-                    name="ShieldAlert"
-                    size={scale(15)}
-                    color="#DC2626"
-                  />
-                </View>
-                <View>
-                  <Text style={[styles.title, { color: colors.textPrimary }]}>
-                    Emergency Controls
-                  </Text>
-                  <Text style={[styles.subtitle, { color: colors.textMuted }]}>
-                    Site-wide actions
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={[
-                  styles.stopBtn,
-                  {
-                    backgroundColor: colors.stopBtnBg,
-                    borderColor: colors.stopBtnBorder,
-                  },
-                ]}
-                activeOpacity={0.75}
-                onPress={() =>
-                  setEmergencyModal({ visible: true, type: 'taskStop' })
-                }
-              >
-                <AppIcon name="OctagonX" size={scale(14)} color="#DC2626" />
-                <Text style={styles.stopBtnText}>Stop Tasks</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.punchBtn}
-                activeOpacity={0.75}
-                onPress={() =>
-                  setEmergencyModal({ visible: true, type: 'puchOut' })
-                }
-              >
-                <AppIcon name="LogOut" size={scale(14)} color="#FFFFFF" />
-                <Text style={styles.punchBtnText}>Punch Out</Text>
-              </TouchableOpacity>
-            </View>
-          </View> */}
-
-          {/* ── RUNNING TASKS ────────────────────────────────────────────────── */}
-          {/* {loadingTasks ? (
-            <RunningTasksSkeleton isDark={isDark} />
-          ) : (
-            <View style={[styles.card, dynCard]}>
-              <View style={styles.cardHeader}>
-                <View>
-                  <Text
-                    style={[styles.cardTitle, { color: colors.textPrimary }]}
-                  >
-                    Running Tasks
-                  </Text>
-                  <Text
-                    style={[
-                      styles.runningTaskSummary,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    {runningTaskData.length} active
-                    {overTimeTaskCount > 0
-                      ? ` • ${overTimeTaskCount} over time`
-                      : ''}
-                  </Text>
-                </View>
-                {runningTaskData.length > 5 && (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() => setShowAllTasks(prev => !prev)}
-                  >
-                    <Text style={[styles.linkText, { color: colors.accent }]}>
-                      {showAllTasks ? 'Show Less' : 'View All'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              {displayedTasks.length > 0 ? (
-                displayedTasks.map((task: any, index: number) => {
-                  const isOverTime =
-                    Number(task.total_minutes) >
-                    parseInt(task.estimated_minutes);
-                  const priorityStyle =
-                    task.priority === 'High'
-                      ? styles.highText
-                      : task.priority === 'Medium'
-                      ? styles.mediumText
-                      : styles.lowText;
-                  const priorityDotStyle =
-                    task.priority === 'High'
-                      ? styles.highDot
-                      : task.priority === 'Medium'
-                      ? styles.mediumDot
-                      : styles.lowDot;
-
-                  return (
-                    <View
-                      key={index}
-                      style={[
-                        styles.runningTaskRow,
-                        { borderBottomColor: colors.cardBorder },
-                      ]}
-                    >
-                      <View style={styles.runningTaskTopRow}>
-                        <View style={styles.runningEmployeeLine}>
-                          <View
-                            style={[
-                              styles.runningAvatar,
-                              { backgroundColor: colors.avatarBg },
-                            ]}
-                          >
-                            <Text style={styles.runningAvatarText}>
-                              {task.employee?.charAt(0)}
-                            </Text>
-                          </View>
-
-                          <View style={styles.runningEmployeeTextWrap}>
-                            <Text
-                              style={[
-                                styles.runningEmployeeName,
-                                { color: colors.textDeepPrimary },
-                              ]}
-                              numberOfLines={1}
-                            >
-                              {task.employee}
-                            </Text>
-                            <View style={styles.runningPriorityRow}>
-                              <View
-                                style={[
-                                  styles.runningPriorityDot,
-                                  priorityDotStyle,
-                                ]}
-                              />
-                              <Text
-                                style={[
-                                  styles.runningPriorityText,
-                                  priorityStyle,
-                                ]}
-                                numberOfLines={1}
-                              >
-                                {task.priority}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-
-                        <View style={styles.runningTimeCell}>
-                          <Text
-                            style={[
-                              styles.runningTimeValue,
-                              { color: colors.textPrimary },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {formatMinutes(task.total_minutes)}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.runningTimeStatus,
-                              isOverTime
-                                ? styles.overTimeText
-                                : styles.remainingTimeText,
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {isOverTime
-                              ? `${formatMinutes(task.time_status)} over`
-                              : `${formatMinutes(task.time_status)} left`}
-                          </Text>
-                        </View>
-                      </View>
-
-                      <View style={styles.runningTaskCell}>
-                        <Text
-                          style={[styles.runningProjectName, { color: 'blue' }]}
-                          numberOfLines={2}
-                        >
-                          {task.project} • {task.module}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.runningTaskTitle,
-                            { color: isDark ? '#CBD5E1' : '#334155' },
-                          ]}
-                          numberOfLines={2}
-                        >
-                          {task.task}
-                        </Text>
-                      </View>
-                    </View>
-                  );
-                })
-              ) : (
-                <NoData
-                  message="No tasks are currently running"
-                  icon="ClipboardList"
-                  isDark={isDark}
-                />
-              )}
-            </View>
-          )} */}
-          {/* ── ATTENDANCE SNAPSHOT ──────────────────────────────────────────── */}
-          {loadingAttendance ? (
+            {/* ── ATTENDANCE SNAPSHOT ──────────────────────────────────────────── */}
+            {loadingAttendance ? (
             <AttendanceSkeleton isDark={isDark} />
           ) : (
             <View style={[styles.card, dynCard]}>
@@ -1621,74 +1247,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
           )} */}
         </View>
       </ScrollView>
-
-      {/* ── EMERGENCY MODAL ──────────────────────────────────────────────────── */}
-      <Modal
-        transparent
-        animationType="fade"
-        visible={emergencyModal.visible}
-        onRequestClose={() => {
-          if (!emergencyLoading)
-            setEmergencyModal({ visible: false, type: null });
-        }}
-      >
-        <View style={[styles.overlay, { backgroundColor: colors.overlayBg }]}>
-          <View style={[styles.modalCard, { backgroundColor: colors.modalBg }]}>
-            <View style={styles.iconWrap}>
-              <AppIcon name="TriangleAlert" size={scale(28)} color="#DC2626" />
-            </View>
-            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
-              {emergencyModal.type === 'taskStop'
-                ? 'Stop All Tasks?'
-                : 'Punch Out All Staff?'}
-            </Text>
-            <Text style={[styles.modalDesc, { color: colors.textSecondary }]}>
-              {emergencyModal.type === 'taskStop'
-                ? 'This will immediately stop every running task across the platform. This action cannot be undone.'
-                : 'This will punch out all currently checked-in staff. They will need to check in again manually.'}
-            </Text>
-            <View style={styles.modalBtnRow}>
-              <TouchableOpacity
-                style={[
-                  styles.cancelBtn,
-                  { backgroundColor: colors.cancelBtnBg },
-                ]}
-                disabled={emergencyLoading}
-                onPress={() =>
-                  setEmergencyModal({ visible: false, type: null })
-                }
-              >
-                <Text
-                  style={[
-                    styles.cancelBtnText,
-                    { color: colors.cancelBtnText },
-                  ]}
-                >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.confirmBtn,
-                  emergencyLoading && styles.confirmBtnDisabled,
-                ]}
-                disabled={emergencyLoading}
-                onPress={handleEmergencyAction}
-              >
-                {emergencyLoading ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.confirmBtnText}>
-                    {emergencyModal.type === 'taskStop'
-                      ? 'Yes, Stop All'
-                      : 'Yes, Punch Out'}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </GestureHandlerRootView>
   );
 };
@@ -1915,104 +1473,6 @@ const styles = StyleSheet.create({
   textLate: { color: '#D97706' },
   textEarlyExit: { color: '#E11D48' },
   textLeave: { color: '#2563EB' },
-
-  // Tasks
-  runningTaskSummary: {
-    fontSize: moderateScale(10),
-    fontWeight: '600',
-    marginTop: scale(2),
-  },
-  runningTaskRow: {
-    borderBottomWidth: 1,
-    paddingVertical: scale(10),
-    gap: scale(8),
-  },
-  runningTaskTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: scale(10),
-  },
-  runningEmployeeLine: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    minWidth: 0,
-  },
-  runningAvatar: {
-    width: scale(28),
-    height: scale(28),
-    borderRadius: scale(14),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: scale(8),
-  },
-  runningAvatarText: {
-    color: '#FFFFFF',
-    fontSize: moderateScale(10),
-    fontWeight: '800',
-  },
-  runningEmployeeTextWrap: {
-    flex: 1,
-    minWidth: 0,
-  },
-  runningEmployeeName: {
-    fontSize: moderateScale(12),
-    fontWeight: '800',
-  },
-  runningPriorityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: scale(2),
-  },
-  runningPriorityDot: {
-    width: scale(5),
-    height: scale(5),
-    borderRadius: scale(3),
-    marginRight: scale(4),
-  },
-  highDot: { backgroundColor: '#DC2626' },
-  mediumDot: { backgroundColor: '#D97706' },
-  lowDot: { backgroundColor: '#16A34A' },
-  runningPriorityText: {
-    fontSize: moderateScale(9),
-    fontWeight: '800',
-  },
-  runningTaskCell: {
-    width: '100%',
-    paddingLeft: scale(36), // aligns with text after avatar
-  },
-  runningTaskTitle: {
-    fontSize: moderateScale(12),
-    fontWeight: '800',
-    lineHeight: moderateScale(16),
-  },
-  runningProjectName: {
-    fontSize: moderateScale(10),
-    fontWeight: '600',
-    marginTop: scale(3),
-    lineHeight: moderateScale(14),
-    textTransform: 'none', // remove if API sends all-caps
-  },
-  runningTimeCell: {
-    alignItems: 'flex-end',
-    flexShrink: 0,
-    minWidth: scale(68),
-  },
-  runningTimeValue: {
-    fontSize: moderateScale(12),
-    fontWeight: '800',
-  },
-  runningTimeStatus: {
-    fontSize: moderateScale(9),
-    fontWeight: '800',
-    marginTop: scale(2),
-  },
-  highText: { color: '#DC2626' },
-  mediumText: { color: '#D97706' },
-  lowText: { color: '#16A34A' },
-  overTimeText: { color: '#DC2626' },
-  remainingTimeText: { color: '#16A34A' },
 
   // Financial
   upcomingCard: {

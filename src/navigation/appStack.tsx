@@ -3,16 +3,10 @@ import { useColorScheme } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ShowImage from '../screens/imageMap/showImage';
 import ShowMap from '../screens/imageMap/showMap';
-import TaskList from '../screens/task/taskList';
-import TaskDetail from '../screens/task/taskDetail';
-import TaskDiscussion from '../screens/task/taskDiscussion';
-import UpdateTask from '../screens/task/updateTask';
 import Attendancelist from '../screens/attandance/attendanceList';
 import LeaveList from '../screens/leave/leaveList';
 import AddLeave from '../screens/leave/addLeave';
-import WorkLog from '../screens/task/workLog';
 import AdminAttendancelist from '../screens/attandance/admin/adminAttendance';
-import AddTask from '../screens/task/addTask';
 import ProjectList from '../screens/profile/project/projectList';
 import ModuleList from '../screens/profile/project/module/moduleList';
 import AddModule from '../screens/profile/project/module/addModule';
@@ -25,7 +19,6 @@ import { useAuth } from '../context/authContext';
 import AttendanceFilter from '../screens/attandance/attendanceFilter';
 import performanceReport from '../screens/home/performanceReport';
 import Salary from '../screens/profile/salary/salary';
-import moduleTaskList from '../screens/profile/project/module/moduleTaskList';
 import projectReminder from '../screens/profile/projectRemain/projectReminder';
 import addProjectReminder from '../screens/profile/projectRemain/addProjectReminder';
 import AddProjectRemainingScreen from '../screens/profile/projectRemain/addProjectRemainingScreen';
@@ -114,26 +107,6 @@ const AppStack = ({
         }}
       />
       <Stack.Screen
-        name="TaskList"
-        component={TaskList}
-        options={detailHeaderOptions('Task List')}
-      />
-      <Stack.Screen
-        name="TaskDetail"
-        component={TaskDetail}
-        options={detailHeaderOptions('Task Detail')}
-      />
-      <Stack.Screen
-        name="TaskDiscussion"
-        component={TaskDiscussion}
-        options={detailHeaderOptions('Task Discussion')}
-      />
-      <Stack.Screen
-        name="UpdateTask"
-        component={UpdateTask}
-        options={detailHeaderOptions('Update Task')}
-      />
-      <Stack.Screen
         name="Attendancelist"
         component={Attendancelist}
         options={detailHeaderOptions('Attendance List')}
@@ -156,22 +129,11 @@ const AppStack = ({
       />
 
       <Stack.Screen
-        name="WorkLog"
-        component={WorkLog}
-        options={detailHeaderOptions('Work Log')}
-      />
-
-      <Stack.Screen
         name="AdminAttendancelist"
         component={AdminAttendancelist}
         options={detailHeaderOptions('Attendance List')}
       />
 
-      <Stack.Screen
-        name="AddTask"
-        component={AddTask}
-        options={detailHeaderOptions('Add New Task')}
-      />
       <Stack.Screen
         name="NotificationScreen"
         component={NotificationScreen}
@@ -186,11 +148,6 @@ const AppStack = ({
         name="ModuleList"
         component={ModuleList}
         options={detailHeaderOptions('Module List')}
-      />
-      <Stack.Screen
-        name="ModuleTaskList"
-        component={moduleTaskList}
-        options={detailHeaderOptions('Module Task List')}
       />
       <Stack.Screen
         name="AddModule"

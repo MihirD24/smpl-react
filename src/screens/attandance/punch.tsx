@@ -267,7 +267,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error('Error creating task:', error.message);
+        console.error('Error marking attendance:', error.message);
       }
     } finally {
       setDisableBtn(false);
@@ -312,7 +312,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error('Error creating task:', error.message);
+        console.error('Error marking attendance:', error.message);
       }
     } finally {
       setDisableBtn(false);

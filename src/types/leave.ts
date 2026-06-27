@@ -22,7 +22,6 @@ export interface StaffDetail {
   doj: string | null;
   dob: string | null;
   salary: number | null;
-  is_task_creator: number;
   allowed_paid_leave: number;
   remaining_paid_leave: number;
   staff_time_diff: number;
