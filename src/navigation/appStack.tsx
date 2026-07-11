@@ -23,6 +23,9 @@ import projectReminder from '../screens/profile/projectRemain/projectReminder';
 import addProjectReminder from '../screens/profile/projectRemain/addProjectReminder';
 import AddProjectRemainingScreen from '../screens/profile/projectRemain/addProjectRemainingScreen';
 import ProjectRemainingScreen from '../screens/profile/projectRemain/projectRemainingScreen';
+import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
+import AddServiceVisit from '../screens/serviceVisit/addServiceVisit';
+
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -208,6 +211,16 @@ const AppStack = ({
           headerBackTitle: '',
           headerBackVisible: true,
         }}
+      />
+      <Stack.Screen
+        name="ServiceVisitList"
+        component={ServiceVisitList}
+        options={detailHeaderOptions('Service Visits')}
+      />
+      <Stack.Screen
+        name="AddServiceVisit"
+        component={AddServiceVisit}
+        options={detailHeaderOptions('New Service Visit')}
       />
     </Stack.Navigator>
   );

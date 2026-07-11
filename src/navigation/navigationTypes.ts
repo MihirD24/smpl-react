@@ -61,6 +61,8 @@ export type AppStackParamList = {
   AddProjectReminderScreen: undefined;
   AddProjectRemainingScreen: undefined;
   ProjectRemainingScreen: undefined;
+  ServiceVisitList: undefined;
+  AddServiceVisit: undefined;
 };
 
 export type BottomTabParamList = {
