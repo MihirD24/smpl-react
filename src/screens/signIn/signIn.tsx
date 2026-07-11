@@ -51,6 +51,8 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
     button: '#2563EB',
     forgot: '#60A5FA',
     version: isDarkMode ? '#64748B' : '#CBD5E1',
+    inputBorder: isDarkMode ? '#334155' : '#E2E8F0',
+    cardBorder: isDarkMode ? '#1E293B' : '#E2E8F0',
   };
   const handleLogin = async () => {
     if (!mobileNo && !password) {
@@ -127,7 +129,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
             </Text>
 
             {/* Card */}
-            <View style={[styles.card, { backgroundColor: theme.card }]}>
+            <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder, borderWidth: 1 }]}>
               <Text style={[styles.label, { color: theme.label }]}>
                 MOBILE NUMBER
               </Text>
@@ -135,7 +137,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
                 placeholder="mobile number"
                 style={[
                   styles.input,
-                  { backgroundColor: theme.inputBg, color: theme.inputText },
+                  { backgroundColor: theme.inputBg, color: theme.inputText, borderColor: theme.inputBorder, borderWidth: 1 },
                 ]}
                 placeholderTextColor={theme.placeholder}
                 value={mobileNo ?? ''}
@@ -152,7 +154,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
                   placeholder="••••••••"
                   style={[
                     styles.passwordInput,
-                    { backgroundColor: theme.inputBg, color: theme.inputText },
+                    { backgroundColor: theme.inputBg, color: theme.inputText, borderColor: theme.inputBorder, borderWidth: 1 },
                   ]}
                   placeholderTextColor={theme.placeholder}
                   secureTextEntry={secure}
@@ -208,124 +210,130 @@ export default SignIn;
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'center',
   },
   wrapper: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: verticalScale(20),
-    paddingBottom: verticalScale(24),
+    justifyContent: 'center',
+    paddingTop: verticalScale(30),
+    paddingBottom: verticalScale(30),
   },
   logoContainer: {
-    width: moderateScale(90),
-    height: moderateVerticalScale(90),
-    borderRadius: moderateScale(18),
+    width: moderateScale(96),
+    height: moderateVerticalScale(96),
+    borderRadius: moderateScale(24),
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: verticalScale(14),
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    marginBottom: verticalScale(20),
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   logo: {
-    width: moderateScale(80),
-    height: moderateVerticalScale(80),
+    width: moderateScale(76),
+    height: moderateVerticalScale(76),
   },
   title: {
-    fontSize: moderateScale(20),
-    letterSpacing: 1,
+    fontSize: moderateScale(22),
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 4,
   },
   titleBold: {
-    fontWeight: '700',
-    color: '#111827',
+    fontWeight: '800',
+    color: '#0F172A',
   },
   titleLight: {
     fontWeight: '400',
-    color: '#111827',
+    color: '#0F172A',
   },
-
   subtitle: {
-    fontSize: scale(12),
-    color: '#6B7280',
-    marginBottom: verticalScale(22),
+    fontSize: scale(13),
+    color: '#64748B',
+    marginBottom: verticalScale(28),
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
-
   card: {
-    width: '88%',
+    width: '90%',
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 20,
+    padding: 24,
     marginBottom: 24,
-    shadowColor: '#000',
+    shadowColor: '#0F172A',
     shadowOpacity: 0.06,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowRadius: 24,
+    elevation: 4,
   },
-
   label: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    marginBottom: 6,
-    marginTop: 12,
-    letterSpacing: 1,
+    fontSize: 11,
+    color: '#64748B',
+    marginBottom: 8,
+    marginTop: 14,
+    fontWeight: '600',
+    letterSpacing: 1.2,
   },
-
   input: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F8FAFC',
     borderRadius: 14,
     paddingHorizontal: 16,
-    height: verticalScale(42),
-    fontSize: 14,
-    color: '#111827',
+    height: 52,
+    fontSize: 15,
+    color: '#0F172A',
   },
   passwordWrapper: {
     position: 'relative',
     justifyContent: 'center',
   },
-
   passwordInput: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F8FAFC',
     borderRadius: 14,
     paddingHorizontal: 16,
-    paddingRight: 44, // space for eye icon
-    height: verticalScale(42),
-    fontSize: 14,
-    color: '#111827',
+    paddingRight: 48,
+    height: 52,
+    fontSize: 15,
+    color: '#0F172A',
   },
-
   eyeButton: {
     position: 'absolute',
-    right: 14,
+    right: 16,
     height: '100%',
     justifyContent: 'center',
   },
-
   signInButton: {
-    marginTop: 20,
+    marginTop: 24,
     height: 52,
-    borderRadius: 16,
+    borderRadius: 14,
     backgroundColor: '#2563EB',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#2563EB',
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
-
   signInText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
-
   forgot: {
     color: '#2563EB',
-    marginVertical: 12,
-    fontSize: scale(12),
+    marginVertical: 14,
+    fontSize: scale(13),
+    fontWeight: '600',
   },
-
   version: {
-    marginTop: verticalScale(22),
+    marginTop: verticalScale(30),
     fontSize: scale(10),
-    color: '#CBD5E1',
-    letterSpacing: 1,
+    color: '#94A3B8',
+    letterSpacing: 1.5,
+    fontWeight: '500',
   },
 });

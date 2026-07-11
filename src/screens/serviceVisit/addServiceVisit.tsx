@@ -1040,12 +1040,12 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   searchIconButton: {
-    width: moderateScale(46),
-    height: moderateScale(46),
-    borderRadius: moderateScale(8),
+    width: 52,
+    height: 52,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: verticalScale(0),
+    marginTop: 0,
   },
   imagePreviewContainer: {
     alignItems: 'center',
