@@ -63,4 +63,14 @@ export const API_ENDPOINTS = {
   DASHBOARD_SALES: 'dashboard-sales',
   DASHBOARD_PURCHASE: 'dashboard-purchases',
   GET_DASHBOARD_COUNT: 'get-dashboard-count',
+
+  //============Service Visit================
+  BRANCH_LIST: 'branch-list',
+  EMPLOYEE_LIST: 'employee-list',
+  MACHINE_MODEL_LIST: 'machine-model-list',
+  SERVICE_VISIT_GET_PARTY_BY_MACHINE: 'service-visit-get-party-by-machine',
+  SERVICE_VISIT_STORE_MACHINE: 'service-visit-store-machine',
+  SERVICE_VISIT_GET_DA_AMOUNT: 'service-visit-get-da-amount',
+  SERVICE_VISIT_ADD: 'service-visit-add',
+  SERVICE_VISITS_LIST: 'service-visits-list',
 };

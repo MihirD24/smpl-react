@@ -11,58 +11,57 @@ const MainStyle = () => {
       flexDirection: 'row',
       alignItems: 'center',
       padding: 15,
-      backgroundColor: '#232323',
+      backgroundColor: colors.card,
       margin: 10,
-      borderRadius: 10,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 5,
-      elevation: 5,
+      borderRadius: 16,
+      shadowColor: isDarkMode ? '#000000' : '#0F172A',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      elevation: 3,
     },
     headerWelcome: {
-      fontSize: 16,
-      color: '#fff',
-      fontWeight: '600',
+      fontSize: 14,
+      color: isDarkMode ? '#94A3B8' : '#64748B',
+      fontWeight: '500',
     },
     headerUsername: {
-      fontSize: 20,
-      color: '#fff',
-      fontWeight: 'bold',
+      fontSize: 18,
+      color: colors.text,
+      fontWeight: '700',
     },
     safeContent: {
       flex: 1,
-      backgroundColor: isDarkMode ? '#232323' : '#232323',
+      backgroundColor: colors.background,
     },
     headerLight: {
-      backgroundColor: '#232323', // Light mode header background
+      backgroundColor: '#FFFFFF', // Light mode header background
     },
     headerDark: {
-      backgroundColor: '#FFF', // Dark mode header background
+      backgroundColor: '#1E293B', // Dark mode header background
     },
     mainContainer: {
       flex: 1,
-      // backgroundColor: '#F0F0F5',
       paddingHorizontal: moderateScale(16),
       paddingTop: 10,
       paddingBottom: 5,
     },
     container: {
-      backgroundColor: '#232323',
+      backgroundColor: colors.background,
       flex: 1,
     },
     cardContainer: {
       backgroundColor: colors.card,
-      padding: 10,
-      borderRadius: 20, // Increased radius for softer corners
-      shadowColor: isDarkMode ? '#262626' : '#000',
-      shadowOffset: { width: 0, height: 1 }, // Reduced height for a subtler shadow
-      shadowOpacity: 0.1, // Reduced opacity for a lighter shadow
-      shadowRadius: 10, // Softer shadow spread
-      elevation: 4, // Lower elevation for a gentler shadow effect
-      marginBottom: 10, // Increased margin for better spacing
+      padding: 15,
+      borderRadius: 16,
+      shadowColor: isDarkMode ? '#000000' : '#0F172A',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.04,
+      shadowRadius: 12,
+      elevation: 2,
+      marginBottom: 12,
       borderWidth: 1,
-      borderColor: isDarkMode ? '#232323' : '#E2E8F0',
+      borderColor: colors.border,
     },
     topView: {
       width: '100%',

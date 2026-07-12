@@ -25,12 +25,12 @@ const CustomDarkTheme = {
   ...NavigationDarkTheme,
   colors: {
     ...NavigationDarkTheme.colors,
-    background: '#121212', // Custom dark background color
-    primary: '#FFFFFF', // Custom primary color
-    card: '#1E1E1E', // Custom card color
-    text: '#FFFFFF', // Custom text color
-    border: '#2E2E2E', // Custom border color
-    notification: '#A5A5A5', // Custom notification color
+    background: '#0F172A',
+    primary: '#3B82F6',
+    card: '#1E293B',
+    text: '#F8FAFC',
+    border: '#334155',
+    notification: '#F87171',
   },
 };
 
@@ -38,12 +38,12 @@ const CustomDefaultTheme = {
   ...NavigationDefaultTheme,
   colors: {
     ...NavigationDefaultTheme.colors,
-    background: '#FAFAFA', // Softer background color to reduce strain
-    primary: '#333333', // A slightly softer black for text
-    card: '#FFFFFF', // Clean white for cards
-    text: '#333333', // Consistent with primary for text
-    border: '#E0E0E0', // Light gray for subtle dividers
-    notification: '#000000', // Use a soft, noticeable red for notifications
+    background: '#F8FAFC',
+    primary: '#2563EB',
+    card: '#FFFFFF',
+    text: '#0F172A',
+    border: '#E2E8F0',
+    notification: '#EF4444',
   },
 };
 function App(): JSX.Element {

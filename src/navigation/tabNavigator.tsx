@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from '../screens/home/home';
 import Punch from '../screens/attandance/punch';
 import ProfilePage from '../screens/profile/profile';
+import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import { AuthContext } from '../context/authContext';
 import AppIcon from '../components/appIcon';
 
@@ -173,6 +174,19 @@ export default function TabNavigator() {
             }}
           />
         )}
+
+        {/* Service Visit */}
+        <Tab.Screen
+          name="ServiceVisitList"
+          component={ServiceVisitList}
+          options={{
+            tabBarLabel: 'Service Visit',
+            tabBarIcon: ({ color, size }) => (
+              <AppIcon name="MapPin" color={color} size={size} />
+            ),
+            headerTitle: 'Service Visits',
+          }}
+        />
 
         {/* Profile */}
         <Tab.Screen
