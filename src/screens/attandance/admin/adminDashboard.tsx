@@ -6,9 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Alert,
-  Modal,
-  ActivityIndicator,
   Animated,
   RefreshControl,
   useColorScheme,
@@ -16,8 +13,6 @@ import {
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppIcon from '../../../components/appIcon';
 import {
-  getDashboardPurchaseData,
-  getDashboardSalesData,
   getStaffAttendanceData,
   getDashboardCount,
 } from '../../../services/adminDashboardServices';
@@ -344,142 +339,6 @@ const AttendanceSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
   </View>
 );
 
-// ─── Skeleton: Financial Summary ──────────────────────────────────────────────
-
-const FinancialSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
-  <View
-    style={{
-      backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-      borderWidth: 1,
-      borderColor: isDark ? '#334155' : '#E2E8F0',
-      borderRadius: scale(16),
-      padding: scale(20),
-      marginBottom: scale(16),
-    }}
-  >
-    <SkeletonBox width={scale(140)} height={scale(16)} isDark={isDark} />
-    <View
-      style={{
-        backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
-        borderRadius: scale(16),
-        padding: scale(16),
-        marginTop: scale(12),
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: scale(12),
-        }}
-      >
-        <SkeletonBox width={scale(130)} height={scale(10)} isDark={isDark} />
-        <SkeletonBox
-          width={scale(36)}
-          height={scale(36)}
-          borderRadius={scale(8)}
-          isDark={isDark}
-        />
-      </View>
-      {[1, 2].map(i => (
-        <View
-          key={i}
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: scale(14),
-          }}
-        >
-          <View style={{ flex: 1, gap: scale(5) }}>
-            <SkeletonBox
-              width={scale(110)}
-              height={scale(11)}
-              isDark={isDark}
-            />
-            <SkeletonBox width={scale(80)} height={scale(16)} isDark={isDark} />
-            <SkeletonBox width={scale(60)} height={scale(10)} isDark={isDark} />
-          </View>
-          <View style={{ alignItems: 'flex-end', gap: scale(6) }}>
-            <SkeletonBox width={scale(60)} height={scale(9)} isDark={isDark} />
-            <SkeletonBox width={scale(50)} height={scale(12)} isDark={isDark} />
-          </View>
-        </View>
-      ))}
-    </View>
-    <View
-      style={{
-        backgroundColor: '#1546A0',
-        borderRadius: scale(16),
-        padding: scale(16),
-        marginTop: scale(16),
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: scale(12),
-        }}
-      >
-        <SkeletonBox
-          width={scale(120)}
-          height={scale(10)}
-          style={{ backgroundColor: '#3B6AC4' }}
-        />
-        <SkeletonBox
-          width={scale(36)}
-          height={scale(36)}
-          borderRadius={scale(8)}
-          style={{ backgroundColor: '#3B6AC4' }}
-        />
-      </View>
-      {[1, 2].map(i => (
-        <View
-          key={i}
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: scale(14),
-          }}
-        >
-          <View style={{ flex: 1, gap: scale(5) }}>
-            <SkeletonBox
-              width={scale(100)}
-              height={scale(11)}
-              style={{ backgroundColor: '#3B6AC4' }}
-            />
-            <SkeletonBox
-              width={scale(80)}
-              height={scale(15)}
-              style={{ backgroundColor: '#3B6AC4' }}
-            />
-            <SkeletonBox
-              width={scale(55)}
-              height={scale(10)}
-              style={{ backgroundColor: '#3B6AC4' }}
-            />
-          </View>
-          <View style={{ alignItems: 'flex-end', gap: scale(6) }}>
-            <SkeletonBox
-              width={scale(60)}
-              height={scale(9)}
-              style={{ backgroundColor: '#3B6AC4' }}
-            />
-            <SkeletonBox
-              width={scale(50)}
-              height={scale(12)}
-              style={{ backgroundColor: '#3B6AC4' }}
-            />
-          </View>
-        </View>
-      ))}
-    </View>
-  </View>
-);
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -490,15 +349,11 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const [attendanceData, setAttendanceData] = useState([]);
-  const [salesData, setSalesData] = useState([]);
-  const [purchaseData, setPurchaseData] = useState([]);
-  const [showAllPayments, setShowAllPayments] = useState(false);
-  const [showAllSales, setShowAllSales] = useState(false);
-  const [statsCards, setStatsCards] = useState([]);
+
+  const [statsCards, setStatsCards] = useState<any>([]);
 
   // Per-section loading
   const [loadingAttendance, setLoadingAttendance] = useState(true);
-  const [loadingFinancial, setLoadingFinancial] = useState(true);
   const [loadingStats, setLoadingStats] = useState(true);
 
   // ── Helpers
@@ -527,6 +382,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
     setLoadingAttendance(true);
     try {
       const response = await getStaffAttendanceData();
+      console.log('Attendance response:', response);
       if (response?.attendance?.length) {
         const formattedData = response.attendance.map(
           (item: any, index: number) => {
@@ -577,100 +433,46 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
     }
   };
 
-  const fetchSalesData = async () => {
-    try {
-      const response = await getDashboardSalesData();
-      if (response?.sales?.length) {
-        const formattedSales = response.sales.map((item: any) => {
-          const dueStatus = item.due_status?.toLowerCase();
-          return {
-            id: item.id,
-            label: item.ledger_name,
-            type: item.sale_type,
-            amount: `₹ ${Number(item.pending_amount).toLocaleString('en-IN', {
-              maximumFractionDigits: 0,
-            })}`,
-            expectedIn:
-              dueStatus === 'overdue'
-                ? 'OVERDUE'
-                : dueStatus === 'today'
-                ? 'TODAY'
-                : dueStatus === 'no_date'
-                ? 'NO DATE'
-                : item.due_date,
-            expectedLabel:
-              dueStatus === 'overdue'
-                ? 'PENDING'
-                : dueStatus === 'today'
-                ? 'RECEIVE TODAY'
-                : dueStatus === 'no_date'
-                ? 'FOLLOW UP'
-                : 'UPCOMING',
-            overdue: dueStatus === 'overdue',
-            dueStatus,
-          };
-        });
-        setSalesData(formattedSales);
-      } else {
-        setSalesData([]);
-      }
-    } catch {
-      setSalesData([]);
-    }
-  };
-
-  const fetchPurchaseData = async () => {
-    try {
-      const response = await getDashboardPurchaseData();
-      if (response?.purchases?.length) {
-        const formattedPurchases = response.purchases.map((item: any) => {
-          const dueStatus = item.due_status?.toLowerCase();
-          return {
-            id: item.id,
-            label: item.ledger_name,
-            type: item.record_type,
-            amount: `₹ ${Number(item.unsettled_amount).toLocaleString(
-              'en-IN',
-            )}`,
-            dueIn:
-              dueStatus === 'overdue'
-                ? 'OVERDUE'
-                : dueStatus === 'today'
-                ? 'TODAY'
-                : item.due_date,
-            dueLabel:
-              dueStatus === 'overdue'
-                ? 'PAY NOW'
-                : dueStatus === 'today'
-                ? 'DUE TODAY'
-                : 'UPCOMING',
-            urgent: dueStatus === 'overdue' || dueStatus === 'today',
-            dueStatus,
-          };
-        });
-        setPurchaseData(formattedPurchases);
-      } else {
-        setPurchaseData([]);
-      }
-    } catch {
-      setPurchaseData([]);
-    }
-  };
 
   const fetchDashboardCount = async () => {
     setLoadingStats(true);
     try {
       const response = await getDashboardCount();
+      console.log("response",response)
       if (response) {
         setStatsCards([
           {
-            id: 3,
-            label: 'Employees',
-            value: response?.total_employees_count,
+            id: 1,
+            label: 'Pending Service Visits',
+            value: response?.pendingServiceVisits,
             icon: 'Users',
             color: 'blue',
             bg: '#EFF6FF',
-          }
+          },
+          {
+            id: 2,
+            label: 'Departments',
+            value: response?.departmentsCount,
+            icon: 'Users',
+            color: 'blue',
+            bg: '#EFF6FF',
+          },
+          {
+            id: 3,
+            label: 'Designation',
+            value: response?.designationsCount,
+            icon: 'Users',
+            color: 'blue',
+            bg: '#EFF6FF',
+          },
+          {
+            id: 4,
+            label: 'Employees',
+            value: response?.employeesCount,
+            icon: 'Users',
+            color: 'blue',
+            bg: '#EFF6FF',
+          },
         ]);
       }
     } finally {
@@ -684,15 +486,12 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
   // Instead we use a ref so useEffect and onRefresh always call the
   // latest version without any dependency array issues.
   const fetchAllData = async () => {
-    setLoadingFinancial(true);
     try {
       await Promise.all([
         fetchAttendanceData(),
         fetchDashboardCount(),
-        Promise.all([fetchSalesData(), fetchPurchaseData()]),
       ]);
     } finally {
-      setLoadingFinancial(false);
     }
   };
 
@@ -1059,192 +858,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
             </View>
           )}
 
-          {/* ── FINANCIAL SUMMARY ────────────────────────────────────────────── */}
-          {/* {loadingFinancial ? (
-            <FinancialSkeleton isDark={isDark} />
-          ) : (
-            <View style={[styles.card, dynCard]}>
-              <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
-                Financial Summary
-              </Text>
-              <View
-                style={[
-                  styles.upcomingCard,
-                  { backgroundColor: colors.upcomingCardBg },
-                ]}
-              >
-                <View style={styles.financialHeaderRow}>
-                  <Text
-                    style={[
-                      styles.financialSectionLabel,
-                      { color: colors.textMuted },
-                    ]}
-                  >
-                    UPCOMING PAYMENTS
-                  </Text>
-                  <AppIcon
-                    name="Wallet"
-                    size={scale(36)}
-                    color={isDark ? '#475569' : '#CBD5F5'}
-                  />
-                </View>
-                {purchaseData.length > 0 ? (
-                  <>
-                    {purchaseData
-                      .slice(0, showAllPayments ? purchaseData.length : 2)
-                      .map((p: any) => (
-                        <View key={p.id} style={styles.financialRowClean}>
-                          <View style={{ flex: 1 }}>
-                            <Text
-                              style={[
-                                styles.financialItemLabel,
-                                { color: colors.textSecondary },
-                              ]}
-                            >
-                              {p.label}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.financialAmount,
-                                { color: colors.textPrimary },
-                              ]}
-                            >
-                              {p.amount}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.purchaseType,
-                                { color: colors.textMuted },
-                              ]}
-                            >
-                              {p.type.replace('_', ' ').toUpperCase()}
-                            </Text>
-                          </View>
-                          <View style={styles.financialRight}>
-                            <Text
-                              style={[
-                                styles.financialDueLabel,
-                                { color: colors.textMuted },
-                              ]}
-                            >
-                              {p.dueLabel}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.financialDueValue,
-                                { color: isDark ? '#94A3B8' : '#1E293B' },
-                                p.dueStatus === 'overdue' &&
-                                  styles.financialDueUrgent,
-                                p.dueStatus === 'today' &&
-                                  styles.financialDueToday,
-                              ]}
-                            >
-                              {p.dueIn}
-                            </Text>
-                          </View>
-                        </View>
-                      ))}
-                    {purchaseData.length > 2 && (
-                      <TouchableOpacity
-                        style={styles.viewMoreBtn}
-                        activeOpacity={0.7}
-                        onPress={() => setShowAllPayments(prev => !prev)}
-                      >
-                        <Text
-                          style={[
-                            styles.viewMoreText,
-                            { color: colors.accent },
-                          ]}
-                        >
-                          {showAllPayments ? 'SHOW LESS' : 'VIEW MORE'}
-                        </Text>
-                        <AppIcon
-                          name={showAllPayments ? 'ChevronUp' : 'ChevronDown'}
-                          size={scale(14)}
-                          color={colors.accent}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </>
-                ) : (
-                  <NoData
-                    message="No upcoming payments"
-                    icon="WalletCards"
-                    isDark={isDark}
-                  />
-                )}
-              </View>
-            
-              <View style={styles.pendingReceiptsCard}>
-                <View style={styles.financialHeaderRow}>
-                  <Text style={styles.pendingReceiptsLabel}>
-                    PENDING RECEIPTS
-                  </Text>
-                  <AppIcon name="Wallet" size={scale(36)} color="#3B82F6" />
-                </View>
-                {salesData.length > 0 ? (
-                  <>
-                    {salesData
-                      .slice(0, showAllSales ? salesData.length : 2)
-                      .map((r: any) => (
-                        <View key={r.id} style={styles.financialRowClean}>
-                          <View style={{ flex: 1 }}>
-                            <Text style={styles.pendingReceiptItemLabel}>
-                              {r.label}
-                            </Text>
-                            <Text style={styles.pendingReceiptAmount}>
-                              {r.amount}
-                            </Text>
-                            <Text style={styles.saleType}>
-                              {r.type.toUpperCase()}
-                            </Text>
-                          </View>
-                          <View style={styles.pendingRight}>
-                            <Text style={styles.pendingExpectedLabel}>
-                              {r.expectedLabel}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.pendingExpectedValue,
-                                r.dueStatus === 'overdue' &&
-                                  styles.pendingOverdue,
-                                r.dueStatus === 'today' && styles.pendingToday,
-                                r.dueStatus === 'no_date' &&
-                                  styles.pendingNoDate,
-                              ]}
-                            >
-                              {r.expectedIn}
-                            </Text>
-                          </View>
-                        </View>
-                      ))}
-                    {salesData.length > 2 && (
-                      <TouchableOpacity
-                        style={styles.viewMoreBtnDark}
-                        activeOpacity={0.7}
-                        onPress={() => setShowAllSales(prev => !prev)}
-                      >
-                        <Text style={styles.viewMoreTextDark}>
-                          {showAllSales ? 'SHOW LESS' : 'VIEW MORE'}
-                        </Text>
-                        <AppIcon
-                          name={showAllSales ? 'ChevronUp' : 'ChevronDown'}
-                          size={scale(14)}
-                          color="#93C5FD"
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </>
-                ) : (
-                  <NoData
-                    message="No pending receipts"
-                    icon="ReceiptText"
-                    darkBg
-                  />
-                )}
-              </View>
-            </View>
-          )} */}
+        
         </View>
       </ScrollView>
     </GestureHandlerRootView>

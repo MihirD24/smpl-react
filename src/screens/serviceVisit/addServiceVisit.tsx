@@ -593,7 +593,9 @@ const AddServiceVisit = ({ navigation }: any) => {
                 <View style={{ flex: 1 }}>
                   <CustomInput
                     value={machineNumber}
-                    onChangeText={setMachineNumber}
+                    onChangeText={(text) => {
+                      setMachineNumber(text)
+                    }}
                     placeholder="Enter Machine Number"
                   />
                 </View>
@@ -813,6 +815,7 @@ const AddServiceVisit = ({ navigation }: any) => {
 
           <CustomInput
             label="Location"
+            required
             value={location}
             onChangeText={setLocation}
             placeholder="Enter location address"

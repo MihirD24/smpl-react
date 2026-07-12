@@ -113,3 +113,13 @@ export const getServiceVisitsList = async (data: any = {}) => {
     return { success: false, message: 'Failed to fetch service visits list' };
   }
 };
+
+export const bulkApproveServiceVisits = async (data: { updates: { id: number; status: number; deduction_amount?: number; approval_remarks?: string }[] }) => {
+  try {
+    const response = await apiPost(API_ENDPOINTS.SERVICE_VISITS_BULK_APPROVE, data);
+    return response;
+  } catch (error) {
+    console.error('bulkApproveServiceVisits error:', error);
+    return { success: false, message: 'Failed to approve service visits' };
+  }
+};
