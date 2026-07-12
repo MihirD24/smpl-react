@@ -591,11 +591,6 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
                 label: 'Holidays',
                 onPress: () => navigation.navigate('HolidayList'),
               },
-              {
-                icon: 'Wrench',
-                label: 'Service Visits',
-                onPress: () => navigation.navigate('ServiceVisitList'),
-              },
             ].map((item, index) => (
               <QuickCard
                 key={item.label}

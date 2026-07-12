@@ -1,8 +1,9 @@
 import { apiPost, apiPostUpload } from './api/apiService';
+import { API_ENDPOINTS } from '../constant/apiEndpoint';
 
 export const getBranchList = async () => {
   try {
-    const response = await apiPost('/branch-list');
+    const response = await apiPost(API_ENDPOINTS.BRANCH_LIST);
     return response;
   } catch (error) {
     console.error('getBranchList error:', error);
@@ -12,7 +13,7 @@ export const getBranchList = async () => {
 
 export const getEmployeeList = async () => {
   try {
-    const response = await apiPost('/employee-list');
+    const response = await apiPost(API_ENDPOINTS.EMPLOYEE_LIST);
     return response;
   } catch (error) {
     console.error('getEmployeeList error:', error);
@@ -22,7 +23,7 @@ export const getEmployeeList = async () => {
 
 export const getMachineModelsList = async () => {
   try {
-    const response = await apiPost('/machine-model-list');
+    const response = await apiPost(API_ENDPOINTS.MACHINE_MODEL_LIST);
     return response;
   } catch (error) {
     console.error('getMachineModelsList error:', error);
@@ -32,7 +33,7 @@ export const getMachineModelsList = async () => {
 
 export const getPartyList = async () => {
   try {
-    const response = await apiPost('/party-list');
+    const response = await apiPost(API_ENDPOINTS.PARTY_LIST);
     return response;
   } catch (error) {
     console.error('getPartyList error:', error);
@@ -42,7 +43,10 @@ export const getPartyList = async () => {
 
 export const getPartyByMachine = async (machineNo: string) => {
   try {
-    const response = await apiPost('/service-visit-get-party-by-machine', { machine_no: machineNo });
+    const formData = new FormData();
+    formData.append('machine_no', machineNo);
+    const response = await apiPost(API_ENDPOINTS.SERVICE_VISIT_GET_PARTY_BY_MACHINE, formData);
+    // console.log('getPartyByMachine response:', response);
     return response;
   } catch (error) {
     console.error('getPartyByMachine error:', error);
@@ -52,7 +56,11 @@ export const getPartyByMachine = async (machineNo: string) => {
 
 export const storeMachine = async (data: { name: string; machine_model_id: number; party_id: number }) => {
   try {
-    const response = await apiPost('/service-visit-store-machine', data);
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('machine_model_id', String(data.machine_model_id));
+    formData.append('party_id', String(data.party_id));
+    const response = await apiPost(API_ENDPOINTS.SERVICE_VISIT_STORE_MACHINE, formData);
     return response;
   } catch (error) {
     console.error('storeMachine error:', error);
@@ -68,7 +76,15 @@ export const getDaAmount = async (params: {
   branch_id: number;
 }) => {
   try {
-    const response = await apiPost('/service-visit-get-da-amount', params);
+    const formData = new FormData();
+    formData.append('km', String(params.km));
+    formData.append('employee_id', String(params.employee_id));
+    formData.append('visit_date', params.visit_date);
+    if (params.visit_id !== undefined && params.visit_id !== null) {
+      formData.append('visit_id', String(params.visit_id));
+    }
+    formData.append('branch_id', String(params.branch_id));
+    const response = await apiPost(API_ENDPOINTS.SERVICE_VISIT_GET_DA_AMOUNT, formData);
     return response;
   } catch (error) {
     console.error('getDaAmount error:', error);
@@ -79,7 +95,7 @@ export const getDaAmount = async (params: {
 export const addServiceVisit = async (formData: FormData) => {
   try {
     // Since it contains potential file upload or needs multipart form, use apiPostUpload
-    const response = await apiPostUpload('service-visit-add', formData);
+    const response = await apiPostUpload(API_ENDPOINTS.SERVICE_VISIT_ADD, formData);
     return response;
   } catch (error) {
     console.error('addServiceVisit error:', error);
@@ -89,8 +105,9 @@ export const addServiceVisit = async (formData: FormData) => {
 
 export const getServiceVisitsList = async (data: any = {}) => {
   try {
-    const response = await apiPost('/service-visits-list', data);
+    const response = await apiPost(API_ENDPOINTS.SERVICE_VISITS_LIST, data);
     return response;
+
   } catch (error) {
     console.error('getServiceVisitsList error:', error);
     return { success: false, message: 'Failed to fetch service visits list' };

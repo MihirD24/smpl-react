@@ -117,3 +117,56 @@ Define Axios helper functions to interact with our backend APIs (all URLs requir
 - Include validation alerts for required fields (Branch, Visit Date, Visiting Employee, Location, KM).
 - Use smooth loading spinners for machine lookup and DA calculation API calls.
 ```
+
+---
+
+## LLM System Prompt: React Native Dashboard / Home Screen with Count Cards
+
+```text
+You are an expert React Native developer. Build a premium, high-fidelity, clean "Dashboard / Home Screen" using React Native, TypeScript, and Tailwind CSS (via NativeWind) or standard StyleSheet.
+
+The dashboard must display summary count cards fetched from our Laravel ERP API.
+
+### 1. API Endpoints Integration
+Define Axios helper functions to interact with our backend APIs (all URLs require Sanctum Auth Headers):
+1. **Get Dashboard Count:**
+   - `POST /api/get-dashboard-count`
+   - Response:
+     ```json
+     {
+       "success": true,
+       "data": {
+         "pendingServiceVisits": 5,
+         "departmentsCount": 12,
+         "designationsCount": 15,
+         "employeesCount": 42
+       },
+       "message": "Data found!"
+     }
+     ```
+
+### 2. Dashboard Layout & Cards UI
+Implement a clean, modern layout:
+1. **Header Section:** Shows a welcoming message (e.g., "Hello!" or dynamic username) and the current date.
+2. **Summary Count Cards Grid:** Display a 2x2 grid (or responsive vertical list) of cards with role-based visibility:
+   - **Pending Visits Card (Visible for both Employees & Owners):**
+     - Value: `pendingServiceVisits`
+     - Icon: `time` or `timer-outline` (Red theme background & text)
+     - Action: Navigates to the Service Visits List screen.
+   - **Departments Card (Visible ONLY for Owners/Admin):**
+     - Value: `departmentsCount`
+     - Icon: `git-network-outline` (Blue theme background & text)
+   - **Designations Card (Visible ONLY for Owners/Admin):**
+     - Value: `designationsCount`
+     - Icon: `briefcase-outline` (Green theme background & text)
+   - **Total Employees Card (Visible ONLY for Owners/Admin):**
+     - Value: `employeesCount`
+     - Icon: `people-outline` (Indigo theme background & text)
+
+   *Note: If the logged-in user is an Employee, hide/do not render the Departments, Designations, and Total Employees cards.*
+
+### 3. Design & UI Specifications
+- Theme: Premium look matching a professional ERP dashboard. White cards with crisp borders, subtle shadows, and colored icon tags.
+- Support Pull-to-Refresh to reload the counts from the API.
+- Use smooth loading skeletons or a standard spinner while loading the statistics.
+```

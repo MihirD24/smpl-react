@@ -182,10 +182,16 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
 
   // ── State ─────────────────────────────────────────────────────────────────
   const [loginuserRole, setLoginuserRole] = useState('');
+  const [loginuserName, setLoginuserName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   const [dashboardCounts, setDashboardCounts] = useState({
     remainPointCount: 0,
     reminderCount: 0,
+    pendingServiceVisits: 0,
+    departmentsCount: 0,
+    designationsCount: 0,
+    employeesCount: 0,
   });
   const [refreshing, setRefreshing] = useState(false);
 
@@ -215,14 +221,15 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
 
   // ── Theme ─────────────────────────────────────────────────────────────────
   const t = {
-    bg: isDarkMode ? '#141518' : '#F5F7FB',
+    bg: isDarkMode ? '#111318' : '#F8FAFC',
     card: isDarkMode ? '#1E2028' : '#FFFFFF',
-    text: isDarkMode ? '#F0F0F0' : '#1A1D2E',
-    sub: '#9098B1',
-    border: isDarkMode ? '#2A2D38' : '#EAEDFF',
+    text: isDarkMode ? '#F8FAFC' : '#0F172A',
+    sub: isDarkMode ? '#94A3B8' : '#64748B',
+    border: isDarkMode ? '#2E323E' : '#E2E8F0',
     primary: '#3B6FD4',
     headerBg: isDarkMode ? '#1E2028' : '#FFFFFF',
-    headerBorder: isDarkMode ? '#2A2D38' : '#F0F3FF',
+    headerBorder: isDarkMode ? '#2E323E' : '#F1F5F9',
+    shadow: isDarkMode ? '#000000' : '#0F172A',
   };
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -237,7 +244,8 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     const userInfo = await AsyncStorage.getItem('userInfo');
     if (userInfo) {
       const p = JSON.parse(userInfo);
-      setLoginuserRole(p.role);
+      setLoginuserRole(p.role || '');
+      setLoginuserName(p.name || '');
     }
   };
 
@@ -248,10 +256,12 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
       if (response) {
         setDashboardCounts(prev => ({
           ...prev,
-
           remainPointCount: response?.project_remain_points_count ?? 0,
-
           reminderCount: response?.reminder_count ?? 0,
+          pendingServiceVisits: response?.pendingServiceVisits ?? response?.pending_service_visits ?? 0,
+          departmentsCount: response?.departmentsCount ?? response?.departments_count ?? 0,
+          designationsCount: response?.designationsCount ?? response?.designations_count ?? 0,
+          employeesCount: response?.employeesCount ?? response?.employees_count ?? 0,
         }));
       }
     } catch (error) {
@@ -264,23 +274,20 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     if (!isFocused) return;
 
     const init = async () => {
+      setIsLoading(true);
       await fetchUserDetails();
-
       await Promise.allSettled([
         fetchCounts(),
       ]);
+      setIsLoading(false);
     };
 
     init();
   }, [isFocused]);
 
-  useEffect(() => {
-  }, []);
-
   const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-
       await Promise.allSettled([
         fetchCounts(),
         fetchUserDetails(),
@@ -325,7 +332,6 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
   ];
 
   const pulseAnim = useRef(new Animated.Value(0)).current;
-
   const floatAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -336,7 +342,6 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
           duration: 1400,
           useNativeDriver: true,
         }),
-
         Animated.timing(pulseAnim, {
           toValue: 0,
           duration: 1400,
@@ -352,7 +357,6 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
           duration: 1600,
           useNativeDriver: true,
         }),
-
         Animated.timing(floatAnim, {
           toValue: 0,
           duration: 1600,
@@ -367,7 +371,6 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     <>
       <NetInfoComponent onReconnect={onRefresh} />
       <GestureHandlerRootView style={{ flex: 1 }}>
-
         <ScrollView
           style={{ flex: 1, backgroundColor: t.bg }}
           contentContainerStyle={styles.scrollContent}
@@ -382,12 +385,158 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             />
           }
         >
+          {/* Counts Grid */}
+          <View style={styles.gridContainer}>
+            {isLoading ? (
+              <>
+                <View
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor: t.card,
+                      borderColor: t.border,
+                      width: loginuserRole === 'Employee' ? '100%' : '48%',
+                    },
+                  ]}
+                >
+                  <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
+                  <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
+                  <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
+                </View>
+                {loginuserRole !== 'Employee' && (
+                  <>
+                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                      <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
+                      <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
+                      <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
+                    </View>
+                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                      <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
+                      <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
+                      <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
+                    </View>
+                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                      <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
+                      <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
+                      <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
+                    </View>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Pending Service Visits Card */}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('ServiceVisitList')}
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor: t.card,
+                      borderColor: t.border,
+                      shadowColor: t.shadow,
+                      width: loginuserRole === 'Employee' ? '100%' : '48%',
+                    },
+                  ]}
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={[styles.iconBg, { backgroundColor: '#FEE2E2' }]}>
+                      <AppIcon name="Clock" size={20} color="#EF4444" />
+                    </View>
+                    <AppIcon name="ChevronRight" size={16} color={t.sub} />
+                  </View>
+                  <Text style={[styles.cardValue, { color: t.text }]}>
+                    {dashboardCounts.pendingServiceVisits}
+                  </Text>
+                  <Text style={[styles.cardLabel, { color: t.sub }]}>
+                    Pending Service Visits
+                  </Text>
+                </TouchableOpacity>
+
+                {loginuserRole !== 'Employee' && (
+                  <>
+                    {/* Departments Card */}
+                    <View
+                      style={[
+                        styles.card,
+                        {
+                          backgroundColor: t.card,
+                          borderColor: t.border,
+                          shadowColor: t.shadow,
+                        },
+                      ]}
+                    >
+                      <View style={styles.cardHeader}>
+                        <View style={[styles.iconBg, { backgroundColor: '#DBEAFE' }]}>
+                          <AppIcon name="Network" size={20} color="#3B82F6" />
+                        </View>
+                      </View>
+                      <Text style={[styles.cardValue, { color: t.text }]}>
+                        {dashboardCounts.departmentsCount}
+                      </Text>
+                      <Text style={[styles.cardLabel, { color: t.sub }]}>
+                        Departments
+                      </Text>
+                    </View>
+
+                    {/* Designations Card */}
+                    <View
+                      style={[
+                        styles.card,
+                        {
+                          backgroundColor: t.card,
+                          borderColor: t.border,
+                          shadowColor: t.shadow,
+                        },
+                      ]}
+                    >
+                      <View style={styles.cardHeader}>
+                        <View style={[styles.iconBg, { backgroundColor: '#D1FAE5' }]}>
+                          <AppIcon name="Briefcase" size={20} color="#10B981" />
+                        </View>
+                      </View>
+                      <Text style={[styles.cardValue, { color: t.text }]}>
+                        {dashboardCounts.designationsCount}
+                      </Text>
+                      <Text style={[styles.cardLabel, { color: t.sub }]}>
+                        Designations
+                      </Text>
+                    </View>
+
+                    {/* Total Employees Card */}
+                    <View
+                      style={[
+                        styles.card,
+                        {
+                          backgroundColor: t.card,
+                          borderColor: t.border,
+                          shadowColor: t.shadow,
+                        },
+                      ]}
+                    >
+                      <View style={styles.cardHeader}>
+                        <View style={[styles.iconBg, { backgroundColor: '#E0E7FF' }]}>
+                          <AppIcon name="Users" size={20} color="#6366F1" />
+                        </View>
+                      </View>
+                      <Text style={[styles.cardValue, { color: t.text }]}>
+                        {dashboardCounts.employeesCount}
+                      </Text>
+                      <Text style={[styles.cardLabel, { color: t.sub }]}>
+                        Total Employees
+                      </Text>
+                    </View>
+                  </>
+                )}
+              </>
+            )}
+          </View>
+
           {/* Branding */}
-          <Text style={[styles.brandName, { color: t.border }]}>
+          <Text style={[styles.brandName, { color: isDarkMode ? '#2A2D38' : '#EAEDFF' }]}>
             Shantinath Motors Pvt Ltd
           </Text>
         </ScrollView>
-
 
         {/* ── Quick Actions Bottom Sheet ── */}
         <BottomSheet
@@ -474,40 +623,70 @@ const styles = StyleSheet.create({
     paddingTop: verticalScale(18),
     paddingBottom: verticalScale(100),
   },
-  section: { marginBottom: verticalScale(22) },
-  sectionTitle: {
-    fontSize: moderateScale(14),
-    fontWeight: '800',
-    marginBottom: verticalScale(12),
-    letterSpacing: 0.1,
-  },
-  compactSectionHeader: {
+  headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: verticalScale(10),
+    marginBottom: verticalScale(18),
   },
-  compactSectionTitle: {
-    marginBottom: 0,
-  },
-  liveBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: moderateScale(10),
-    paddingVertical: verticalScale(5),
-    borderRadius: moderateScale(20),
-  },
-  liveDot: {
-    width: moderateScale(7),
-    height: moderateScale(7),
-    borderRadius: moderateScale(4),
-    backgroundColor: '#3B6FD4',
-  },
-  liveBadgeText: {
-    fontSize: moderateScale(10),
+  welcomeText: {
+    fontSize: moderateScale(22),
     fontWeight: '800',
-    letterSpacing: 0.8,
+    letterSpacing: -0.2,
+  },
+  dateText: {
+    fontSize: moderateScale(12),
+    fontWeight: '500',
+    marginTop: verticalScale(2),
+  },
+  quickActionsTrigger: {
+    width: moderateScale(42),
+    height: moderateScale(42),
+    borderRadius: moderateScale(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginVertical: verticalScale(8),
+  },
+  card: {
+    width: '48%',
+    borderRadius: moderateScale(16),
+    padding: moderateScale(16),
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: verticalScale(16),
+    minHeight: scale(120),
+    justifyContent: 'space-between',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  iconBg: {
+    width: moderateScale(36),
+    height: moderateScale(36),
+    borderRadius: moderateScale(10),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardValue: {
+    fontSize: moderateScale(24),
+    fontWeight: '800',
+    marginTop: verticalScale(12),
+  },
+  cardLabel: {
+    fontSize: moderateScale(12),
+    fontWeight: '600',
+    marginTop: verticalScale(4),
   },
   brandName: {
     fontSize: moderateScale(32),

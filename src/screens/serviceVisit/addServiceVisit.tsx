@@ -100,7 +100,7 @@ const AddServiceVisit = ({ navigation }: any) => {
   const [newMachineModelId, setNewMachineModelId] = useState<number | null>(null);
   const [newMachinePartyId, setNewMachinePartyId] = useState<number | null>(null);
   const [savingMachine, setSavingMachine] = useState(false);
-
+  console.log('part',partyName)
   // Load Dropdown Data
   useEffect(() => {
     const loadInitialData = async () => {
@@ -229,8 +229,8 @@ const AddServiceVisit = ({ navigation }: any) => {
             visit_date: formatDate(visitDate, 'api') || formatDate(new Date(), 'api'),
             branch_id: branchId,
           });
-          if (res && res.rate !== undefined) {
-            setDaAmount(Number(res.rate));
+          if (res && res.data?.rate !== undefined) {
+            setDaAmount(Number(res.data.rate));
           } else {
             setDaAmount(0);
           }
@@ -268,10 +268,10 @@ const AddServiceVisit = ({ navigation }: any) => {
     setSearchingMachine(true);
     try {
       const res = await getPartyByMachine(machineNumber);
-      if (res.success && res.found) {
-        setMachineId(res.machine?.id || null);
-        setPartyId(res.party?.id || null);
-        setPartyName(res.party?.name || '');
+      if (res.data) {
+        setMachineId(res.data.machine?.id || null);
+        setPartyId(res.data.party?.id || null);
+        setPartyName(res.data.party?.name || '');
         ToastUtil.success(res.message || 'Machine and Customer found!');
       } else {
         ToastUtil.info(res.message || 'Machine not found. You can add it manually.');
@@ -513,32 +513,44 @@ const AddServiceVisit = ({ navigation }: any) => {
           </View>
 
           {/* Employee & Count */}
-          <View style={formStyles.row}>
-            <View style={[formStyles.half, { minWidth: '60%' }]}>
-              <FormLabel label="Visiting Employee" required color={theme.label} />
-              <CustomDropdown
-                label=""
-                data={employees}
-                value={employeeId}
-                placeholder="Select Employee"
-                onChange={(item) => setEmployeeId(item.id)}
-                labelField="name"
-                valueField="id"
-                renderItem={renderItem}
-                colors={colors}
-                search
-                searchPlaceholder="Search employee..."
-              />
+          <View style={formStyles.fieldContainer}>
+            <FormLabel label="No of Employees" color={theme.label} />
+            <View style={styles.stepperContainer}>
+              <TouchableOpacity
+                style={[styles.stepperButton, { backgroundColor: theme.inputBackground, borderColor: theme.border }]}
+                onPress={() => setNoOfEmployee((prev) => Math.max(1, prev - 1))}
+                activeOpacity={0.7}
+              >
+                <AppIcon name="Minus" size={16} color={theme.inputText} />
+              </TouchableOpacity>
+              <View style={[styles.stepperValueContainer, { backgroundColor: theme.inputBackground, borderColor: theme.border }]}>
+                <Text style={[styles.stepperValue, { color: theme.inputText }]}>{noOfEmployee}</Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.stepperButton, { backgroundColor: theme.inputBackground, borderColor: theme.border }]}
+                onPress={() => setNoOfEmployee((prev) => prev + 1)}
+                activeOpacity={0.7}
+              >
+                <AppIcon name="Plus" size={16} color={theme.inputText} />
+              </TouchableOpacity>
             </View>
+          </View>
 
-            <View style={formStyles.half}>
-              <CustomInput
-                label="No of Employees"
-                value={String(noOfEmployee)}
-                onChangeText={(val) => setNoOfEmployee(Number(val) || 1)}
-                keyboardType="numeric"
-              />
-            </View>
+          <View style={formStyles.fieldContainer}>
+            <FormLabel label="Visiting Employee" required color={theme.label} />
+            <CustomDropdown
+              label=""
+              data={employees}
+              value={employeeId}
+              placeholder="Select Employee"
+              onChange={(item) => setEmployeeId(item.id)}
+              labelField="name"
+              valueField="id"
+              renderItem={renderItem}
+              colors={colors}
+              search
+              searchPlaceholder="Search employee..."
+            />
           </View>
 
           {/* Dynamic Extra Employees Dropdowns */}
@@ -1139,5 +1151,32 @@ const styles = StyleSheet.create({
   modalButtonText: {
     fontSize: moderateScale(14),
     fontWeight: '600',
+  },
+  stepperContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    marginTop: verticalScale(4),
+  },
+  stepperButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepperValueContainer: {
+    flex: 1,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: moderateScale(8),
+  },
+  stepperValue: {
+    fontSize: moderateScale(15),
+    fontWeight: '700',
   },
 });
