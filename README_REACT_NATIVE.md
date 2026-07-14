@@ -110,6 +110,8 @@ Define Axios helper functions to interact with our backend APIs (all URLs requir
    - `POST /api/service-visit-add` (Multipart/form-data containing all fields + `svr_file` binary)
 9. **Service Visits List:**
    - `POST /api/service-visits-list`
+10. **Bulk Approve Service Visits (Owner Only):**
+    - `POST /api/service-visits-bulk-approve` (body: `{ updates: [ { id: number, status: 0|1, deduction_amount?: number, approval_remarks?: string } ] }`)
 
 ### 6. Design & UI Specifications
 - Theme: Premium corporate look matching a professional ERP dashboard. White cards with crisp gray borders, subtle shadows, and colored icon tags.
@@ -169,4 +171,86 @@ Implement a clean, modern layout:
 - Theme: Premium look matching a professional ERP dashboard. White cards with crisp borders, subtle shadows, and colored icon tags.
 - Support Pull-to-Refresh to reload the counts from the API.
 - Use smooth loading skeletons or a standard spinner while loading the statistics.
+```
+
+---
+
+## LLM System Prompt: React Native Service Visits List & Approval Screen
+
+```text
+You are an expert React Native developer. Build a premium, high-fidelity, clean "Service Visits List & Approval" screen using React Native, TypeScript, and Tailwind CSS (via NativeWind) or standard StyleSheet.
+
+The screen displays a list of logged service visits and must support role-based approval options (Owner vs. Employee).
+
+### 1. State Variables & Initial Logic
+- `visits` (Array of Service Visit objects fetched from `/api/service-visits-list`)
+- `selectedVisitIds` (Set/Array of visit IDs currently selected via checkboxes for bulk action - Owner/Admin only)
+- `searchQuery` (Text filter to search by Employee Name or Party Name)
+- `statusFilter` (Select/Dropdown: 'All', 'Pending' [status = 0], 'Approved' [status = 1])
+- `isApprovalModalVisible` (Boolean: to show/hide the Bulk Approval form modal)
+- `deductionAmount` (Numeric Input: dynamic deduction amount to apply to selected visits)
+- `approvalRemarks` (Textarea: approval comments to apply to selected visits)
+
+### 2. Role-Based List UI (Checkboxes & Selection)
+Identify the logged-in user's role (Owner or Employee):
+- **Owner / Admin Role:**
+  - Show a "Select All" checkbox in the header to select all visible Pending (status = 0) visits.
+  - Show a checkbox next to each Pending visit card.
+  - Show a sticky bottom **Action Bar** when 1 or more visits are selected.
+  - The Action Bar must show:
+    - Text: "{count} visits selected"
+    - "Approve Selected" Button: Opens the Approval Modal.
+    - "Deselect All" Button.
+- **Employee Role:**
+  - Do NOT render any checkboxes (hide list-level checkboxes and the select-all header).
+  - Do NOT show the bottom Action Bar.
+
+### 3. Approval Modal (Owner / Admin Only)
+Clicking "Approve Selected" shows a modal containing:
+- Summary of visits being approved.
+- **Deduction Amount:** Number Input (Default: 0).
+- **Approval Remarks:** Text Input / Textarea (Optional).
+- **Submit Button:** Sends the payload to the API. Shows a loading indicator during submission. Upon success, clears selected checkboxes and reloads the visit list.
+
+### 4. Card Layout & Columns
+Replicate the columns specified in `config/modules/serviceVisit.php`:
+- Each service visit card displays:
+  - **Date:** `visit_date` (formatted DD/MM/YYYY)
+  - **Employee:** `employee.name`
+  - **Customer/Party:** `party.name` or `sales_party_name`
+  - **Category:** `visit_category`
+  - **KM:** `km`
+  - **Net Amount:** Gross amount (`total_amount`) minus deduction (`deduction_amount` ?? 0).
+  - **Remarks:** `approval_remarks` (if present)
+  - **Status Badge:**
+    - If status is 1 -> Approved (Green badge/text)
+    - If status is 0 -> Pending (Yellow/Orange badge/text)
+  - **SVR File Button:** If `svr_file` is present, render a small icon/button to open/download the attachment URL.
+
+### 5. API Endpoints Integration
+Define Axios helper functions to interact with our backend APIs (all URLs require Sanctum Auth Headers):
+1. **Get Service Visits List:**
+   - `POST /api/service-visits-list`
+   - Returns: `{ success: true, data: [...] }`
+2. **Bulk Approve/Update Status (Owner only):**
+   - `POST /api/service-visits-bulk-approve`
+   - Body format:
+     ```json
+     {
+       "updates": [
+         {
+           "id": 12,
+           "status": 1,s
+           "deduction_amount": 50,
+           "approval_remarks": "Approved with minor deductions"
+         }
+       ]
+     }
+   - Returns: `{ success: true, message: "Service visits status updated successfully." }`
+
+### 6. Design & UI Specifications
+- Theme: Premium corporate look matching a professional ERP dashboard. White cards with crisp gray borders, subtle shadows, and colored status/icon tags.
+- Support Pull-to-Refresh to reload the visits list.
+- Show a message (e.g. "No service visits found") if the list is empty.
+- Show a skeleton loader or spinner while fetching from the API.
 ```

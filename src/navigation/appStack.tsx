@@ -65,10 +65,10 @@ const AppStack = ({
         headerBackButtonDisplayMode: 'minimal',
       }}
       initialRouteName={
-        userInfo?.role === 'Owner' ? 'AdminTabNavigator' : 'TabNavigator'
+        userInfo?.role === 'Owner' || userInfo?.role === 'Admin' ? 'AdminTabNavigator' : 'TabNavigator'
       }
     >
-      {userInfo?.role === 'Owner' ? (
+      {userInfo?.role === 'Owner' || userInfo?.role === 'Admin' ? (
         <Stack.Screen
           name="AdminTabNavigator"
           component={AdminTabNavigator}

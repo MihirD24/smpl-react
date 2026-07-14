@@ -88,8 +88,8 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.screenBg }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={80}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
         style={{ flex: 1 }}
       >
         <StatusBar
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   wrapper: {
-    flex: 1,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: verticalScale(30),

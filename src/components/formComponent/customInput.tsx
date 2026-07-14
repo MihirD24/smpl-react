@@ -23,6 +23,7 @@ interface CustomInputProps {
   keyboardType?: KeyboardTypeOptions;
   iconName?: keyof typeof Icons; // Lucide icon name
   style?: StyleProp<ViewStyle>;
+  required?: boolean;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -34,7 +35,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   keyboardType = 'default',
   iconName,
   style,
- 
+  required = false,
 }) => {
   const MainStyles = MainStyle();
   const isDarkMode = useColorScheme() === 'dark';
@@ -51,7 +52,12 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   return (
     <View style={{ marginBottom: 16 }}>
-      {label && <Text style={MainStyles.formlabel}>{label}</Text>}
+      {label && (
+        <Text style={MainStyles.formlabel}>
+          {label}
+          {required && <Text style={{ color: '#EF4444' }}> *</Text>}
+        </Text>
+      )}
 
       <View
         style={[

@@ -11,10 +11,17 @@
     "find:assets": "node scripts/find-unused-assets.js",
     "ios:clean": "cd ios && xcodebuild clean && rm -rf Pods Podfile.lock && pod install",
     "ios:pods": "cd ios && pod install --repo-update",
-    "ios:dev": "cross-env ENVFILE=.env.development react-native run-ios",
+    "ios:dev": "cross-env ENVFILE=.env.development react-native run-ios --simulator='iPhone SE (3rd generation)' ",
     "ios:prod": "cross-env ENVFILE=.env.production react-native run-ios --configuration Release",
     "android:dev": "cross-env ENVFILE=.env.development react-native run-android",
-    "android:prod": "cross-env ENVFILE=.env.production react-native run-android"
+    "android:prod": "cross-env ENVFILE=.env.production react-native run-android",
+     "android:debug:apk": "cd android && ./gradlew assembleDebug",
+      "android:release:apk": "cd android && ENVFILE=.env.production ./gradlew assembleRelease",
+      "android:release:aab": "cd android && ENVFILE=.env.production ./gradlew bundleRelease",
+      "android:clean": "cd android && ./gradlew clean",
+      "ios:release": "cross-env ENVFILE=.env.production react-native run-ios --configuration Release",
+      "ios:pods": "cd ios && pod install --repo-update",
+      "ios:clean": "cd ios && xcodebuild clean && rm -rf Pods Podfile.lock && pod install"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.14",

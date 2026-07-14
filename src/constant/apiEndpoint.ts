@@ -73,4 +73,5 @@ export const API_ENDPOINTS = {
   SERVICE_VISIT_GET_DA_AMOUNT: 'service-visit-get-da-amount',
   SERVICE_VISIT_ADD: 'service-visit-add',
   SERVICE_VISITS_LIST: 'service-visits-list',
+  SERVICE_VISITS_BULK_APPROVE: 'service-visits-bulk-approve',
 };
