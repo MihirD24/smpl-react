@@ -7,6 +7,7 @@ import {
   useColorScheme,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import ProfilePage from '../screens/profile/profile';
 import AdminDashboard from '../screens/attandance/admin/adminDashboard';
 import AppIcon from '../components/appIcon';
@@ -98,6 +99,18 @@ export default function AdminTabNavigator() {
             tabBarIcon: ({ color, size }) => (
               <AppIcon name="BadgeIndianRupee" color={color} size={size} />
             ),
+          }}
+        />
+
+        <Tab.Screen
+          name="ServiceVisitList"
+          component={ServiceVisitList}
+          options={{
+            tabBarLabel: 'Service Visit',
+            tabBarIcon: ({ color, size }) => (
+              <AppIcon name="MapPin" color={color} size={size} />
+            ),
+            headerTitle: 'Service Visits',
           }}
         />
 
