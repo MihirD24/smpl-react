@@ -2,6 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView, StatusBar, useColorScheme } from 'react-native';
 import SignIn from '../screens/signIn/signIn';
+import OtpScreen from '../screens/signIn/OtpScreen';
 
 
 
@@ -27,10 +28,19 @@ const AuthStack = () => {
             contentStyle: { backgroundColor },
           }}
         />
+        <Stack.Screen
+          name="otp"
+          component={OtpScreen}
+          options={{
+            headerShown: false,
+            headerBackTitleVisible: false,
+            contentStyle: { backgroundColor },
+            animationEnabled: true,
+          }}
+        />
       </Stack.Navigator>
     </SafeAreaView>
   );
 };
 
 export default AuthStack;
-           

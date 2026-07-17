@@ -11,7 +11,7 @@
     "find:assets": "node scripts/find-unused-assets.js",
     "ios:clean": "cd ios && xcodebuild clean && rm -rf Pods Podfile.lock && pod install",
     "ios:pods": "cd ios && pod install --repo-update",
-    "ios:dev": "cross-env ENVFILE=.env.development react-native run-ios --simulator='iPhone SE (3rd generation)' ",
+    "ios:dev": "cross-env ENVFILE=.env.development react-native run-ios",
     "ios:prod": "cross-env ENVFILE=.env.production react-native run-ios --configuration Release",
     "android:dev": "cross-env ENVFILE=.env.development react-native run-android",
     "android:prod": "cross-env ENVFILE=.env.production react-native run-android",
