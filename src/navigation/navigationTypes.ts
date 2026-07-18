@@ -10,6 +10,10 @@ import { CompositeNavigationProp } from '@react-navigation/native';
 
 export type AuthStackParamList = {
   signIn: undefined;
+  otp: {
+    mobileNumber: string | number;
+    userId: string | number;
+  };
 };
 
 export type AppStackParamList = {

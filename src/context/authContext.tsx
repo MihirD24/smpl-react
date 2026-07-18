@@ -7,18 +7,8 @@ import {
   saveAuthToken,
 } from '../services/api/apiService';
 
-interface UserInfo {
-  api_token: string;
-  name: string | null;
-  profile_pic: string;
-  email: string | null;
-  role: string;
-  mobile_no: number;
-  staff_time_diff: number;
-}
-
 interface AuthContextType {
-  login: (mobileNo: number, password: string) => Promise<void>;
+  login: (mobileNo: number, password: string) => Promise<{ userId: any }>;
   logout: () => Promise<void>;
   isLoading: boolean;
   userToken: string | null;
@@ -26,6 +16,8 @@ interface AuthContextType {
   setUserToken: React.Dispatch<React.SetStateAction<string | null>>;
   setUserInfo: React.Dispatch<React.SetStateAction<UserInfo | null>>;
   loginError: string;
+  tempMobileNumber: string | null;
+  setTempMobileNumber: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -36,8 +28,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userToken, setUserToken] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loginError, setLoginError] = useState<string>('');
+  const [tempMobileNumber, setTempMobileNumber] = useState<string | null>(null);
 
-  const login = async (mobileNo: number, password: string): Promise<void> => {
+  const login = async (mobileNo: number, password: string): Promise<{ userId: any }> => {
     setIsLoading(true);
     setLoginError('');
     try {
@@ -52,18 +45,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         formData,
       );
 
+      // console.log('Login response:', response);
+
       if (response.success) {
-        const userInfo = response.data;
-
-        setUserInfo(userInfo); // Assuming `setUserInfo` is in scope
-        setUserToken(userInfo.api_token); // Assuming `setUserToken` is in scope
-
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-        // await AsyncStorage.setItem('userToken', userInfo.api_token);
-        saveAuthToken(userInfo.api_token);
+        // Store temporary mobile number for OTP screen
+        setTempMobileNumber(String(mobileNo));
+        const extractedUserId = response.data?.user_id ?? 
+                               response.data?.id ?? 
+                               response.data?.userId ?? 
+                               response.user_id ?? 
+                               response.id ?? 
+                               response.userId;
+        return { userId: extractedUserId };
+        // DO NOT set userToken yet - wait for OTP verification
       } else {
         const msg = response.message || 'Login failed';
-        setLoginError(msg); // Assuming `setLoginError` is in scope
+        setLoginError(msg);
         throw new Error(msg);
       }
     } catch (error) {
@@ -144,6 +141,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userInfo,
         setUserToken,
         setUserInfo,
+        tempMobileNumber,
+        setTempMobileNumber,
       }}
     >
       {children}

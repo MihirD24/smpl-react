@@ -4,7 +4,7 @@ import Config from 'react-native-config';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { API_ENDPOINTS } from '../../constant/apiEndpoint';
 
-const PUBLIC_API_ROUTES = [API_ENDPOINTS.AUTH.AUTHENTICATE_USER];
+const PUBLIC_API_ROUTES = [API_ENDPOINTS.AUTH.AUTHENTICATE_USER, API_ENDPOINTS.AUTH.VERIFY_OTP, API_ENDPOINTS.AUTH.RESEND_OTP];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

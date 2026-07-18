@@ -26,14 +26,15 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import ToastUtil from '../../utils/toastAndroid';
-const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
+
+const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   const { login } = useContext(AuthContext) as {
-    login: (mobileNo: number | null, password: string | null) => Promise<void>;
+    login: (mobileNo: number, password: string) => Promise<{ userId: number }>;
     loginError: string;
   };
 
-  const [mobileNo, setMobileNo] = useState<number | null>(null);
-  const [password, setPassword] = useState<string | null>(null);
+  const [mobileNo, setMobileNo] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [secure, setSecure] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const isDarkMode = useColorScheme() === 'dark';
@@ -55,7 +56,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
     cardBorder: isDarkMode ? '#1E293B' : '#E2E8F0',
   };
   const handleLogin = async () => {
-    if (!mobileNo && !password) {
+    if (!mobileNo || !password) {
       ToastUtil.info('Please enter mobile number and password');
       return;
     }
@@ -72,7 +73,13 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
 
     setLoading(true);
     try {
-      await login(mobileNo, password);
+        const { userId } = await login(Number(mobileNo), password);
+      // Navigate to OTP screen after successful login
+      console.log('LOGIN SUCCESS - Navigating to OTP with mobile:', mobileNo);
+      console.log('LOGIN SUCCESS - Navigating to OTP with userId:', userId);
+      setTimeout(() => {
+        navigation.navigate('otp', { mobileNumber: mobileNo , userId: userId });
+      }, 300);
     } catch (error) {
       const msg =
         error instanceof Error && error.message
@@ -140,7 +147,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
                   { backgroundColor: theme.inputBg, color: theme.inputText, borderColor: theme.inputBorder, borderWidth: 1 },
                 ]}
                 placeholderTextColor={theme.placeholder}
-                value={mobileNo ?? ''}
+                value={mobileNo}
                 onChangeText={setMobileNo}
                 keyboardType="numeric"
                 maxLength={10}
@@ -184,11 +191,11 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = () => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <Text style={[styles.forgot, { color: theme.forgot }]}>
                 Forgot Password?
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <Text style={[styles.version, { color: theme.version }]}>
               VERSION {VersionCheck.getCurrentVersion()} • ENTERPRISE EDITION
