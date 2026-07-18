@@ -73,11 +73,12 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
 
     setLoading(true);
     try {
-      await login(Number(mobileNo), password);
+      const userId = await login(Number(mobileNo), password);
       // Navigate to OTP screen after successful login
       console.log('LOGIN SUCCESS - Navigating to OTP with mobile:', mobileNo);
+      console.log('LOGIN SUCCESS - Navigating to OTP with userId:', userId);
       setTimeout(() => {
-        navigation.navigate('otp', { mobileNumber: mobileNo });
+        navigation.navigate('otp', { mobileNumber: mobileNo , userId: userId });
       }, 300);
     } catch (error) {
       const msg =
