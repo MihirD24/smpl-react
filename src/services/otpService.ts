@@ -4,24 +4,24 @@ import { OtpVerifyRequest, OtpResendRequest, OtpVerifyResponse, OtpResendRespons
 
 /**
  * Verify OTP with Laravel backend
- * @param mobileNo - User's mobile number
+ * @param userId - User's ID
  * @param otp - 6-digit OTP code
  * @returns User token and info on success
  */
 export const verifyOtp = async (
-  mobileNo: string | number,
+  userId: string | number,
   otp: string
 ): Promise<OtpVerifyResponse> => {
   try {
     const formData = new FormData();
-    formData.append('mobile_no', mobileNo.toString());
+    formData.append('user_id', userId);
     formData.append('otp', otp);
 
     const response = await apiPost(
       API_ENDPOINTS.AUTH.VERIFY_OTP,
       formData
     );
-
+    console.log('OTP Verification Response:', response);
     if (!response.success) {
       throw new Error(response.message || 'OTP verification failed');
     }

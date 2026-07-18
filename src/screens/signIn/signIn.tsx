@@ -29,7 +29,7 @@ import ToastUtil from '../../utils/toastAndroid';
 
 const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   const { login } = useContext(AuthContext) as {
-    login: (mobileNo: number, password: string) => Promise<void>;
+    login: (mobileNo: number, password: string) => Promise<{ userId: number }>;
     loginError: string;
   };
 
@@ -73,7 +73,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
 
     setLoading(true);
     try {
-      const userId = await login(Number(mobileNo), password);
+        const { userId } = await login(Number(mobileNo), password);
       // Navigate to OTP screen after successful login
       console.log('LOGIN SUCCESS - Navigating to OTP with mobile:', mobileNo);
       console.log('LOGIN SUCCESS - Navigating to OTP with userId:', userId);

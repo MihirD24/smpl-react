@@ -12,6 +12,7 @@ export type AuthStackParamList = {
   signIn: undefined;
   otp: {
     mobileNumber: string | number;
+    userId: string | number;
   };
 };
 

@@ -2,8 +2,8 @@ export const API_ENDPOINTS = {
   // ================= ATTENDANCE =================
   AUTH: {
     AUTHENTICATE_USER: '/authenticate-user',
-    VERIFY_OTP: '/verify-otp',
-    RESEND_OTP: '/resend-otp',
+    VERIFY_OTP: '/otp-verify',
+    RESEND_OTP: '/otp-resend',
   },
   ATTENDANCE_BY_USER: 'attendance-by-user',
   ATTENDANCE_STATUS_COUNT: 'attendance-status-count',

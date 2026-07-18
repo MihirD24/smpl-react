@@ -68,6 +68,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
   };
 
   const mobileNumber = route.params?.mobileNumber || '';
+  const userId = route.params?.userId || '';
   const maskedMobileNumber = maskMobileNumber(mobileNumber);
 
   useEffect(() => {
@@ -129,8 +130,8 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
 
     setLoading(true);
     try {
-      const response = await verifyOtp(mobileNumber, otpCode);
-
+      const response = await verifyOtp(userId, otpCode);
+      console.log('OTP Verification Response:', response);
       if (response.success && response.data) {
         ToastUtil.success('OTP verified successfully!');
         
@@ -144,11 +145,6 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
           authContext.setUserToken(userInfo.api_token);
           authContext.setUserInfo(userInfo);
         }
-
-        // Navigate to home
-        setTimeout(() => {
-          navigation.replace('Home' as any);
-        }, 500);
       } else {
         throw new Error(response.message || 'Invalid OTP');
       }

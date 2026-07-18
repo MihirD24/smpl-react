@@ -8,7 +8,7 @@ import {
 } from '../services/api/apiService';
 
 interface AuthContextType {
-  login: (mobileNo: number, password: string) => Promise<void>;
+  login: (mobileNo: number, password: string) => Promise<{ userId: any }>;
   logout: () => Promise<void>;
   isLoading: boolean;
   userToken: string | null;
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loginError, setLoginError] = useState<string>('');
   const [tempMobileNumber, setTempMobileNumber] = useState<string | null>(null);
 
-  const login = async (mobileNo: number, password: string): Promise<void> => {
+  const login = async (mobileNo: number, password: string): Promise<{ userId: any }> => {
     setIsLoading(true);
     setLoginError('');
     try {
@@ -45,9 +45,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         formData,
       );
 
+      // console.log('Login response:', response);
+
       if (response.success) {
         // Store temporary mobile number for OTP screen
         setTempMobileNumber(String(mobileNo));
+        const extractedUserId = response.data?.user_id ?? 
+                               response.data?.id ?? 
+                               response.data?.userId ?? 
+                               response.user_id ?? 
+                               response.id ?? 
+                               response.userId;
+        return { userId: extractedUserId };
         // DO NOT set userToken yet - wait for OTP verification
       } else {
         const msg = response.message || 'Login failed';
