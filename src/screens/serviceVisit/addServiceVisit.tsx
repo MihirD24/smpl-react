@@ -185,7 +185,7 @@ const AddServiceVisit = ({ navigation }: any) => {
   // - dept == 4 (Engineer/Service) → 'SERVICE'
   // - All other departments       → 'Sales'
   const userType = useMemo<'SERVICE' | 'Sales' | 'ADMIN'>(() => {
-    if (!selectedEmployee) return 'SERVICE';
+    if (!selectedEmployee) return 'Sales';
     const deptId = Number(selectedEmployee.department_id || selectedEmployee.department);
     if (deptId === 5) return 'ADMIN';
     if (deptId === 4) return 'SERVICE';
@@ -769,10 +769,10 @@ const AddServiceVisit = ({ navigation }: any) => {
               </View>
 
               <CustomInput
-                label="Sales Party Name"
+                label="Client Name"
                 value={salesPartyName}
                 onChangeText={setSalesPartyName}
-                placeholder="Enter Sales Party Name"
+                placeholder="Enter Client Name"
               />
 
               {/* Attachment (Optional) – shown for Sales type */}
