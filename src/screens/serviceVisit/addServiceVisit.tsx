@@ -32,6 +32,7 @@ import { formatDate } from '../../utils/dateUtils';
 import {
   getBranchList,
   getEmployeeList,
+  getEmployeesByBranch,
   getMachineModelsList,
   getPartyList,
   getPartyByMachine,
@@ -100,7 +101,7 @@ const AddServiceVisit = ({ navigation }: any) => {
   const [newMachineModelId, setNewMachineModelId] = useState<number | null>(null);
   const [newMachinePartyId, setNewMachinePartyId] = useState<number | null>(null);
   const [savingMachine, setSavingMachine] = useState(false);
-  console.log('part',partyName)
+
   // Load Dropdown Data
   useEffect(() => {
     const loadInitialData = async () => {
@@ -117,7 +118,7 @@ const AddServiceVisit = ({ navigation }: any) => {
         if (empRes.success) {
           const empList = empRes.data || [];
           setEmployees(empList);
-          
+
           // Set current user as default logged-in employee if match found
           if (userInfo?.name) {
             const foundUser = empList.find(
@@ -140,6 +141,34 @@ const AddServiceVisit = ({ navigation }: any) => {
     loadInitialData();
   }, [userInfo]);
 
+  // Reload employees when branch changes (branch-filtered employee list)
+  useEffect(() => {
+    const reloadEmployeesByBranch = async () => {
+      try {
+        const res = await getEmployeesByBranch(branchId);
+        if (res.success) {
+          const empList = res.data || [];
+          setEmployees(empList);
+          // Reset employee selections when branch changes
+          setEmployeeId(null);
+          setAdditionalEmployeeIds([]);
+        }
+      } catch (err) {
+        console.error('Failed to reload employees by branch:', err);
+      }
+    };
+
+    // Only reload if a branch is selected; on clear, reset to all employees
+    if (branchId !== null) {
+      reloadEmployeesByBranch();
+    } else {
+      // Branch cleared – reset employee dropdown
+      setEmployeeId(null);
+      setAdditionalEmployeeIds([]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [branchId]);
+
   // Determine selected employee details
   const selectedEmployee = useMemo(() => {
     if (!employeeId) return null;
@@ -151,16 +180,16 @@ const AddServiceVisit = ({ navigation }: any) => {
     return branches.find((b: any) => b.id === branchId);
   }, [branchId, branches]);
 
-  // Department Code rules logic:
-  // - If employee department is 5 (Driver) -> type = 'ADMIN'
-  // - If employee department is 6 (Sales) -> type = 'Sales'
-  // - Else -> type = 'SERVICE'
+  // Department type rules (per README spec):
+  // - dept == 5 (Driver)         → 'ADMIN'
+  // - dept == 4 (Engineer/Service) → 'SERVICE'
+  // - All other departments       → 'Sales'
   const userType = useMemo<'SERVICE' | 'Sales' | 'ADMIN'>(() => {
     if (!selectedEmployee) return 'SERVICE';
     const deptId = Number(selectedEmployee.department_id || selectedEmployee.department);
     if (deptId === 5) return 'ADMIN';
-    if (deptId === 6) return 'Sales';
-    return 'SERVICE';
+    if (deptId === 4) return 'SERVICE';
+    return 'Sales';
   }, [selectedEmployee]);
 
   // Handle Dynamic Additional Employee list updates
@@ -196,10 +225,16 @@ const AddServiceVisit = ({ navigation }: any) => {
     }
   }, [companyVehicle, userType, selectedBranch, km]);
 
-  // 2. Stay Amount Calculation
-  // - If night_stay == 'Late night' -> stay_amount = 350
-  // - Else if night_stay == 'Full night' -> stay_amount = 450
-  // - Else -> stay_amount = 0
+  // 2. Stay Amount Calculation + Dynamic Label
+  // - 'Late night'  → stay_amount = 350  (label: "Late Night Amount")
+  // - 'Full night'  → stay_amount = 450  (label: "Full Night Amount")
+  // - 'None'        → stay_amount = 0    (label: "Stay Amount")
+  const stayAmountLabel = useMemo(() => {
+    if (nightStay === 'Late night') return 'Late Night Amount';
+    if (nightStay === 'Full night') return 'Full Night Amount';
+    return 'Stay Amount';
+  }, [nightStay]);
+
   useEffect(() => {
     if (nightStay === 'Late night') {
       setStayAmount(350);
@@ -739,6 +774,38 @@ const AddServiceVisit = ({ navigation }: any) => {
                 onChangeText={setSalesPartyName}
                 placeholder="Enter Sales Party Name"
               />
+
+              {/* Attachment (Optional) – shown for Sales type */}
+              <View style={formStyles.fieldContainer}>
+                <FormLabel label="Attachment (Optional)" color={theme.label} />
+                <TouchableOpacity
+                  style={[
+                    formStyles.attachmentContainer,
+                    {
+                      backgroundColor: theme.attachmentBackground,
+                      borderColor: theme.border,
+                      paddingVertical: verticalScale(10),
+                    },
+                  ]}
+                  onPress={() => setShowAttachmentOptions(true)}
+                >
+                  {svrFile ? (
+                    <View style={styles.imagePreviewContainer}>
+                      <Image source={{ uri: svrFile.uri }} style={styles.imagePreview} />
+                      <Text style={[styles.attachmentName, { color: theme.inputText }]} numberOfLines={1}>
+                        {svrFile.name}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={formStyles.attachmentContent}>
+                      <View style={[formStyles.attachmentIconContainer, { backgroundColor: theme.attachmentIconBackground }]}>
+                        <AppIcon name="UploadCloud" size={20} color="#F59E0B" />
+                      </View>
+                      <Text style={[formStyles.attachmentText, { color: theme.subText }]}>Attach Document</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
             </>
           )}
 
@@ -833,20 +900,14 @@ const AddServiceVisit = ({ navigation }: any) => {
 
             <View style={formStyles.half}>
               <FormLabel label="Night Stay" color={theme.label} />
-              <CustomDropdown
-                label=""
-                data={[
-                  { name: 'None', id: 'None' },
-                  { name: 'Late night', id: 'Late night' },
-                  { name: 'Full night', id: 'Full night' },
+              <CustomRadioGroup
+                options={[
+                  { label: 'None', value: 'None' },
+                  { label: 'Late', value: 'Late night' },
+                  { label: 'Full', value: 'Full night' },
                 ]}
                 value={nightStay}
-                placeholder="Select Night Stay"
-                onChange={(item) => setNightStay(item.id as any)}
-                labelField="name"
-                valueField="id"
-                renderItem={renderItem}
-                colors={colors}
+                onChange={(val) => setNightStay(val as 'None' | 'Late night' | 'Full night')}
               />
             </View>
           </View>
@@ -859,12 +920,14 @@ const AddServiceVisit = ({ navigation }: any) => {
             </View>
 
             <View style={styles.financialRow}>
-              <Text style={styles.financialLabel}>Night Stay Allowance:</Text>
+              <Text style={styles.financialLabel}>{stayAmountLabel}:</Text>
               <Text style={styles.financialValue}>₹{stayAmount.toFixed(2)}</Text>
             </View>
 
             <View style={styles.financialRow}>
-              <Text style={styles.financialLabel}>Daily Allowance (DA):</Text>
+              <Text style={styles.financialLabel}>
+                {userType === 'Sales' ? 'Expense:' : 'Daily Allowance (DA):'}
+              </Text>
               {userType === 'Sales' ? (
                 <View style={{ width: 100, marginBottom: -16 }}>
                   <CustomInput

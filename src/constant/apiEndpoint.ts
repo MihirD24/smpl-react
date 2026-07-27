@@ -69,6 +69,7 @@ export const API_ENDPOINTS = {
   //============Service Visit================
   BRANCH_LIST: 'branch-list',
   EMPLOYEE_LIST: 'employee-list',
+  SERVICE_VISIT_GET_EMPLOYEES_BY_BRANCH: 'service-visit-get-employees-by-branch',
   MACHINE_MODEL_LIST: 'machine-model-list',
   SERVICE_VISIT_GET_PARTY_BY_MACHINE: 'service-visit-get-party-by-machine',
   SERVICE_VISIT_STORE_MACHINE: 'service-visit-store-machine',

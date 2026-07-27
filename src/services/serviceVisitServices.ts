@@ -21,6 +21,21 @@ export const getEmployeeList = async () => {
   }
 };
 
+export const getEmployeesByBranch = async (branchId: number | null) => {
+  try {
+    const formData = new FormData();
+    if (branchId !== null && branchId !== undefined) {
+      formData.append('branch_id', String(branchId));
+    }
+    const response = await apiPost(API_ENDPOINTS.SERVICE_VISIT_GET_EMPLOYEES_BY_BRANCH, formData);
+    return response;
+  } catch (error) {
+    console.error('getEmployeesByBranch error:', error);
+    return { success: false, message: 'Failed to fetch employees by branch' };
+  }
+};
+
+
 export const getMachineModelsList = async () => {
   try {
     const response = await apiPost(API_ENDPOINTS.MACHINE_MODEL_LIST);
