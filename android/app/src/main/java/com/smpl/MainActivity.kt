@@ -1,4 +1,4 @@
-package com.smpl
+package com.ShantinathMotorsPvtLtd
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

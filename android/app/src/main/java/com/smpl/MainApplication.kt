@@ -1,4 +1,4 @@
-package com.smpl
+package com.ShantinathMotorsPvtLtd
 
 import android.app.Application
 import com.facebook.react.PackageList

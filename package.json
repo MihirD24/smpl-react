@@ -15,13 +15,11 @@
     "ios:prod": "cross-env ENVFILE=.env.production react-native run-ios --configuration Release",
     "android:dev": "cross-env ENVFILE=.env.development react-native run-android",
     "android:prod": "cross-env ENVFILE=.env.production react-native run-android",
-     "android:debug:apk": "cd android && ./gradlew assembleDebug",
-      "android:release:apk": "cd android && ENVFILE=.env.production ./gradlew assembleRelease",
-      "android:release:aab": "cd android && ENVFILE=.env.production ./gradlew bundleRelease",
-      "android:clean": "cd android && ./gradlew clean",
-      "ios:release": "cross-env ENVFILE=.env.production react-native run-ios --configuration Release",
-      "ios:pods": "cd ios && pod install --repo-update",
-      "ios:clean": "cd ios && xcodebuild clean && rm -rf Pods Podfile.lock && pod install"
+    "android:debug:apk": "cd android && ./gradlew assembleDebug",
+    "android:release:apk": "cd android && ENVFILE=.env.production ./gradlew assembleRelease",
+    "android:release:aab": "cd android && ENVFILE=.env.production ./gradlew bundleRelease",
+    "android:clean": "cd android && ./gradlew clean",
+    "ios:release": "cross-env ENVFILE=.env.production react-native run-ios --configuration Release"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.14",
@@ -73,7 +71,7 @@
     "react-native-version-check": "^3.5.0",
     "react-native-view-shot": "^5.1.0",
     "react-native-vision-camera": "^4.7.3",
-    "react-native-worklets": "^0.9.2"
+    "react-native-worklets": "^0.11.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
