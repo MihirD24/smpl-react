@@ -6,17 +6,19 @@ import { AppStackScreenProps } from '../../navigation/navigationTypes';
 const ShowMap: React.FC<AppStackScreenProps<'showMap'>> = ({ route }) => {
   const [lat, setLat] = useState(route.params.lat);
   const [long, setLong] = useState(route.params.long);
-
+  console.log('lat', lat);
   return (
     <View style={styles.container}>
       <MapView
-        style={styles.map}
+        style={styles.mapContainer}
         region={{
           latitude: lat,
           longitude: long,
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
         }}
+        showsUserLocation={false}
+            followsUserLocation={true}
       >
         <Marker coordinate={{ latitude: lat, longitude: long }}>
           <View
@@ -39,14 +41,16 @@ const ShowMap: React.FC<AppStackScreenProps<'showMap'>> = ({ route }) => {
 };
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
     height: '100%',
     width: '100%',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
+ mapContainer: {
+    height: '100%',
+     width: '100%',
+     overflow: 'hidden',
+     alignSelf: 'center',
+   },
 });
 export default ShowMap;
