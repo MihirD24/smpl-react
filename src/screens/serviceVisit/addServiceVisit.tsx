@@ -66,6 +66,7 @@ const AddServiceVisit = ({ navigation }: any) => {
   const [salesPartyName, setSalesPartyName] = useState('');
   const [machineNumber, setMachineNumber] = useState('');
   const [machineId, setMachineId] = useState<number | null>(null);
+  const [machineModelId, setMachineModelId] = useState<number | null>(null);
   const [partyId, setPartyId] = useState<number | null>(null);
   const [partyName, setPartyName] = useState('');
   const [visitCategory, setVisitCategory] = useState<string | null>(null);
@@ -94,13 +95,6 @@ const AddServiceVisit = ({ navigation }: any) => {
   const [employees, setEmployees] = useState<any[]>([]);
   const [parties, setParties] = useState<any[]>([]);
   const [machineModels, setMachineModels] = useState<any[]>([]);
-
-  // Add Machine Modal State
-  const [addMachineVisible, setAddMachineVisible] = useState(false);
-  const [newMachineName, setNewMachineName] = useState('');
-  const [newMachineModelId, setNewMachineModelId] = useState<number | null>(null);
-  const [newMachinePartyId, setNewMachinePartyId] = useState<number | null>(null);
-  const [savingMachine, setSavingMachine] = useState(false);
 
   // Load Dropdown Data
   useEffect(() => {
@@ -294,72 +288,40 @@ const AddServiceVisit = ({ navigation }: any) => {
     setShowDatePicker(false);
   };
 
-  // Machine Search Trigger
-  const handleMachineSearch = async () => {
+  // Machine Search automatically via debounce when machineNumber changes
+  useEffect(() => {
     if (!machineNumber.trim()) {
-      ToastUtil.info('Please enter a machine number first');
+      setMachineId(null);
+      setPartyId(null);
+      setPartyName('');
+      setMachineModelId(null);
       return;
     }
-    setSearchingMachine(true);
-    try {
-      const res = await getPartyByMachine(machineNumber);
-      if (res.data) {
-        setMachineId(res.data.machine?.id || null);
-        setPartyId(res.data.party?.id || null);
-        setPartyName(res.data.party?.name || '');
-        ToastUtil.success(res.message || 'Machine and Customer found!');
-      } else {
-        ToastUtil.info(res.message || 'Machine not found. You can add it manually.');
-        setMachineId(null);
-        setPartyId(null);
-        setPartyName('');
+
+    const delayDebounceFn = setTimeout(async () => {
+      setSearchingMachine(true);
+      try {
+        const res = await getPartyByMachine(machineNumber);
+        if (res.data) {
+          setMachineId(res.data.machine?.id || null);
+          setMachineModelId(res.data.machine?.machine_model_id || null);
+          setPartyId(res.data.party?.id || null);
+          setPartyName(res.data.party?.name || '');
+          ToastUtil.success(res.message || 'Machine and Customer found!');
+        } else {
+          setMachineId(null);
+          setPartyId(null);
+          setPartyName('');
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setSearchingMachine(false);
       }
-    } catch (err) {
-      console.error(err);
-      ToastUtil.error('Failed to check machine status.');
-    } finally {
-      setSearchingMachine(false);
-    }
-  };
+    }, 600);
 
-  // Store Machine Trigger
-  const handleAddMachineSubmit = async () => {
-    if (!newMachineName.trim() || !newMachineModelId || !newMachinePartyId) {
-      ToastUtil.info('All fields in Add Machine modal are required.');
-      return;
-    }
-    setSavingMachine(true);
-    try {
-      const res = await storeMachine({
-        name: newMachineName,
-        machine_model_id: newMachineModelId,
-        party_id: newMachinePartyId,
-      });
-
-      if (res.success) {
-        setMachineNumber(newMachineName);
-        setMachineId(res.data?.id || res.machine?.id || null);
-        setPartyId(newMachinePartyId);
-        
-        // Find party name
-        const p = parties.find((x) => x.id === newMachinePartyId);
-        setPartyName(p ? p.name : '');
-
-        setAddMachineVisible(false);
-        setNewMachineName('');
-        setNewMachineModelId(null);
-        setNewMachinePartyId(null);
-        ToastUtil.success('Machine stored successfully.');
-      } else {
-        ToastUtil.error(res.message || 'Failed to save machine.');
-      }
-    } catch (err) {
-      console.error(err);
-      ToastUtil.error('Failed to create new machine.');
-    } finally {
-      setSavingMachine(false);
-    }
-  };
+    return () => clearTimeout(delayDebounceFn);
+  }, [machineNumber]);
 
   // Handle Photo attachment
   const handleFileAttach = (method: 'camera' | 'library') => {
@@ -399,6 +361,11 @@ const AddServiceVisit = ({ navigation }: any) => {
     if (!location.trim()) return ToastUtil.info('Location is required');
     if (km === undefined || km === null || isNaN(km)) return ToastUtil.info('KM is required');
 
+    if (userType === 'SERVICE') {
+      if (!machineNumber.trim()) return ToastUtil.info('Machine Number is required');
+      if (!machineModelId) return ToastUtil.info('Machine Model is required');
+    }
+
     // Setup FormData
     const formData = new FormData();
     formData.append('branch_id', String(branchId));
@@ -419,6 +386,9 @@ const AddServiceVisit = ({ navigation }: any) => {
     // Visibility specific values
     if (userType === 'SERVICE') {
       if (machineId) formData.append('machine_id', String(machineId));
+      if (machineModelId) formData.append('machine_model_id', String(machineModelId));
+      formData.append('machine_number', machineNumber);
+      formData.append('machine_no', machineNumber);
       if (partyId) formData.append('party_id', String(partyId));
       formData.append('visit_category', visitCategory || '');
       formData.append('work_description', workDescription);
@@ -622,42 +592,36 @@ const AddServiceVisit = ({ navigation }: any) => {
                 <Text style={[styles.sectionTitle, { color: theme.label }]}>Service Visit Specifications</Text>
               </View>
 
-              {/* Machine Search input with search/add buttons */}
-              <FormLabel label="Machine Number" color={theme.label} />
-              <View style={styles.searchRow}>
-                <View style={{ flex: 1 }}>
-                  <CustomInput
-                    value={machineNumber}
-                    onChangeText={(text) => {
-                      setMachineNumber(text)
-                    }}
-                    placeholder="Enter Machine Number"
-                  />
-                </View>
-                <TouchableOpacity
-                  style={[styles.searchIconButton, { backgroundColor: '#3B82F6' }]}
-                  onPress={handleMachineSearch}
-                  disabled={searchingMachine}
-                >
-                  {searchingMachine ? (
-                    <ActivityIndicator size="small" color="#FFF" />
-                  ) : (
-                    <AppIcon name="Search" size={18} color="#FFF" />
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.searchIconButton, { backgroundColor: '#10B981' }]}
-                  onPress={() => setAddMachineVisible(true)}
-                >
-                  <AppIcon name="Plus" size={18} color="#FFF" />
-                </TouchableOpacity>
+              <CustomInput
+                label="Machine Number"
+                value={machineNumber}
+                onChangeText={setMachineNumber}
+                placeholder="Enter Machine Number"
+                required
+              />
+
+              <View style={formStyles.fieldContainer}>
+                <FormLabel label="Machine Model" required color={theme.label} />
+                <CustomDropdown
+                  label=""
+                  data={machineModels}
+                  value={machineModelId}
+                  placeholder="Select Machine Model"
+                  onChange={(item) => setMachineModelId(item.id)}
+                  labelField="name"
+                  valueField="id"
+                  renderItem={renderItem}
+                  colors={colors}
+                  search
+                  searchPlaceholder="Search machine model..."
+                />
               </View>
 
               <CustomInput
                 label="Customer (Party Name)"
                 value={partyName}
                 onChangeText={() => {}}
-                placeholder="Autofilled from Machine search"
+                placeholder={searchingMachine ? "Searching customer..." : "Autofilled from Machine search"}
                 style={{ opacity: 0.85 }}
               />
 
@@ -1012,73 +976,7 @@ const AddServiceVisit = ({ navigation }: any) => {
         </TouchableOpacity>
       </Modal>
 
-      {/* Add New Machine Modal */}
-      <Modal visible={addMachineVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <Text style={[styles.modalTitleText, { color: theme.label }]}>Add New Machine</Text>
-            
-            <CustomInput
-              label="Machine Name / Serial Number"
-              value={newMachineName}
-              onChangeText={setNewMachineName}
-              placeholder="e.g. MC-XYZ-123"
-            />
 
-            <View style={formStyles.fieldContainer}>
-              <FormLabel label="Machine Model" color={theme.label} />
-              <CustomDropdown
-                label=""
-                data={machineModels}
-                value={newMachineModelId}
-                placeholder="Select Model"
-                onChange={(item) => setNewMachineModelId(item.id)}
-                labelField="name"
-                valueField="id"
-                renderItem={renderItem}
-                colors={colors}
-                search
-              />
-            </View>
-
-            <View style={formStyles.fieldContainer}>
-              <FormLabel label="Select Customer Party" color={theme.label} />
-              <CustomDropdown
-                label=""
-                data={parties}
-                value={newMachinePartyId}
-                placeholder="Select Party"
-                onChange={(item) => setNewMachinePartyId(item.id)}
-                labelField="name"
-                valueField="id"
-                renderItem={renderItem}
-                colors={colors}
-                search
-              />
-            </View>
-
-            <View style={styles.modalActionButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: theme.cancelBackground }]}
-                onPress={() => setAddMachineVisible(false)}
-              >
-                <Text style={[styles.modalButtonText, { color: theme.label }]}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: '#3B82F6' }]}
-                onPress={handleAddMachineSubmit}
-                disabled={savingMachine}
-              >
-                {savingMachine ? (
-                  <ActivityIndicator size="small" color="#FFF" />
-                ) : (
-                  <Text style={[styles.modalButtonText, { color: '#FFF' }]}>Save Machine</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </KeyboardAvoidingView>
   );
 };

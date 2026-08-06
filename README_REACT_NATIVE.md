@@ -23,7 +23,8 @@ Initialize state for the following fields:
 - engineer_id (Select/Dropdown)
 - party_id_driver (Select/Dropdown)
 - sales_party_name (Text Input)
-- machine_number (Text Input with Search & Add buttons)
+- machine_number (Text Input)
+- machine_model_id (Select/Dropdown - Options fetched from Machine Models API)
 - machine_id (Hidden/Internal State)
 - party_id (Hidden/Internal State)
 - party_name (Readonly Text Input)
@@ -53,7 +54,7 @@ Depending on the selected `employee_id`'s department/role, determine the `type` 
 
 Apply visibility rules:
 - **SERVICE Type (dept 4):**
-  - Show: Customer (Party Name), Machine No, Search/Add Machine buttons, Visit Category, Complain, HMR, Call, SVR, SVR File, Stay Amount, Work Description, Night Stay radio group.
+  - Show: Customer (Party Name), Machine No, Machine Model dropdown, Visit Category, Complain, HMR, Call, SVR, SVR File, Stay Amount, Work Description, Night Stay radio group.
   - Hide: Engineer dropdown, Customer (for Driver), Sales Party Name, `is_engineer` radio.
   - DA Amount: **Readonly** (fetched from API).
 - **Sales Type (all other depts):**
@@ -117,8 +118,8 @@ Define Axios helper functions to interact with our backend APIs (all URLs requir
    - `POST /api/party-list`
 5. **Machine Search:**
    - `POST /api/service-visit-get-party-by-machine` (body: `{ machine_no: string }`)
-   - Returns: `{ found: boolean, machine: { id, name }, party: { id, name } | null, message: string | null }`
-   - If machine not found or not assigned to a party, `found` may still be true but `party` is null with a `message`.
+    - Returns: `{ found: boolean, machine: { id, name, machine_model_id }, party: { id, name } | null, message: string | null }`
+    - If machine not found or not assigned to a party, `found` is false. On successful lookup, set both `machine_id` and pre-select the `machine_model_id` dropdown.
 6. **Add New Machine:**
    - `POST /api/service-visit-store-machine` (body: `{ name, machine_model_id, party_id }`)
    - Returns: `{ id, name, machine_model_id, status }` — the saved machine object.
@@ -130,8 +131,8 @@ Define Axios helper functions to interact with our backend APIs (all URLs requir
      - Same employee already has a visit on `visit_date` (excluding current edit) → `rate: 50`
      - Branch name is `'Khavda'` → `rate: 300`
      - Otherwise → looks up `DistanceAllowance` table by km range → returns matching rate (or 0 if not found)
-8. **Submit Form (Create):**
-   - `POST /api/service-visit-add` (Multipart/form-data — include `svr_file` as binary if present)
+ 8. **Submit Form (Create):**
+    - `POST /api/service-visit-add` (Multipart/form-data — include `svr_file` as binary if present, and `machine_model_id` parameter to resolve/create the machine on backend)
 9. **Service Visits List:**
    - `POST /api/service-visits-list`
 10. **Bulk Approve Service Visits (Owner Only):**
