@@ -298,29 +298,29 @@ const AddServiceVisit = ({ navigation }: any) => {
       return;
     }
 
-    const delayDebounceFn = setTimeout(async () => {
-      setSearchingMachine(true);
-      try {
-        const res = await getPartyByMachine(machineNumber);
-        if (res.data) {
-          setMachineId(res.data.machine?.id || null);
-          setMachineModelId(res.data.machine?.machine_model_id || null);
-          setPartyId(res.data.party?.id || null);
-          setPartyName(res.data.party?.name || '');
-          ToastUtil.success(res.message || 'Machine and Customer found!');
-        } else {
-          setMachineId(null);
-          setPartyId(null);
-          setPartyName('');
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setSearchingMachine(false);
-      }
-    }, 600);
+    // const delayDebounceFn = setTimeout(async () => {
+    //   setSearchingMachine(true);
+    //   try {
+    //     const res = await getPartyByMachine(machineNumber);
+    //     if (res.data) {
+    //       setMachineId(res.data.machine?.id || null);
+    //       setMachineModelId(res.data.machine?.machine_model_id || null);
+    //       setPartyId(res.data.party?.id || null);
+    //       setPartyName(res.data.party?.name || '');
+    //       ToastUtil.success(res.message || 'Machine and Customer found!');
+    //     } else {
+    //       setMachineId(null);
+    //       setPartyId(null);
+    //       setPartyName('');
+    //     }
+    //   } catch (err) {
+    //     console.error(err);
+    //   } finally {
+    //     setSearchingMachine(false);
+    //   }
+    // }, 600);
 
-    return () => clearTimeout(delayDebounceFn);
+    // return () => clearTimeout(delayDebounceFn);
   }, [machineNumber]);
 
   // Handle Photo attachment
@@ -620,8 +620,8 @@ const AddServiceVisit = ({ navigation }: any) => {
               <CustomInput
                 label="Customer (Party Name)"
                 value={partyName}
-                onChangeText={() => {}}
-                placeholder={searchingMachine ? "Searching customer..." : "Autofilled from Machine search"}
+                onChangeText={setPartyName}
+                placeholder=""
                 style={{ opacity: 0.85 }}
               />
 
