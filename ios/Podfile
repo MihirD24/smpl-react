@@ -34,7 +34,6 @@ target 'Smpl' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -43,7 +42,19 @@ target 'Smpl' do
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
     )
+
+    envfiles = {
+      'Debug' => '$(PODS_ROOT)/../../.env.development',
+      'Release' => '$(PODS_ROOT)/../../.env.production',
+    }
+
+    installer.pods_project.targets.each do |target|
+      if target.name == 'react-native-config'
+        target.build_configurations.each do |config|
+          config.build_settings['ENVFILE'] = envfiles[config.name]
+        end
+      end
+    end
   end
 end
