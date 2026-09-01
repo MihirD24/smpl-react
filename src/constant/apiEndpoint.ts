@@ -40,6 +40,7 @@ export const API_ENDPOINTS = {
 
   // ================= SALARY =================
   SALARY_LIST: 'salary-list',
+  SALARY_CALCULATE: 'salary-calculate',
   PRINT_SALARY_SLIP: 'print-salary-slip',
   // ================= PROJECT REMAINING =================
   GET_PROJECT_REMAINING_POINT: 'get-project-remain-point',

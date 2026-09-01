@@ -25,6 +25,7 @@ import AddProjectRemainingScreen from '../screens/profile/projectRemain/addProje
 import ProjectRemainingScreen from '../screens/profile/projectRemain/projectRemainingScreen';
 import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import AddServiceVisit from '../screens/serviceVisit/addServiceVisit';
+import CalculateSalary from '../screens/accounts/calculateSalary';
 
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -221,6 +222,11 @@ const AppStack = ({
         name="AddServiceVisit"
         component={AddServiceVisit}
         options={detailHeaderOptions('New Service Visit')}
+      />
+      <Stack.Screen
+        name="CalculateSalary"
+        component={CalculateSalary}
+        options={detailHeaderOptions('Salary Calculation')}
       />
     </Stack.Navigator>
   );
