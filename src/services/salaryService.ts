@@ -139,6 +139,19 @@ export const getSalaryList = async (): Promise<{
   }
 };
 
+export const calculateSalary = async (formData: FormData): Promise<any> => {
+  try {
+    const response = await apiPost(API_ENDPOINTS.SALARY_CALCULATE, formData);
+    if (response.success) {
+      return { success: true, data: response.data };
+    }
+    return { success: false, data: null };
+  } catch (error) {
+    console.error('[calculateSalary] Error:', error);
+    return { success: false, data: null };
+  }
+};
+
 export const getSalaryPdf = async (formData: FormData) => {
   try {
     const response = await apiPost(API_ENDPOINTS.PRINT_SALARY_SLIP, formData);

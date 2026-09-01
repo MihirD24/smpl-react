@@ -280,3 +280,85 @@ Define Axios helper functions to interact with our backend APIs (all URLs requir
 - Show a message (e.g. "No service visits found") if the list is empty.
 - Show a skeleton loader or spinner while fetching from the API.
 ```
+
+---
+
+## LLM System Prompt: React Native Leave Form Screen
+
+```text
+You are an expert React Native developer. Build a premium, high-fidelity, clean "Leave Form" screen using React Native, TypeScript, and Tailwind CSS (via NativeWind) or standard StyleSheet.
+
+The form must replicate the exact business logic and API integrations of our Laravel ERP system for leaves.
+
+### 1. Form Fields & State Variables
+Initialize state for the following fields:
+- employee_id (Select/Dropdown - dynamically populated with employees)
+- type (Select/Dropdown - Leave types: 'Paternity Leave', 'Optional Leave', 'Paid Leave', 'NH/FHH', 'Occupational Leave')
+- mode (Radio or Dropdown - 0 for Full Day, 1 for Half Day)
+- from_date (Datepicker - Default: Today)
+- to_date (Datepicker - Default: Today)
+
+### 2. API Endpoints Integration
+Define Axios helper functions to interact with our backend APIs (all URLs require Sanctum Auth Headers):
+1. **Employees List:**
+   - `POST /api/employee-list` (or equivalent employee fetching endpoint)
+2. **Submit Form (Create Leave):**
+   - `POST /api/leave-add`
+   - Body format:
+     ```json
+     {
+       "employee_id": 1,
+       "type": "Paid Leave",
+       "mode": 0,
+       "from_date": "2026-08-31",
+       "to_date": "2026-09-02"
+     }
+     ```
+
+### 3. Design & UI Specifications
+- Theme: Premium corporate look matching a professional ERP dashboard.
+- Display clear validation messages for required fields.
+- Show success alerts when the leave is submitted.
+```
+
+---
+
+## LLM System Prompt: React Native Salary Calculation Screen
+
+```text
+You are an expert React Native developer. Build a premium, high-fidelity, clean "Salary Calculation" screen using React Native, TypeScript, and Tailwind CSS (via NativeWind) or standard StyleSheet.
+
+The form must integrate with our Laravel ERP salary calculation logic to show payroll summaries.
+
+### 1. Form Fields & State Variables
+Initialize state for the following inputs to calculate salary:
+- employee_id (Select/Dropdown)
+- entry_date (Datepicker - Default: Today)
+- additional_amt (Numeric Input - Optional extra amount/overtime)
+- from_date (Datepicker - optional filters)
+- to_date (Datepicker - optional filters)
+
+State for API result displaying calculated data:
+- Calculated gross amount, net amount, deduction amount, working days, leave days, etc.
+
+### 2. Live Auto-Calculations
+When inputs change, call the calculation API to preview the salary breakdown:
+1. **Calculate Salary API:**
+   - `POST /api/salary-calculate`
+   - Body format:
+     ```json
+     {
+       "employee_id": 1,
+       "entry_date": "2026-08-31",
+       "additional_amt": 500
+     }
+     ```
+   - Returns data structure:
+     `{ salary, actual_working_days, working_days, leave_days, net_amount, gross_amount, deduction_amount, components: [...] }`
+
+### 3. Design & UI Specifications
+- Theme: Premium corporate look.
+- Use a smooth loading spinner during API calls.
+- Display a clean summary card for the calculated Salary Data (Gross, Net, Deductions).
+- Form to confirm and submit salary voucher.
+```

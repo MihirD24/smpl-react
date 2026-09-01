@@ -67,6 +67,7 @@ export type AppStackParamList = {
   ProjectRemainingScreen: undefined;
   ServiceVisitList: undefined;
   AddServiceVisit: undefined;
+  CalculateSalary: undefined;
 };
 
 export type BottomTabParamList = {

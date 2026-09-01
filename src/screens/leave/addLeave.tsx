@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -16,6 +16,7 @@ import CustomInput from '../../components/formComponent/customInput';
 import CustomButton from '../../components/button/customButton';
 import CalendarPickerModal from '../../components/formComponent/calendarpickermodal';
 import { addLeave } from '../../services';
+import { getDevelopersList, Developer } from '../../services/salaryService';
 import { AppStackScreenProps } from '../../navigation/navigationTypes';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AppIcon from '../../components/appIcon';
@@ -56,29 +57,27 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
   const [reason, setReason] = useState('');
   const [disableBtn, setDisableBtn] = useState(false);
   const [leaveType, setLeaveType] = useState('');
+  const [employeeId, setEmployeeId] = useState('');
+  const [employees, setEmployees] = useState<Developer[]>([]);
   const [attachment, setAttachment] = useState<any>(null);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      const result = await getDevelopersList();
+      if (result.success) {
+        setEmployees(result.data);
+      }
+    };
+    fetchEmployees();
+  }, []);
+
   const leaveOptions = [
-    {
-      id: 'Study leave',
-      name: 'Study leave',
-      icon: 'MoreHorizontal',
-    },
-    {
-      id: 'Maternity leave',
-      name: 'Maternity leave',
-      icon: 'Baby',
-    },
-    {
-      id: 'Sick leave',
-      name: 'Sick leave',
-      icon: 'Stethoscope',
-    },
-    {
-      id: 'Casual leave',
-      name: 'Casual leave',
-      icon: 'Coffee',
-    },
+    { id: 'Paternity Leave', name: 'Paternity Leave', icon: 'Baby' },
+    { id: 'Optional Leave', name: 'Optional Leave', icon: 'Coffee' },
+    { id: 'Paid Leave', name: 'Paid Leave', icon: 'DollarSign' },
+    { id: 'NH/FHH', name: 'NH/FHH', icon: 'Calendar' },
+    { id: 'Occupational Leave', name: 'Occupational Leave', icon: 'Briefcase' },
   ];
 
   const handleStartDateSelect = (date: Date) => {
@@ -191,6 +190,10 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
   const handleAddLeave = async () => {
     try {
       setDisableBtn(true);
+      if (!employeeId) {
+        ToastUtil.info('Please select an employee');
+        return;
+      }
       if (!leaveType) {
         ToastUtil.info('Please select leave type');
         return;
@@ -212,6 +215,7 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
       }
 
       let formData = new FormData();
+      formData.append('employee_id', employeeId);
       formData.append('type', leaveType);
       formData.append('mode', leaveFor);
       formData.append('from_date', startDateServer);
@@ -294,6 +298,21 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
               <Text style={[formStyles.formSubtitle, { color: theme.subText }]}>
                 Add your leave details and attach proof if needed.
               </Text>
+            </View>
+            {/* ── Employee ────────────────────────────────────────────────── */}
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Employee" required color={theme.label} />
+              <CustomDropdown
+                data={employees}
+                value={employeeId}
+                placeholder="Select employee..."
+                searchPlaceholder="Search employee..."
+                onChange={item => setEmployeeId(item.id.toString())}
+                labelField="name"
+                valueField="id"
+                colors={colors}
+                label=""
+              />
             </View>
             {/* ── Leave For ──────────────────────────────────────────────── */}
             <View style={formStyles.fieldContainer}>
