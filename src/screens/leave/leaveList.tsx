@@ -275,6 +275,25 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             { backgroundColor: theme.screenBg, paddingHorizontal: 0 },
           ]}
         >
+          <View style={styles.leaveHeader}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.leaveKicker, { color: theme.muted }]}>TIME OFF</Text>
+              <Text style={[styles.leaveTitle, { color: theme.text }]}>Leave requests</Text>
+              <Text style={[styles.leaveSubtitle, { color: theme.muted }]}>Review, search and track your time off</Text>
+            </View>
+            <View style={[styles.leaveCount, { backgroundColor: isDarkMode ? '#172554' : '#EFF6FF' }]}>
+              <Text style={[styles.leaveCountValue, { color: isDarkMode ? '#BFDBFE' : '#2563EB' }]}>{filterJobData.length}</Text>
+              <Text style={[styles.leaveCountLabel, { color: theme.muted }]}>TOTAL</Text>
+            </View>
+          </View>
+          <View style={[styles.statusRail, { backgroundColor: theme.softBg, borderColor: theme.border }]}>
+            {[['Pending', '#F59E0B'], ['Approved', '#10B981'], ['Rejected', '#EF4444']].map(([label,color]) => (
+              <View key={label} style={styles.statusRailItem}>
+                <View style={[styles.statusRailDot, { backgroundColor: color }]} />
+                <View><Text style={[styles.statusRailValue, { color: theme.text }]}>{filterJobData.filter(x => x.status === (label === 'Pending' ? 0 : label === 'Approved' ? 1 : 2)).length}</Text><Text style={[styles.statusRailLabel, { color: theme.muted }]}>{label}</Text></View>
+              </View>
+            ))}
+          </View>
           {/* ── Search + Filter button ── */}
           <View
             style={[
@@ -402,11 +421,20 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
 };
 
 const styles = StyleSheet.create({
+  leaveHeader: { paddingHorizontal: moderateScale(16), paddingTop: verticalScale(14), paddingBottom: verticalScale(11), flexDirection: 'row', alignItems: 'center' },
+  leaveKicker: { fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.3 },
+  leaveTitle: { fontSize: moderateScale(22), fontWeight: '800', letterSpacing: -0.3, marginTop: verticalScale(2) },
+  leaveSubtitle: { fontSize: moderateScale(11), marginTop: verticalScale(3), fontWeight: '500' },
+  leaveCount: { width: moderateScale(58), height: moderateScale(58), borderRadius: moderateScale(17), alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#DBEAFE' },
+  leaveCountValue: { fontSize: moderateScale(19), fontWeight: '800', lineHeight: moderateScale(21) },
+  leaveCountLabel: { fontSize: moderateScale(7), fontWeight: '800', letterSpacing: 0.7, marginTop: verticalScale(1) },
+  statusRail: { marginHorizontal: moderateScale(16), marginBottom: verticalScale(8), paddingHorizontal: moderateScale(12), paddingVertical: verticalScale(11), borderRadius: moderateScale(16), borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between' },
+  statusRailItem: { flexDirection: 'row', alignItems: 'center', minWidth: moderateScale(75) },
+  statusRailDot: { width: moderateScale(7), height: moderateScale(7), borderRadius: 4, marginRight: moderateScale(7) },
+  statusRailValue: { fontSize: moderateScale(16), fontWeight: '800' },
+  statusRailLabel: { fontSize: moderateScale(8.5), fontWeight: '600', marginTop: verticalScale(1) },
   content: { flex: 1 },
-  listContent: {
-    padding: moderateScale(13),
-    paddingBottom: scale(90),
-  },
+  listContent: { paddingHorizontal: moderateScale(13), paddingTop: moderateScale(10), paddingBottom: scale(90) },
   noDataContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -414,12 +442,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(40),
     paddingTop: scale(60),
   },
-  noDataText: {
-    fontSize: moderateScale(18),
-    fontWeight: '600',
-    marginTop: scale(16),
-    marginBottom: scale(8),
-  },
+  noDataText: { fontSize: moderateScale(16), fontWeight: '700', marginTop: scale(14), marginBottom: scale(7) },
 });
 
 export default LeaveList;

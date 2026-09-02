@@ -8,11 +8,11 @@ export const getCardTheme = (isDark: boolean) => ({
   textMuted: isDark ? '#6B7280' : '#9CA3AF',
 
   // Surfaces
-  cardBg: isDark ? '#1E293B' : '#FFFFFF',
-  cardBorder: isDark ? '#334155' : '#F3F4F6',
+  cardBg: isDark ? '#1E1E1E' : '#FFFFFF',
+  cardBorder: isDark ? '#2E2E2E' : '#F3F4F6',
 
   // Divider
-  divider: isDark ? '#334155' : '#F3F4F6',
+  divider: isDark ? '#2E2E2E' : '#F3F4F6',
 
   // Icon box
   iconBoxBg: isDark ? '#1A2A3A' : '#EFF6FF',
@@ -48,8 +48,8 @@ export const cardStyles = StyleSheet.create({
     elevation: 2,
   },
   cardDark: {
-    backgroundColor: '#1E293B',
-    borderColor: '#334155',
+    backgroundColor: '#1E1E1E',
+    borderColor: '#2E2E2E',
     elevation: 2,
   },
   cardPressed: {
@@ -88,7 +88,7 @@ export const cardStyles = StyleSheet.create({
     marginVertical: verticalScale(10),
   },
   dividerLight: { backgroundColor: '#F3F4F6' },
-  dividerDark: { backgroundColor: '#334155' },
+  dividerDark: { backgroundColor: '#2E2E2E' },
   contentBlock: {
     flexDirection: 'row',
     alignItems: 'flex-start',

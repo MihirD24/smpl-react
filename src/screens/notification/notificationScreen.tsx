@@ -14,7 +14,6 @@ import AppIcon from '../../components/appIcon';
 import NotificationCardSkeleton from '../../skeletonview/notificationCardSkeleton';
 import ScreenWrapper from '../../components/screenWrapper';
 import NetInfoComponent from '../../components/netinfoComponent';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
 
 type NotificationItem = {
   id: number;
@@ -58,29 +57,18 @@ const NotificationScreen: React.FC<
       <View
         style={[
           styles.card,
-          isDarkMode ? styles.cardDark : styles.cardLight,
+          { backgroundColor: isDarkMode ? '#1E1E1E' : '#FFFFFF' },
         ]}
       >
-        {/* Left accent bar */}
-        <View style={styles.accentBar} />
-
         {/* Left Icon */}
-        <View
-          style={[
-            styles.iconContainer,
-            { backgroundColor: isDarkMode ? '#1E3A5F' : '#EFF6FF' },
-          ]}
-        >
-          <AppIcon name="MessageSquareMore" size={moderateScale(20)} color="#2563EB" />
+        <View style={styles.iconContainer}>
+          <AppIcon name="MessageSquareMore" size={20} color="#4A90E2" />
         </View>
 
         {/* Text Content */}
         <View style={styles.textContainer}>
           <Text
-            style={[
-              styles.title,
-              { color: isDarkMode ? '#F8FAFC' : '#0F172A' },
-            ]}
+            style={[styles.title, { color: isDarkMode ? '#FFFFFF' : '#222' }]}
             numberOfLines={1}
           >
             {item.title}
@@ -89,7 +77,7 @@ const NotificationScreen: React.FC<
           <Text
             style={[
               styles.description,
-              { color: isDarkMode ? '#94A3B8' : '#64748B' },
+              { color: isDarkMode ? '#BBBBBB' : '#555' },
             ]}
             numberOfLines={2}
           >
@@ -105,51 +93,24 @@ const NotificationScreen: React.FC<
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#0F172A' : '#F8FAFC'}
+      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={handleNotificationData} />
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
-        }}
-      >
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
         {loading ? (
           <FlatList
-            contentContainerStyle={{ padding: moderateScale(16) }}
+            contentContainerStyle={{ padding: 16 }}
             data={[1, 2, 3, 4]}
             keyExtractor={(_, index) => index.toString()}
             renderItem={() => <NotificationCardSkeleton />}
           />
         ) : notificationList.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconWrapper}>
-              <AppIcon
-                name="Bell"
-                size={moderateScale(56)}
-                color="#CBD5E1"
-              />
-            </View>
-            <Text
-              style={[
-                styles.emptyTitle,
-                { color: isDarkMode ? '#94A3B8' : '#64748B' },
-              ]}
-            >
-              No Notifications
-            </Text>
-            <Text
-              style={[
-                styles.emptySubtitle,
-                { color: isDarkMode ? '#475569' : '#94A3B8' },
-              ]}
-            >
-              You're all caught up!
-            </Text>
+            <Text style={{ color: colors.text }}>No Notifications Found</Text>
           </View>
         ) : (
           <FlatList
-            contentContainerStyle={{ padding: moderateScale(16) }}
+            contentContainerStyle={{ padding: 16 }}
             data={notificationList}
             keyExtractor={item => item.id.toString()}
             renderItem={renderItem}
@@ -173,71 +134,38 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: moderateScale(14),
-    borderRadius: moderateScale(16),
-    marginBottom: verticalScale(10),
-    overflow: 'hidden',
-  },
-  cardLight: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#94A3B8',
-    shadowOpacity: 0.12,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: moderateScale(8),
-    elevation: 3,
-  },
-  cardDark: {
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-  },
-  accentBar: {
-    position: 'absolute',
-    width: moderateScale(3),
-    top: 0,
-    bottom: 0,
-    left: 0,
-    borderRadius: moderateScale(3),
-    backgroundColor: '#2563EB',
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   iconContainer: {
-    width: moderateScale(44),
-    height: moderateScale(44),
-    borderRadius: moderateScale(12),
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: '#E8F0FE',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: moderateScale(10),
-    marginRight: moderateScale(12),
+    marginRight: 12,
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    fontSize: moderateScale(14),
+    fontSize: 14,
     fontWeight: '600',
-    marginBottom: verticalScale(3),
+    marginBottom: 4,
   },
   description: {
-    fontSize: moderateScale(13),
-    lineHeight: moderateScale(19),
+    fontSize: 13,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: moderateScale(32),
-  },
-  emptyIconWrapper: {
-    marginBottom: verticalScale(16),
-  },
-  emptyTitle: {
-    fontSize: moderateScale(17),
-    fontWeight: '600',
-    marginBottom: verticalScale(6),
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: moderateScale(13),
-    textAlign: 'center',
   },
 });

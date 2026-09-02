@@ -570,7 +570,7 @@ const Salary = () => {
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#0F172A' : '#F8FAFC'}
+      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={fetchSalary} />
       <View style={[styles.screen, isDarkMode && styles.screenDark]}>
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
   employeeName: {
     fontSize: moderateScale(13),
     fontFamily: 'PTSans-Bold',
-    color: isDarkMode ? '#F8FAFC' : '#0F172A',
+    color: '#111827',
   },
   periodText: {
     fontSize: moderateScale(10),
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
   breakdownItemValue: {
     fontSize: moderateScale(11),
     fontFamily: 'PTSans-Bold',
-    color: isDarkMode ? '#F8FAFC' : '#0F172A',
+    color: '#111827',
   },
 
   // ── Misc ──────────────────────────────────────────────────
@@ -774,7 +774,7 @@ const styles = StyleSheet.create({
 
   salaryMetaValue: {
     fontSize: moderateScale(11),
-    color: isDarkMode ? '#F8FAFC' : '#0F172A',
+    color: '#111827',
     fontFamily: 'PTSans-Bold',
   },
 

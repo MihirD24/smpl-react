@@ -385,28 +385,31 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             />
           }
         >
-          {/* Welcome Header */}
-          <View style={[styles.headerCard, { backgroundColor: t.card, borderColor: t.border }]}>
-            <View style={styles.headerLeft}>
-              <Text style={[styles.greetingText, { color: t.sub }]}>
-                {(() => { const h = new Date().getHours(); return h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening'; })()} 👋
-              </Text>
-              <Text style={[styles.userNameText, { color: t.text }]} numberOfLines={1}>
-                {loginuserName || 'User'}
-              </Text>
-              <Text style={[styles.dateText, { color: t.sub }]}>
-                {moment().format('dddd, MMM D')}
-              </Text>
+          {/* Product-style dashboard header */}
+          <View style={styles.dashboardHeader}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.dashboardKicker, { color: t.sub }]}>OVERVIEW</Text>
+              <Text numberOfLines={1} style={[styles.dashboardTitle, { color: t.text }]}>Hi, {loginuserName || 'there'} 👋</Text>
+              <Text style={[styles.dashboardDate, { color: t.sub }]}>{moment().format('dddd, D MMMM YYYY')}</Text>
             </View>
-            <TouchableOpacity
-              style={[styles.quickActionsTrigger, { backgroundColor: t.primary }]}
-              onPress={openQuickActions}
-              activeOpacity={0.8}
-            >
-              <AppIcon name="Plus" size={20} color="#FFFFFF" />
+            <TouchableOpacity style={[styles.profileButton, { backgroundColor: t.card, borderColor: t.border }]} activeOpacity={0.8}>
+              <Text style={[styles.profileInitial, { color: t.primary }]}>{(loginuserName || 'U').charAt(0).toUpperCase()}</Text>
             </TouchableOpacity>
           </View>
-
+          <View style={[styles.focusCard, { backgroundColor: t.primary }]}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.focusLabel}>{loginuserRole || 'EMPLOYEE'} WORKSPACE</Text>
+              <Text style={styles.focusTitle}>Everything important, in one place.</Text>
+              <Text style={styles.focusSub}>Stay on top of attendance, service work and team activity.</Text>
+            </View>
+            <View style={styles.focusIcon}>
+              <AppIcon name="LayoutDashboard" size={moderateScale(24)} color={t.primary} />
+            </View>
+          </View>
+          <View style={styles.sectionHeader}>
+            <View><Text style={[styles.sectionKicker, { color: t.sub }]}>AT A GLANCE</Text><Text style={[styles.sectionTitle, { color: t.text }]}>Workforce overview</Text></View>
+            <View style={[styles.liveTag, { backgroundColor: isDarkMode ? '#052E16' : '#ECFDF5' }]}><View style={styles.liveDot} /><Text style={styles.liveText}>LIVE</Text></View>
+          </View>
           {/* Counts Grid */}
           <View style={styles.gridContainer}>
             {isLoading ? (
@@ -554,7 +557,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             )}
           </View>
 
-          {/* Branding — subtle watermark */}
+          {/* Branding */}
           <Text style={[styles.brandName, { color: isDarkMode ? '#2A2D38' : '#EAEDFF' }]}>
             Shantinath Motors Pvt Ltd
           </Text>
@@ -640,82 +643,31 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: moderateScale(16),
-    paddingTop: verticalScale(18),
-    paddingBottom: verticalScale(100),
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: verticalScale(18),
-  },
-  welcomeText: {
-    fontSize: moderateScale(22),
-    fontWeight: '800',
-    letterSpacing: -0.2,
-  },
-  dateText: {
-    fontSize: moderateScale(12),
-    fontWeight: '500',
-    marginTop: verticalScale(2),
-  },
-  // ── Welcome Header Card ───────────────────────────────────────────────────
-  headerCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: moderateScale(18),
-    borderRadius: moderateScale(18),
-    borderWidth: 1,
-    marginBottom: verticalScale(16),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  headerLeft: {
-    flex: 1,
-  },
-  greetingText: {
-    fontSize: moderateScale(13),
-    fontWeight: '500',
-    marginBottom: verticalScale(2),
-  },
-  userNameText: {
-    fontSize: moderateScale(20),
-    fontWeight: '800',
-    letterSpacing: -0.3,
-    marginBottom: verticalScale(2),
-  },
-  quickActionsTrigger: {
-    width: moderateScale(42),
-    height: moderateScale(42),
-    borderRadius: moderateScale(12),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  scrollContent: { paddingHorizontal: moderateScale(16), paddingTop: verticalScale(14), paddingBottom: verticalScale(100) },
+  dashboardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(14) },
+  dashboardKicker: { fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.5, marginBottom: verticalScale(3) },
+  dashboardTitle: { fontSize: moderateScale(23), fontWeight: '800', letterSpacing: -0.5 },
+  dashboardDate: { fontSize: moderateScale(11), marginTop: verticalScale(4), fontWeight: '500' },
+  profileButton: { width: moderateScale(46), height: moderateScale(46), borderRadius: moderateScale(15), borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  profileInitial: { fontSize: moderateScale(18), fontWeight: '800' },
+  focusCard: { minHeight: verticalScale(126), borderRadius: moderateScale(20), padding: moderateScale(18), flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(18), overflow: 'hidden' },
+  focusLabel: { color: '#BFDBFE', fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.4, marginBottom: verticalScale(6) },
+  focusTitle: { color: '#FFFFFF', fontSize: moderateScale(17), lineHeight: moderateScale(22), fontWeight: '800', maxWidth: '82%' },
+  focusSub: { color: '#CBD5E1', fontSize: moderateScale(10.5), lineHeight: moderateScale(16), marginTop: verticalScale(4), maxWidth: '84%' },
+  focusIcon: { position: 'absolute', right: moderateScale(14), top: moderateScale(14), width: moderateScale(48), height: moderateScale(48), borderRadius: moderateScale(16), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: verticalScale(10) },
+  sectionKicker: { fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.3 },
+  sectionTitle: { fontSize: moderateScale(16), fontWeight: '800', marginTop: verticalScale(3) },
+  liveTag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(9), paddingVertical: verticalScale(5), borderRadius: 99 },
+  liveDot: { width: moderateScale(6), height: moderateScale(6), borderRadius: 3, backgroundColor: '#10B981', marginRight: moderateScale(5) },
+  liveText: { fontSize: moderateScale(8), fontWeight: '800', color: '#059669', letterSpacing: 0.8 },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginVertical: verticalScale(8),
   },
-  card: {
-    width: '48%',
-    borderRadius: moderateScale(18),
-    padding: moderateScale(16),
-    borderWidth: 1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-    marginBottom: verticalScale(16),
-    minHeight: verticalScale(110),
-    justifyContent: 'space-between',
-  },
+  card: { width: '48%', borderRadius: moderateScale(17), padding: moderateScale(14), borderWidth: 1, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 7, elevation: 1, marginBottom: verticalScale(12), minHeight: scale(108), justifyContent: 'space-between' },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -728,26 +680,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cardValue: {
-    fontSize: moderateScale(24),
-    fontWeight: '800',
-    marginTop: verticalScale(12),
-  },
-  cardLabel: {
-    fontSize: moderateScale(12),
-    fontWeight: '600',
-    marginTop: verticalScale(4),
-  },
-  brandName: {
-    fontSize: moderateScale(32),
-    fontWeight: '900',
-    fontStyle: 'italic',
-    lineHeight: moderateScale(38),
-    marginTop: verticalScale(24),
-    marginBottom: verticalScale(8),
-    textAlign: 'right',
-    opacity: 0.12,
-  },
+  cardValue: { fontSize: moderateScale(22), fontWeight: '800', marginTop: verticalScale(10) },
+  cardLabel: { fontSize: moderateScale(11), fontWeight: '600', marginTop: verticalScale(3) },
+  brandName: { fontSize: moderateScale(24), fontWeight: '800', lineHeight: moderateScale(30), marginTop: verticalScale(20), marginBottom: verticalScale(6), textAlign: 'right' },
 
   // ── Bottom Sheet ──────────────────────────────────────────────────────────
   bottomSheetBackground: {

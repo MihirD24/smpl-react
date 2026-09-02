@@ -544,6 +544,10 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
               }}
             >
               <View>
+                <View style={styles.statusPill}>
+                  <View style={styles.statusDot} />
+                  <Text style={styles.statusPillText}>{punchLabel === 'Punch_in' ? 'READY TO START' : 'READY TO FINISH'}</Text>
+                </View>
                 <Text
                   style={[
                     styles.currentTimeLabel,
@@ -582,13 +586,14 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
                   left: scale(10),
                 }}
               />
-              <Text style={styles.locationLabel}>LOCATION ADDRESS</Text>
-
-              <Text style={styles.address}>{address}</Text>
+              <Text style={styles.locationLabel}>CURRENT LOCATION</Text>
+              <Text style={styles.locationHint}>GPS location used for attendance verification</Text>
+              <Text style={styles.address}>{address || 'Locating your current position…'}</Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.rowBetween}>
               <View>
+                <Text style={styles.shiftCaption}>YOUR SHIFT</Text>
                 <Text
                   style={[
                     styles.locationLabel,
@@ -611,9 +616,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
           <View style={styles.sliderWrapper}>
             <SlideToPunchButton
               onComplete={launchCameraHandler}
-              title={`Slide To ${
-                punchLabel === 'Punch_in' ? ' Punch In' : 'Punch Out'
-              }`}
+              title={`Slide to ${punchLabel === 'Punch_in' ? 'Punch In' : 'Punch Out'}`}
             />
           </View>
         </>
@@ -634,6 +637,10 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
               }}
             >
               <View>
+                <View style={styles.statusPill}>
+                  <View style={styles.statusDot} />
+                  <Text style={styles.statusPillText}>{punchLabel === 'Punch_in' ? 'READY TO START' : 'READY TO FINISH'}</Text>
+                </View>
                 <Text
                   style={[
                     styles.currentTimeLabel,
@@ -671,13 +678,14 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
                   left: scale(10),
                 }}
               />
-              <Text style={styles.locationLabel}>LOCATION ADDRESS</Text>
-
-              <Text style={styles.address}>{address}</Text>
+              <Text style={styles.locationLabel}>CURRENT LOCATION</Text>
+              <Text style={styles.locationHint}>GPS location used for attendance verification</Text>
+              <Text style={styles.address}>{address || 'Locating your current position…'}</Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.rowBetween}>
               <View>
+                <Text style={styles.shiftCaption}>YOUR SHIFT</Text>
                 <Text
                   style={[
                     styles.locationLabel,
@@ -701,9 +709,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
           <View style={styles.sliderWrapper}>
             <SlideToPunchButton
               onComplete={launchCameraHandler}
-              title={`Slide To ${
-                punchLabel === 'Punch_in' ? ' Punch In' : ' Punch Out'
-              }`}
+              title={`Slide to ${punchLabel === 'Punch_in' ? 'Punch In' : 'Punch Out'}`}
             />
           </View>
         </>
@@ -727,7 +733,8 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
               source={require('../../assets/images/checkmark.png')}
               style={{ height: moderateScale(50), width: moderateScale(50) }}
             />
-            <Text style={styles.completedTitle}>Work Completed</Text>
+            <View style={styles.completedBadge}><View style={styles.completedBadgeDot} /><Text style={styles.completedBadgeText}>DAY COMPLETED</Text></View>
+            <Text style={styles.completedTitle}>Attendance completed</Text>
             <Text style={styles.completedDesc}>
               You're all set. Your shifts ended and your hours are recorded.
             </Text>
@@ -870,6 +877,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
             <View style={punchStyles.modalContainer}>
               <View style={punchStyles.BottomView}>
                 <View>
+                  <Text style={styles.modalEyebrow}>ATTENDANCE EVIDENCE</Text>
                   <Text style={mainStyles.labelTitle}>
                     <AppIcon
                       name="Clock"
@@ -915,163 +923,86 @@ export default Punch;
 
 const styles = StyleSheet.create({
   sliderWrapper: {
+    left: 0,
+    right: 0,
+    bottom: verticalScale(18),
     justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: moderateScale(18),
+    position: 'absolute',
+  },
+  mapContainer: {
+    marginHorizontal: moderateScale(14),
+    marginTop: verticalScale(10),
+    width: '100%',
+    height: verticalScale(300),
+    borderRadius: moderateScale(22),
+    overflow: 'hidden',
+    alignSelf: 'center',
+    backgroundColor: '#E8EEF7',
+  },
+  bottomCard: {
+    padding: moderateScale(20),
+    borderRadius: moderateScale(20),
+    width: '92%',
+    alignSelf: 'center',
+    elevation: 5,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.10,
+    shadowRadius: 18,
+    shadowOffset: {width: 0, height: 7},
+    position: 'absolute',
+    top: verticalScale(208),
+  },
+  bottomCardOut: {
+    padding: moderateScale(16),
+    borderRadius: moderateScale(20),
+    width: '92%',
+    alignSelf: 'center',
+    elevation: 3,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: {width: 0, height: 5},
+    marginTop: verticalScale(18),
+  },
+  statusPill: {
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: moderateScale(10),
-    position: 'absolute',
-    bottom: scale(10),
+    paddingVertical: verticalScale(6),
+    borderRadius: 99,
+    backgroundColor: '#ECFDF5',
+    marginBottom: verticalScale(10),
   },
-  mapContainer: {
-    margin: scale(10),
-    width: '100%',
-    height: verticalScale(280),
-    borderRadius: moderateScale(18),
-    overflow: 'hidden',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  bottomCard: {
-    padding: moderateScale(18),
-    borderRadius: moderateScale(18),
-    width: '92%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    position: 'absolute',
-    top: verticalScale(210),
-  },
-  bottomCardOut: {
-    padding: moderateScale(18),
-    borderRadius: moderateScale(18),
-    width: '92%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    marginTop: verticalScale(20),
-  },
-  currentTimeLabel: {
-    fontSize: moderateScale(11),
-    fontWeight: '600',
-    letterSpacing: 1.2,
-  },
-  bigTime: {
-    fontSize: moderateScale(28),
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  subText: {
-    fontSize: moderateScale(12),
-    color: '#64748B',
-    marginBottom: verticalScale(8),
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E2E8F0',
-    marginVertical: verticalScale(14),
-  },
-  locationContainer: {
-    paddingHorizontal: moderateScale(40),
-    paddingVertical: verticalScale(12),
-    borderRadius: moderateScale(12),
-    marginTop: verticalScale(7),
-  },
-  locationLabel: {
-    fontSize: moderateScale(11),
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
-  address: {
-    fontSize: moderateScale(13),
-    marginTop: verticalScale(4),
-    lineHeight: moderateScale(18),
-  },
-  rowBetween: {
-    marginTop: verticalScale(14),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  shiftText: {
-    fontSize: moderateScale(12),
-    fontWeight: '600',
-    color: '#2563EB',
-  },
-  completedCard: {
-    padding: moderateScale(16),
-    borderRadius: moderateScale(16),
-    alignItems: 'center',
-  },
-  completedTitle: {
-    fontSize: moderateScale(16),
-    fontWeight: '700',
-  },
-  completedDesc: {
-    marginTop: verticalScale(4),
-    textAlign: 'center',
-    fontSize: moderateScale(12),
-    color: '#64748B',
-  },
-  timeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: verticalScale(18),
-  },
-  timeBox: {
-    width: '48%',
-    padding: moderateScale(14),
-    borderRadius: moderateScale(14),
-  },
-  timeValue: {
-    marginTop: verticalScale(6),
-    fontSize: moderateScale(15),
-    fontWeight: '700',
-  },
-  miniMap: {
-    height: verticalScale(140),
-    borderRadius: moderateScale(14),
-    overflow: 'hidden',
-    marginTop: verticalScale(40),
-  },
-  punchOutChip: {
-    borderTopRightRadius: moderateScale(14),
-    borderTopLeftRadius: moderateScale(14),
-    paddingHorizontal: moderateScale(14),
-    paddingVertical: verticalScale(12),
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  punchOutChipLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: scale(4),
-  },
-  punchOutChipTitle: {
-    fontSize: moderateScale(11),
-    fontWeight: '700',
-    marginLeft: scale(4),
-  },
-  punchOutChipAddress: {
-    fontSize: moderateScale(11),
-    color: '#64748B',
-    flexShrink: 1,
-    marginLeft: scale(8),
-    textAlign: 'right',
-  },
-  loaderText: {
-    marginTop: verticalScale(12),
-    fontSize: moderateScale(13),
-    color: '#64748B',
-  },
+  statusDot: {width: moderateScale(6), height: moderateScale(6), borderRadius: 6, backgroundColor: '#10B981', marginRight: moderateScale(6)},
+  statusPillText: {fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 0.8, color: '#047857'},
+  currentTimeLabel: {fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.2, color: '#64748B'},
+  bigTime: {fontSize: moderateScale(34), fontWeight: '800', letterSpacing: -1, marginTop: verticalScale(2)},
+  subText: {fontSize: moderateScale(11), color: '#64748B', marginTop: verticalScale(2), marginBottom: verticalScale(12), fontWeight: '500'},
+  divider: {height: 1, backgroundColor: '#E8EDF3', marginVertical: verticalScale(15)},
+  locationContainer: {paddingHorizontal: moderateScale(40), paddingVertical: verticalScale(13), borderRadius: moderateScale(14), marginTop: verticalScale(6)},
+  locationLabel: {fontSize: moderateScale(9.5), fontWeight: '800', letterSpacing: 0.7},
+  locationHint: {fontSize: moderateScale(8.5), color: '#64748B', marginTop: verticalScale(2), marginBottom: verticalScale(2)},
+  address: {fontSize: moderateScale(11.5), color: '#111827', marginTop: verticalScale(3), lineHeight: moderateScale(16)},
+  shiftCaption: {fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1, color: '#94A3B8', marginBottom: verticalScale(3)},
+  rowBetween: {marginTop: verticalScale(2), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  shiftText: {fontSize: moderateScale(13), fontWeight: '700', color: '#111827'},
+  completedCard: {padding: moderateScale(20), borderRadius: moderateScale(18), backgroundColor: '#F8FAFC', alignItems: 'center', borderWidth: 1, borderColor: '#E2E8F0'},
+  completedBadge: {flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(9), paddingVertical: verticalScale(5), borderRadius: 99, backgroundColor: '#ECFDF5', marginBottom: verticalScale(10)},
+  completedBadgeDot: {width: moderateScale(5), height: moderateScale(5), borderRadius: 5, backgroundColor: '#10B981', marginRight: moderateScale(5)},
+  completedBadgeText: {fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 0.9, color: '#047857'},
+  completedTitle: {fontSize: moderateScale(18), fontWeight: '800', color: '#0F172A'},
+  completedDesc: {marginTop: verticalScale(5), textAlign: 'center', fontSize: moderateScale(11), lineHeight: moderateScale(16), color: '#64748B'},
+  timeRow: {flexDirection: 'row', justifyContent: 'space-between', marginTop: verticalScale(14), gap: moderateScale(8)},
+  timeBox: {width: '50%', padding: moderateScale(14), borderRadius: moderateScale(14), backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0'},
+  timeValue: {marginTop: verticalScale(5), fontSize: moderateScale(18), fontWeight: '800', color: '#0F172A'},
+  miniMap: {height: verticalScale(150), borderRadius: moderateScale(16), overflow: 'hidden', marginTop: verticalScale(14)},
+  punchOutChip: {backgroundColor: 'rgba(255,255,255,0.96)', paddingHorizontal: moderateScale(12), paddingVertical: verticalScale(10), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2},
+  punchOutChipLeft: {flexDirection: 'row', alignItems: 'center', gap: scale(4)},
+  punchOutChipTitle: {fontSize: moderateScale(10), fontWeight: '800', color: '#0F172A', marginLeft: scale(4)},
+  punchOutChipAddress: {fontSize: moderateScale(9.5), color: '#64748B', flexShrink: 1, marginLeft: scale(8), textAlign: 'right'},
+  modalEyebrow: {fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.2, color: '#64748B', marginBottom: verticalScale(5)},
+  loaderText: {marginTop: verticalScale(12), fontSize: moderateScale(13), color: '#64748B', fontWeight: '500'},
 });

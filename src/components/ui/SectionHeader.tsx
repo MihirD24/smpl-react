@@ -1,0 +1,2 @@
+import React from 'react'; import {Text,View,StyleSheet,useColorScheme} from 'react-native'; import {getTheme} from '../../theme';
+export default function SectionHeader({title,action}:{title:string;action?:React.ReactNode}){const t=getTheme(useColorScheme()==='dark');return <View style={s.row}><Text style={[s.title,{color:t.text}]}>{title}</Text>{action}</View>}; const s=StyleSheet.create({row:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginBottom:12},title:{fontSize:18,fontWeight:'700',letterSpacing:-0.3}});

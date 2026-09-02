@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Dimensions,
   useColorScheme,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
@@ -20,12 +21,14 @@ import AttendanceCard from '../attandance/attendanceCard';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
 import NetInfoComponent from '../../components/netinfoComponent';
 
-// ─── Scaling (via react-native-size-matters) ──────────────────────────────────
-import {
-  moderateScale,
-  scale,
-  verticalScale,
-} from 'react-native-size-matters';
+// ─── Scaling ───────────────────────────────────────────────────────────────────
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const BASE_WIDTH = 375;
+const BASE_HEIGHT = 812;
+const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
+const verticalScale = (size: number) => (SCREEN_HEIGHT / BASE_HEIGHT) * size;
+const moderateScale = (size: number, factor = 0.5) =>
+  size + (scale(size) - size) * factor;
 
 type FilterType =
   | 'All'
@@ -239,10 +242,10 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
   const theme = getCardTheme(isDarkMode);
 
   // Screen-level tokens not in shared theme
-  const screenBg = isDarkMode ? '#0F172A' : '#F8FAFC';
-  const sectionBg = isDarkMode ? '#1E293B' : '#FFFFFF';
-  const legendSoft = isDarkMode ? '#1E293B' : '#F1F5F9';
-  const calendarNumber = isDarkMode ? '#94A3B8' : '#0F172A';
+  const screenBg = isDarkMode ? '#111827' : '#F3F4F6';
+  const sectionBg = isDarkMode ? '#1F2937' : '#FFFFFF';
+  const legendSoft = isDarkMode ? '#0F172A' : '#F3F4F6';
+  const calendarNumber = isDarkMode ? '#4d617e' : '#111827';
 
   const filters: FilterType[] = [
     'All',
@@ -687,7 +690,7 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={screenBg}
+      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
         <NetInfoComponent onReconnect={fetchAttendanceData} />
       <View style={[s.container, { backgroundColor: screenBg }]}>

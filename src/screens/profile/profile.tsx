@@ -237,20 +237,20 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const theme = {
-    screenBg: isDarkMode ? '#0F172A' : '#F8FAFC',
-    cardBg: isDarkMode ? '#1E293B' : '#FFFFFF',
+    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
+    cardBg: isDarkMode ? '#1F2937' : '#FFFFFF',
     cardBorder: isDarkMode ? '#334155' : '#E2E8F0',
-    sectionLabel: isDarkMode ? '#475569' : '#94A3B8',
-    title: isDarkMode ? '#F8FAFC' : '#0F172A',
-    text: isDarkMode ? '#F1F5F9' : '#1E293B',
+    sectionLabel: isDarkMode ? '#64748B' : '#94A3B8',
+    title: isDarkMode ? '#F9FAFB' : '#0F172A',
+    text: isDarkMode ? '#E5E7EB' : '#1E293B',
     muted: isDarkMode ? '#94A3B8' : '#64748B',
-    subMuted: isDarkMode ? '#475569' : '#CBD5E1',
-    quickIconBg: isDarkMode ? '#1E3A5F' : '#EFF6FF',
-    divider: isDarkMode ? '#1E293B' : '#F1F5F9',
-    signOutBg: isDarkMode ? '#1E293B' : '#FFFFFF',
-    signOutBorder: isDarkMode ? '#334155' : '#DBEAFE',
-    heroBg1: isDarkMode ? '#1E3A8A' : '#1D4ED8',
-    heroBg2: isDarkMode ? '#1e3a5f' : '#1D4ED8',
+    subMuted: isDarkMode ? '#64748B' : '#CBD5E1',
+    quickIconBg: isDarkMode ? '#172554' : '#EFF6FF',
+    divider: isDarkMode ? '#334155' : '#F1F5F9',
+    signOutBg: isDarkMode ? '#172554' : '#FFFFFF',
+    signOutBorder: isDarkMode ? '#1D4ED8' : '#DBEAFE',
+    heroBg1: isDarkMode ? '#172554' : '#EFF6FF',
+    heroBg2: isDarkMode ? '#1e3a5f' : '#DBEAFE',
   };
 
   const startEntryAnimations = () => {

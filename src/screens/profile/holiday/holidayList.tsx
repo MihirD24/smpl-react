@@ -84,7 +84,7 @@ const HolidayList: React.FC<AppStackScreenProps<'HolidayList'>> = ({}) => {
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#0F172A' : '#F8FAFC'}
+      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={getHolidayData} />
       <View style={MainStyles.mainContainer}>

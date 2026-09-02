@@ -9,7 +9,6 @@ import {
   Alert,
   Linking,
   useColorScheme,
-  StyleSheet,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import CustomDropdown from '../../components/formComponent/customDropdown';
@@ -26,31 +25,18 @@ import ToastUtil from '../../utils/toastAndroid';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import CustomRadioGroup from '../../components/formComponent/customRadioGroup';
 import FormLabel from '../../components/formComponent/formLabel';
-import { moderateScale, verticalScale, scale } from 'react-native-size-matters';
+import { formStyles, getFormTheme } from '../../assets/style/formStyles';
+import { moderateScale } from 'react-native-size-matters';
 import { formatDate } from '../../utils/dateUtils';
 import ScreenWrapper from '../../components/screenWrapper';
 import moment from 'moment';
 import NetInfoComponent from '../../components/netinfoComponent';
-
 const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
   navigation,
 }) => {
   const isDarkMode = useColorScheme() === 'dark';
   const { colors } = useTheme();
-  
-  const theme = {
-    bg: isDarkMode ? '#0F172A' : '#F8FAFC',
-    card: isDarkMode ? '#1E293B' : '#FFFFFF',
-    textPrimary: isDarkMode ? '#F8FAFC' : '#0F172A',
-    textSecondary: isDarkMode ? '#94A3B8' : '#64748B',
-    border: isDarkMode ? '#334155' : '#E2E8F0',
-    primary: '#2563EB',
-    success: '#10B981',
-    error: '#EF4444',
-    warning: '#F59E0B',
-    overlay: 'rgba(0,0,0,0.5)',
-  };
-
+  const theme = getFormTheme(isDarkMode);
   const [leaveFor, setLeaveFor] = useState<'0' | '1'>('0');
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -100,7 +86,6 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
     setStartDateServer(formatDate(date, 'server'));
     setShowStartPicker(false);
   };
-  
   const handleEndDateSelect = (date: Date) => {
     setEndDate(date);
     setEndDateDisplay(formatDate(date, 'display'));
@@ -129,7 +114,6 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
       setEndDateServer('');
     }
   };
-
   const handleCameraLaunch = async () => {
     setShowAttachmentModal(false);
     try {
@@ -178,7 +162,6 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
       Alert.alert('Error', 'Failed to open camera');
     }
   };
-
   const handleGalleryLaunch = async () => {
     setShowAttachmentModal(false);
     try {
@@ -204,7 +187,6 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
       Alert.alert('Error', 'Failed to open gallery');
     }
   };
-
   const handleAddLeave = async () => {
     try {
       setDisableBtn(true);
@@ -270,16 +252,15 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
       setDisableBtn(false);
     }
   };
-
   const renderDropdownItem = (item: any) => (
-    <View style={styles.dropdownItemContainer}>
+    <View style={formStyles.dropdownItemContainer}>
       <AppIcon
         name={item.icon}
         size={moderateScale(18)}
-        color={theme.textSecondary}
-        style={styles.dropdownItemIcon}
+        color="#6B7280"
+        style={formStyles.dropdownItemIcon}
       />
-      <Text style={[styles.dropdownItemText, { color: theme.textPrimary }]}>{item.name}</Text>
+      <Text style={formStyles.dropdownItemText}>{item.name}</Text>
     </View>
   );
 
@@ -288,44 +269,39 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={theme.bg}
+      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={handleAddLeave} />
       <KeyboardAvoidingView
-        style={[styles.keyboardContainer, { backgroundColor: theme.bg }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? verticalScale(80) : verticalScale(120)}
+        style={[
+          formStyles.keyboardContainer,
+          { backgroundColor: theme.background },
+        ]}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 120}
       >
         <ScrollView
-          style={[styles.container, { backgroundColor: theme.bg }]}
-          contentContainerStyle={styles.scrollContent}
+          style={[formStyles.container, { backgroundColor: theme.background }]}
+          contentContainerStyle={formStyles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <View
             style={[
-              styles.formCard,
-              { 
-                backgroundColor: theme.card, 
-                borderColor: theme.border,
-                shadowColor: isDarkMode ? 'transparent' : '#000',
-              },
+              formStyles.formCard,
+              { backgroundColor: theme.card, borderColor: theme.border },
             ]}
           >
-            <View style={styles.formHeader}>
-              <View style={[styles.headerAccent, { backgroundColor: theme.primary }]} />
-              <View>
-                <Text style={[styles.formTitle, { color: theme.textPrimary }]}>
-                  LEAVE REQUEST
-                </Text>
-                <Text style={[styles.formSubtitle, { color: theme.textSecondary }]}>
-                  Add your leave details and attach proof if needed.
-                </Text>
-              </View>
+            <View style={formStyles.formHeader}>
+              <Text style={[formStyles.formTitle, { color: theme.label }]}>
+                Leave Request
+              </Text>
+              <Text style={[formStyles.formSubtitle, { color: theme.subText }]}>
+                Add your leave details and attach proof if needed.
+              </Text>
             </View>
-
             {/* ── Employee ────────────────────────────────────────────────── */}
-            <View style={styles.fieldContainer}>
-              <FormLabel label="Employee" required color={theme.textPrimary} />
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Employee" required color={theme.label} />
               <CustomDropdown
                 data={employees}
                 value={employeeId}
@@ -338,10 +314,9 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 label=""
               />
             </View>
-
             {/* ── Leave For ──────────────────────────────────────────────── */}
-            <View style={styles.fieldContainer}>
-              <FormLabel label="Leave For" color={theme.textPrimary} required />
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Leave For" color={theme.label} required />
               <CustomRadioGroup
                 options={[
                   { label: 'Full Day', value: '0' },
@@ -351,10 +326,9 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 onChange={val => handleLeaveForChange(val as '0' | '1')}
               />
             </View>
-
             {/* ── Leave Type ─────────────────────────────────────────────── */}
-            <View style={styles.fieldContainer}>
-              <FormLabel label="Leave Type" required color={theme.textPrimary} />
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Leave Type" required color={theme.label} />
               <CustomDropdown
                 data={leaveOptions}
                 value={leaveType}
@@ -369,18 +343,17 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 label=""
               />
             </View>
-
             {/* ── Dates (conditional Full / Half) ────────────────────────── */}
             {leaveFor === '0' ? (
-              <View style={styles.dateRow}>
+              <View style={formStyles.dateRow}>
                 {/* Start Date */}
-                <View style={styles.dateFieldHalf}>
-                  <FormLabel label="Start Date" required color={theme.textPrimary} />
+                <View style={formStyles.dateFieldHalf}>
+                  <FormLabel label="Start Date" required color={theme.label} />
                   <TouchableOpacity
                     style={[
-                      styles.dateInput,
+                      formStyles.dateInput,
                       {
-                        backgroundColor: theme.bg,
+                        backgroundColor: theme.inputBackground,
                         borderColor: theme.border,
                       },
                     ]}
@@ -389,8 +362,12 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                   >
                     <Text
                       style={[
-                        styles.dateInputText,
-                        { color: startDateDisplay ? theme.textPrimary : theme.textSecondary },
+                        formStyles.dateInputText,
+                        {
+                          color: startDateDisplay
+                            ? theme.inputText
+                            : theme.placeholder,
+                        },
                       ]}
                     >
                       {startDateDisplay || 'DD/MM/YYYY'}
@@ -398,19 +375,19 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                     <AppIcon
                       name="Calendar"
                       size={moderateScale(18)}
-                      color={theme.textSecondary}
-                      style={styles.calendarIcon}
+                      color={theme.placeholder}
+                      style={formStyles.calendarIcon}
                     />
                   </TouchableOpacity>
                 </View>
                 {/* End Date */}
-                <View style={styles.dateFieldHalf}>
-                  <FormLabel label="End Date" required color={theme.textPrimary} />
+                <View style={formStyles.dateFieldHalf}>
+                  <FormLabel label="End Date" required color={theme.label} />
                   <TouchableOpacity
                     style={[
-                      styles.dateInput,
+                      formStyles.dateInput,
                       {
-                        backgroundColor: theme.bg,
+                        backgroundColor: theme.inputBackground,
                         borderColor: theme.border,
                       },
                     ]}
@@ -419,8 +396,12 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                   >
                     <Text
                       style={[
-                        styles.dateInputText,
-                        { color: endDateDisplay ? theme.textPrimary : theme.textSecondary },
+                        formStyles.dateInputText,
+                        {
+                          color: endDateDisplay
+                            ? theme.inputText
+                            : theme.placeholder,
+                        },
                       ]}
                     >
                       {endDateDisplay || 'DD/MM/YYYY'}
@@ -428,21 +409,21 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                     <AppIcon
                       name="Calendar"
                       size={moderateScale(18)}
-                      color={theme.textSecondary}
-                      style={styles.calendarIcon}
+                      color={theme.placeholder}
+                      style={formStyles.calendarIcon}
                     />
                   </TouchableOpacity>
                 </View>
               </View>
             ) : (
               // Half Day — single date picker
-              <View style={styles.fieldContainer}>
-                <FormLabel label="Date" required color={theme.textPrimary} />
+              <View style={formStyles.fieldContainer}>
+                <FormLabel label="Date" required color={theme.label} />
                 <TouchableOpacity
                   style={[
-                    styles.dateInputFull,
+                    formStyles.dateInputFull,
                     {
-                      backgroundColor: theme.bg,
+                      backgroundColor: theme.inputBackground,
                       borderColor: theme.border,
                     },
                   ]}
@@ -451,8 +432,12 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 >
                   <Text
                     style={[
-                      styles.dateInputText,
-                      { color: startDateDisplay ? theme.textPrimary : theme.textSecondary },
+                      formStyles.dateInputText,
+                      {
+                        color: startDateDisplay
+                          ? theme.inputText
+                          : theme.placeholder,
+                      },
                     ]}
                   >
                     {startDateDisplay || 'DD/MM/YYYY'}
@@ -460,16 +445,15 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                   <AppIcon
                     name="Calendar"
                     size={moderateScale(18)}
-                    color={theme.textSecondary}
-                    style={styles.calendarIcon}
+                    color={theme.placeholder}
+                    style={formStyles.calendarIcon}
                   />
                 </TouchableOpacity>
               </View>
             )}
-
             {/* ── Reason ─────────────────────────────────────────────────── */}
-            <View style={styles.fieldContainer}>
-              <FormLabel label="Reason" required color={theme.textPrimary} />
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Reason" required color={theme.label} />
               <CustomInput
                 value={reason}
                 onChangeText={setReason}
@@ -478,41 +462,39 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 numberOfLines={4}
               />
             </View>
-
             {/* ── Attachment ─────────────────────────────────────────────── */}
-            <View style={styles.fieldContainer}>
-              <FormLabel label="Attachment" color={theme.textPrimary} optional />
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Attachment" color={theme.label} optional />
               <TouchableOpacity
                 style={[
-                  styles.attachmentContainer,
+                  formStyles.attachmentContainer,
                   {
-                    backgroundColor: theme.bg,
+                    backgroundColor: theme.attachmentBackground,
                     borderColor: theme.border,
                   },
                 ]}
                 onPress={() => setShowAttachmentModal(true)}
                 activeOpacity={0.7}
               >
-                <View style={styles.attachmentContent}>
+                <View style={formStyles.attachmentContent}>
                   <View
                     style={[
-                      styles.attachmentIconContainer,
-                      { backgroundColor: theme.border },
+                      formStyles.attachmentIconContainer,
+                      { backgroundColor: theme.attachmentIconBackground },
                     ]}
                   >
                     <AppIcon
                       name="Paperclip"
-                      size={moderateScale(20)}
-                      color={theme.textSecondary}
+                      size={moderateScale(24)}
+                      color={theme.placeholder}
                     />
                   </View>
                   <Text
                     style={[
-                      styles.attachmentText,
-                      { color: attachment ? theme.primary : theme.textSecondary },
-                      attachment && styles.attachmentTextActive,
+                      formStyles.attachmentText,
+                      { color: attachment ? '#3B82F6' : theme.subText },
+                      attachment && formStyles.attachmentTextActive,
                     ]}
-                    numberOfLines={1}
                   >
                     {attachment
                       ? attachment.name
@@ -521,18 +503,13 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 </View>
               </TouchableOpacity>
             </View>
-
             {/* ── Submit ─────────────────────────────────────────────────── */}
-            <View style={styles.submitContainer}>
-              <CustomButton
-                label="Submit Request"
-                onPress={handleAddLeave}
-                disabled={disableBtn}
-                style={styles.submitButton}
-              />
-            </View>
+            <CustomButton
+              label="Submit Request"
+              onPress={handleAddLeave}
+              disabled={disableBtn}
+            />
           </View>
-
           {/* ── Calendar Pickers ───────────────────────────────────────────── */}
           <CalendarPickerModal
             visible={showStartPicker}
@@ -548,7 +525,6 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
             selectedDate={endDate || undefined}
             minimumDate={startDate || new Date()}
           />
-
           {/* ── Attachment Bottom Sheet Modal ──────────────────────────────── */}
           <Modal
             visible={showAttachmentModal}
@@ -557,70 +533,115 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
             onRequestClose={() => setShowAttachmentModal(false)}
           >
             <TouchableOpacity
-              style={[styles.modalOverlay, { backgroundColor: theme.overlay }]}
+              style={formStyles.modalOverlay}
               activeOpacity={1}
               onPress={() => setShowAttachmentModal(false)}
             >
               <TouchableOpacity
                 activeOpacity={1}
                 onPress={e => e.stopPropagation()}
-                style={styles.modalContentWrapper}
               >
                 <View
                   style={[
-                    styles.modalContent,
-                    { backgroundColor: theme.card },
+                    formStyles.modalContent,
+                    { backgroundColor: theme.modalBackground },
                   ]}
                 >
-                  <View style={styles.modalHeader}>
-                    <Text style={[styles.modalTitle, { color: theme.textPrimary }]}>
+                  {/* Modal Header */}
+                  <View style={formStyles.modalHeader}>
+                    <Text
+                      style={[formStyles.modalTitle, { color: theme.label }]}
+                    >
                       Upload Attachment
                     </Text>
                   </View>
+                  {/* Camera option */}
                   <TouchableOpacity
-                    style={[styles.modalOption, { backgroundColor: theme.bg }]}
+                    style={[
+                      formStyles.modalOption,
+                      { backgroundColor: theme.modalOptionBackground },
+                    ]}
                     onPress={handleCameraLaunch}
                     activeOpacity={0.7}
                   >
-                    <View style={[styles.modalOptionIconContainer, { backgroundColor: `${theme.primary}20` }]}>
-                      <AppIcon name="Camera" size={moderateScale(22)} color={theme.primary} />
+                    <View style={formStyles.modalOptionIconContainer}>
+                      <AppIcon
+                        name="Camera"
+                        size={moderateScale(22)}
+                        color="#3B82F6"
+                      />
                     </View>
-                    <View style={styles.modalOptionTextContainer}>
-                      <Text style={[styles.modalOptionText, { color: theme.textPrimary }]}>
+                    <View style={formStyles.modalOptionTextContainer}>
+                      <Text
+                        style={[
+                          formStyles.modalOptionText,
+                          { color: theme.label },
+                        ]}
+                      >
                         Take Photo
                       </Text>
-                      <Text style={[styles.modalOptionSubtext, { color: theme.textSecondary }]}>
+                      <Text
+                        style={[
+                          formStyles.modalOptionSubtext,
+                          { color: theme.subText },
+                        ]}
+                      >
                         Use camera to capture document
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  
-                  <View style={[styles.modalDivider, { backgroundColor: theme.border }]} />
-                  
+                  <View
+                    style={[
+                      formStyles.modalDivider,
+                      { backgroundColor: theme.modalDivider },
+                    ]}
+                  />
+                  {/* Gallery option */}
                   <TouchableOpacity
-                    style={[styles.modalOption, { backgroundColor: theme.bg }]}
+                    style={[
+                      formStyles.modalOption,
+                      { backgroundColor: theme.modalOptionBackground },
+                    ]}
                     onPress={handleGalleryLaunch}
                     activeOpacity={0.7}
                   >
-                    <View style={[styles.modalOptionIconContainer, { backgroundColor: `${theme.primary}20` }]}>
-                      <AppIcon name="Image" size={moderateScale(22)} color={theme.primary} />
+                    <View style={formStyles.modalOptionIconContainer}>
+                      <AppIcon name="Image" size={22} color="#3B82F6" />
                     </View>
-                    <View style={styles.modalOptionTextContainer}>
-                      <Text style={[styles.modalOptionText, { color: theme.textPrimary }]}>
+                    <View style={formStyles.modalOptionTextContainer}>
+                      <Text
+                        style={[
+                          formStyles.modalOptionText,
+                          { color: theme.label },
+                        ]}
+                      >
                         Choose from Gallery
                       </Text>
-                      <Text style={[styles.modalOptionSubtext, { color: theme.textSecondary }]}>
+                      <Text
+                        style={[
+                          formStyles.modalOptionSubtext,
+                          { color: theme.subText },
+                        ]}
+                      >
                         Select from your photos
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  
+                  {/* Cancel */}
                   <TouchableOpacity
-                    style={[styles.modalCancelButton, { backgroundColor: theme.border }]}
+                    style={[
+                      formStyles.modalCancelButton,
+                      { backgroundColor: theme.cancelBackground },
+                    ]}
                     onPress={() => setShowAttachmentModal(false)}
                     activeOpacity={0.7}
                   >
-                    <Text style={[styles.modalCancelText, { color: theme.textPrimary }]}>
+                    <Text
+                      style={[
+                        formStyles.modalCancelText,
+                        { color: theme.subText },
+                      ]}
+                    >
                       Cancel
                     </Text>
                   </TouchableOpacity>
@@ -633,189 +654,5 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
     </ScreenWrapper>
   );
 };
-
-const styles = StyleSheet.create({
-  keyboardContainer: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: moderateScale(16),
-    paddingBottom: verticalScale(40),
-  },
-  formCard: {
-    borderRadius: moderateScale(16),
-    borderWidth: 1,
-    padding: moderateScale(16),
-    shadowOffset: { width: 0, height: verticalScale(4) },
-    shadowOpacity: 0.05,
-    shadowRadius: moderateScale(12),
-    elevation: 3,
-  },
-  formHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: verticalScale(24),
-  },
-  headerAccent: {
-    width: moderateScale(4),
-    height: '100%',
-    borderRadius: moderateScale(2),
-    marginRight: moderateScale(12),
-  },
-  formTitle: {
-    fontSize: moderateScale(14),
-    fontWeight: '700',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginBottom: verticalScale(4),
-  },
-  formSubtitle: {
-    fontSize: moderateScale(13),
-  },
-  fieldContainer: {
-    marginBottom: verticalScale(20),
-  },
-  dateRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: verticalScale(20),
-  },
-  dateFieldHalf: {
-    width: '48%',
-  },
-  dateInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderRadius: moderateScale(10),
-    paddingHorizontal: moderateScale(14),
-    height: verticalScale(50),
-  },
-  dateInputFull: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderRadius: moderateScale(10),
-    paddingHorizontal: moderateScale(14),
-    height: verticalScale(50),
-  },
-  dateInputText: {
-    fontSize: moderateScale(14),
-  },
-  calendarIcon: {
-    marginLeft: moderateScale(8),
-  },
-  attachmentContainer: {
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderRadius: moderateScale(12),
-    padding: moderateScale(16),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  attachmentContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-  },
-  attachmentIconContainer: {
-    width: moderateScale(40),
-    height: moderateScale(40),
-    borderRadius: moderateScale(10),
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: moderateScale(12),
-  },
-  attachmentText: {
-    fontSize: moderateScale(14),
-    flex: 1,
-  },
-  attachmentTextActive: {
-    fontWeight: '500',
-  },
-  submitContainer: {
-    marginTop: verticalScale(12),
-  },
-  submitButton: {
-    height: verticalScale(50),
-    borderRadius: moderateScale(12),
-  },
-  dropdownItemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: moderateScale(12),
-  },
-  dropdownItemIcon: {
-    marginRight: moderateScale(12),
-  },
-  dropdownItemText: {
-    fontSize: moderateScale(14),
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalContentWrapper: {
-    width: '100%',
-  },
-  modalContent: {
-    borderTopLeftRadius: moderateScale(24),
-    borderTopRightRadius: moderateScale(24),
-    padding: moderateScale(24),
-    paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : verticalScale(24),
-  },
-  modalHeader: {
-    marginBottom: verticalScale(20),
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: moderateScale(18),
-    fontWeight: '600',
-  },
-  modalOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: moderateScale(16),
-    borderRadius: moderateScale(16),
-  },
-  modalOptionIconContainer: {
-    width: moderateScale(48),
-    height: moderateScale(48),
-    borderRadius: moderateScale(12),
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: moderateScale(16),
-  },
-  modalOptionTextContainer: {
-    flex: 1,
-  },
-  modalOptionText: {
-    fontSize: moderateScale(16),
-    fontWeight: '600',
-    marginBottom: verticalScale(4),
-  },
-  modalOptionSubtext: {
-    fontSize: moderateScale(13),
-  },
-  modalDivider: {
-    height: StyleSheet.hairlineWidth,
-    marginVertical: verticalScale(16),
-  },
-  modalCancelButton: {
-    marginTop: verticalScale(24),
-    paddingVertical: verticalScale(16),
-    borderRadius: moderateScale(12),
-    alignItems: 'center',
-  },
-  modalCancelText: {
-    fontSize: moderateScale(16),
-    fontWeight: '600',
-  },
-});
 
 export default AddLeave;
