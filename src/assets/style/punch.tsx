@@ -1,50 +1,59 @@
 import { useTheme } from '@react-navigation/native';
 import { StyleSheet, useColorScheme } from 'react-native';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+
 const PunchStyle = () => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const { colors } = useTheme();
+
+  const bg = isDarkMode ? '#0F172A' : '#F8FAFC';
+  const card = isDarkMode ? '#1E293B' : '#FFFFFF';
+  const border = isDarkMode ? '#334155' : '#E2E8F0';
+  const text = isDarkMode ? '#F8FAFC' : '#0F172A';
+  const muted = isDarkMode ? '#94A3B8' : '#64748B';
+
   return StyleSheet.create({
     scrollContainer: {
       flex: 1,
-      backgroundColor: colors.background, // Background color for the entire screen
+      backgroundColor: bg,
     },
     scrollContent: {
       flexGrow: 1,
-      paddingBottom: 30, // Adds space at the bottom
+      paddingBottom: verticalScale(30),
     },
     container: {
       justifyContent: 'center',
       alignItems: 'center',
-      margin: 10,
+      margin: scale(10),
       width: '95%',
       height: '50%',
       overflow: 'hidden',
-      borderRadius: 15,
-      borderWidth: 0.5,
-      borderColor: '#000',
-      alignSelf: 'center', // Centers the container horizontally in the parent view
+      borderRadius: moderateScale(16),
+      borderWidth: 1,
+      borderColor: border,
+      alignSelf: 'center',
     },
     map: {
       width: '100%',
       height: '100%',
     },
     waitingMessage: {
-      fontSize: 15,
-      color: colors.text,
+      fontSize: moderateScale(14),
+      color: muted,
       textAlign: 'center',
-      marginVertical: 10,
+      marginVertical: verticalScale(10),
     },
     mainView: {
-      marginTop: 20,
-      marginBottom: 10,
+      marginTop: verticalScale(20),
+      marginBottom: verticalScale(10),
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
     markerContainer: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: moderateScale(40),
+      height: moderateScale(40),
+      borderRadius: moderateScale(20),
       overflow: 'hidden',
       justifyContent: 'center',
       alignItems: 'center',
@@ -52,127 +61,125 @@ const PunchStyle = () => {
     markerImage: {
       width: '100%',
       height: '100%',
-      borderRadius: 20,
+      borderRadius: moderateScale(20),
     },
     bottomBar: {
-      backgroundColor: colors.card, // Light, neutral background
-      borderTopLeftRadius: 15, // Slightly more rounded for a modern touch
-      borderTopRightRadius: 15, // Slightly more rounded for a modern touch
-      padding: 20,
-      // elevation: 10, // Subtle shadow for a premium feel
-      // marginBottom: 20,
+      backgroundColor: card,
+      borderTopLeftRadius: moderateScale(20),
+      borderTopRightRadius: moderateScale(20),
+      padding: moderateScale(20),
       height: '100%',
-      shadowColor: '#000', // Shadow details for iOS
-      shadowOffset: { width: 0, height: 5 },
-      shadowOpacity: 0.1,
-      shadowRadius: 15,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 12,
+      elevation: 8,
     },
     punchView: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 20,
-      paddingVertical: 10, // Add some vertical spacing
-      borderBottomWidth: 0.5,
-      borderBottomColor: isDarkMode ? '#FFFFFF' : '#000000', // Light border for sections
+      marginBottom: verticalScale(20),
+      paddingVertical: verticalScale(10),
+      borderBottomWidth: 1,
+      borderBottomColor: border,
     },
     locationInfo: {
       alignItems: 'flex-start',
-      marginBottom: 10,
+      marginBottom: verticalScale(10),
     },
     sliderContainer: {
-      backgroundColor: '#232323', // Corporate blue
-      borderRadius: 20, // Rounded buttons for a clean look
+      backgroundColor: '#1D4ED8',
+      borderRadius: moderateScale(20),
       elevation: 5,
-      shadowColor: isDarkMode ? '#FFFFFF' : '#000000',
-      shadowOpacity: 0.2,
+      shadowColor: '#2563EB',
+      shadowOpacity: 0.3,
       shadowRadius: 10,
     },
     punchLabel: {
-      fontSize: 16,
-      color: isDarkMode ? '#FFFFFF' : '#000000', // Use the corporate blue color
-      fontWeight: '600', // Medium font weight for emphasis
+      fontSize: moderateScale(16),
+      color: text,
+      fontWeight: '600',
     },
     punchButtonContainer: {
       alignItems: 'center',
-      marginBottom: 20,
+      marginBottom: verticalScale(20),
     },
     punchTime: {
-      fontSize: 15,
-      color: '#6C757D', // Muted gray for secondary text
+      fontSize: moderateScale(14),
+      color: muted,
       fontWeight: '500',
     },
     submit: {
-      fontSize: 16,
-      color: colors.text, // Green for success
+      fontSize: moderateScale(16),
+      color: text,
       textAlign: 'center',
-      marginTop: 15,
+      marginTop: verticalScale(15),
       fontWeight: '600',
     },
     punchButton: {
-      backgroundColor: '#0056A1', // Corporate blue
-      padding: 12,
-      borderRadius: 8,
+      backgroundColor: '#2563EB',
+      padding: moderateScale(12),
+      borderRadius: moderateScale(12),
       alignItems: 'center',
     },
     buttonText: {
-      color: '#FFFFFF', // Contrasting white text
-      fontSize: 16,
+      color: '#FFFFFF',
+      fontSize: moderateScale(16),
       fontWeight: '600',
     },
     swipeAction: {
-      backgroundColor: '#FF8800', // Bright orange for actions
+      backgroundColor: '#2563EB',
       justifyContent: 'center',
       alignItems: 'flex-start',
-      paddingHorizontal: 20,
-      width: 250,
+      paddingHorizontal: moderateScale(20),
+      width: moderateScale(250),
     },
     actionText: {
       color: 'white',
-      fontSize: 16,
+      fontSize: moderateScale(16),
       fontWeight: '600',
     },
     arrowImage: {
-      width: 20,
-      height: 20,
-      marginTop: 5,
-      tintColor: '#0056A1', // Corporate blue for the arrow
+      width: moderateScale(20),
+      height: moderateScale(20),
+      marginTop: verticalScale(5),
+      tintColor: '#2563EB',
     },
-
     saveIcon: {
-      width: 24,
-      height: 24,
-      tintColor: '#232323',
+      width: moderateScale(24),
+      height: moderateScale(24),
+      tintColor: text,
     },
     modalOverlay: {
       flex: 1,
-      justifyContent: 'center', // Center the modal vertically
-      alignItems: 'center', // Center the modal horizontally
-      backgroundColor: 'rgba(37, 2, 2, 0.5)', // Semi-transparent background for overlay effect
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
     },
     modalContainer: {
-      width: '80%', // Adjust the width to be 80% of the screen
-      backgroundColor: colors.card, // Modal background color
-      borderRadius: 10, // Rounded corners
-      padding: 20, // Add padding inside the modal
-      elevation: 10, // Shadow effect on Android
-      shadowColor: '#232323', // Shadow on iOS
-      shadowOffset: { width: 0, height: 2 }, // Shadow offset for iOS
-      shadowOpacity: 0.25, // Shadow opacity for iOS
-      shadowRadius: 4, // Shadow radius for iOS
+      width: '85%',
+      backgroundColor: card,
+      borderRadius: moderateScale(20),
+      padding: moderateScale(20),
+      elevation: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: moderateScale(10),
     },
     BottomView: {
-      marginTop: 20, // Adjust the spacing between sections
+      marginTop: verticalScale(20),
     },
     timestamp: {
       position: 'absolute',
-      bottom: 10, // Adjust this value as needed
-      left: 20,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      bottom: verticalScale(10),
+      left: moderateScale(20),
+      backgroundColor: 'rgba(0, 0, 0, 0.55)',
       color: 'white',
-      padding: 5,
-      fontSize: 16,
-      borderRadius: 5,
+      padding: moderateScale(5),
+      fontSize: moderateScale(14),
+      borderRadius: moderateScale(5),
     },
     imageWithTimestamp: {
       position: 'relative',

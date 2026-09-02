@@ -72,7 +72,7 @@ const CalculateSalary = () => {
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
+      backgroundColor={isDarkMode ? '#0F172A' : '#F8FAFC'}
     >
       <ScrollView
         style={[formStyles.container, { backgroundColor: theme.background }]}

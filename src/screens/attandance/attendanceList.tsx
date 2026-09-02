@@ -21,7 +21,7 @@ import { AttendanceItem } from '../../types/adminAttendance';
 import AppIcon from '../../components/appIcon';
 import ScreenWrapper from '../../components/screenWrapper';
 import AttendanceCard, { fmtMins } from '../attandance/attendanceCard';
-import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
+import { cardStyles } from '../../assets/style/cardStyles'; // adjust path as needed
 import NetInfoComponent from '../../components/netinfoComponent';
 
 // ─── Scaling ──────────────────────────────────────────────────────────────────
@@ -58,8 +58,8 @@ const EMPTY_COUNT: UserAttendanceCount = {
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 const AttendanceSkeleton: React.FC = () => {
   const isDark = useColorScheme() === 'dark';
-  const bgColor = isDark ? '#2A2D38' : '#E1E9EE';
-  const hlColor = isDark ? '#3A3D4A' : '#F2F8FC';
+  const bgColor = isDark ? '#1E293B' : '#E2E8F0';
+  const hlColor = isDark ? '#334155' : '#F8FAFC';
   return (
     <SkeletonPlaceholder
       backgroundColor={bgColor}
@@ -98,7 +98,7 @@ const AttendanceSkeleton: React.FC = () => {
         marginHorizontal={scale(16)}
         marginTop={verticalScale(20)}
         height={verticalScale(220)}
-        borderRadius={moderateScale(18)}
+        borderRadius={moderateScale(16)}
       />
       <SkeletonPlaceholder.Item
         flexDirection="row"
@@ -110,12 +110,12 @@ const AttendanceSkeleton: React.FC = () => {
         <SkeletonPlaceholder.Item
           width={scale(120)}
           height={moderateScale(11)}
-          borderRadius={4}
+          borderRadius={moderateScale(4)}
         />
         <SkeletonPlaceholder.Item
           width={scale(80)}
           height={moderateScale(11)}
-          borderRadius={4}
+          borderRadius={moderateScale(4)}
         />
       </SkeletonPlaceholder.Item>
       {[0, 1, 2].map(i => (
@@ -123,7 +123,7 @@ const AttendanceSkeleton: React.FC = () => {
           key={i}
           marginHorizontal={scale(16)}
           marginBottom={verticalScale(10)}
-          borderRadius={moderateScale(14)}
+          borderRadius={moderateScale(16)}
           paddingHorizontal={scale(16)}
           paddingTop={verticalScale(14)}
           paddingBottom={verticalScale(12)}
@@ -139,26 +139,26 @@ const AttendanceSkeleton: React.FC = () => {
               <SkeletonPlaceholder.Item
                 width="55%"
                 height={moderateScale(16)}
-                borderRadius={5}
+                borderRadius={moderateScale(5)}
                 marginBottom={verticalScale(6)}
               />
               <SkeletonPlaceholder.Item
                 width="75%"
                 height={moderateScale(12)}
-                borderRadius={4}
+                borderRadius={moderateScale(4)}
               />
             </SkeletonPlaceholder.Item>
             <SkeletonPlaceholder.Item alignItems="flex-end">
               <SkeletonPlaceholder.Item
                 width={scale(30)}
                 height={moderateScale(9)}
-                borderRadius={3}
+                borderRadius={moderateScale(3)}
                 marginBottom={verticalScale(4)}
               />
               <SkeletonPlaceholder.Item
                 width={scale(64)}
                 height={moderateScale(12)}
-                borderRadius={4}
+                borderRadius={moderateScale(4)}
               />
             </SkeletonPlaceholder.Item>
           </SkeletonPlaceholder.Item>
@@ -193,7 +193,7 @@ interface StatCardProps {
   accentColor: string;
   valueColor: string;
   subtextColor: string;
-  isDarkMode: boolean;
+  theme: any;
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -203,41 +203,31 @@ const StatCard: React.FC<StatCardProps> = ({
   accentColor,
   valueColor,
   subtextColor,
-  isDarkMode,
+  theme,
 }) => {
   return (
     <View
       style={[
         styles.summaryMetric,
         {
-          borderColor: isDarkMode ? '#2E2E2E' : '#E5E7EB',
-          backgroundColor: isDarkMode ? '#111827' : '#F9FAFB',
+          borderColor: theme.border,
+          backgroundColor: theme.card,
         },
       ]}
     >
-      {/* Left accent bar using shared separator concept */}
       <View
         style={{
           position: 'absolute',
           left: 0,
           top: 0,
           bottom: 0,
-          width: scale(3),
+          width: scale(4),
           backgroundColor: accentColor,
           borderTopLeftRadius: moderateScale(9),
           borderBottomLeftRadius: moderateScale(9),
         }}
       />
-      <Text
-        style={[
-          styles.statLabel,
-          isDarkMode
-            ? cardStyles.textSecondaryDark
-            : cardStyles.textSecondaryLight,
-        ]}
-      >
-        {label}
-      </Text>
+      <Text style={[styles.statLabel, { color: theme.sub }]}>{label}</Text>
       <Text style={[styles.statValue, { color: valueColor }]}>{value}</Text>
       <Text style={[styles.statSubtext, { color: subtextColor }]}>
         {subtext}
@@ -264,15 +254,18 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
     useState<UserAttendanceCount>(EMPTY_COUNT);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [punchingOut] = useState(false);
+  
   const isDarkMode = useColorScheme() === 'dark';
 
   // ── Shared theme ──
-  const theme = getCardTheme(isDarkMode);
-
-  // Screen-level tokens not in shared theme
-  const screenBg = isDarkMode ? '#111827' : '#F3F4F6';
-  const sectionBg = isDarkMode ? '#1F2937' : '#FFFFFF';
-  const blueText = isDarkMode ? '#93C5FD' : '#3B82F6';
+  const theme = {
+    bg: isDarkMode ? '#0F172A' : '#F8FAFC',
+    card: isDarkMode ? '#1E293B' : '#FFFFFF',
+    text: isDarkMode ? '#F8FAFC' : '#0F172A',
+    sub: isDarkMode ? '#94A3B8' : '#64748B',
+    border: isDarkMode ? '#334155' : '#E2E8F0',
+    primary: '#2563EB',
+  };
 
   useEffect(() => {
     const iv = setInterval(() => {
@@ -386,20 +379,30 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
+      backgroundColor={theme.bg}
     >
       <NetInfoComponent onReconnect={handleRefresh} />
       <>
         {!isReady ? (
           <ScrollView
-            style={[{ flex: 1 }, { backgroundColor: screenBg }]}
+            style={[{ flex: 1 }, { backgroundColor: theme.bg }]}
+            contentContainerStyle={{
+              paddingHorizontal: moderateScale(16),
+              paddingTop: verticalScale(12),
+              paddingBottom: verticalScale(100),
+            }}
             scrollEnabled={false}
           >
             <AttendanceSkeleton />
           </ScrollView>
         ) : (
           <ScrollView
-            style={[{ flex: 1 }, { backgroundColor: screenBg }]}
+            style={[{ flex: 1 }, { backgroundColor: theme.bg }]}
+            contentContainerStyle={{
+              paddingHorizontal: moderateScale(16),
+              paddingTop: verticalScale(12),
+              paddingBottom: verticalScale(100),
+            }}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -412,8 +415,8 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
               style={[
                 styles.dateSelector,
                 {
-                  backgroundColor: sectionBg,
-                  borderBottomColor: theme.cardBorder,
+                  backgroundColor: theme.card,
+                  borderColor: theme.border,
                 },
               ]}
             >
@@ -428,8 +431,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
               style={[
                 styles.summaryPanel,
                 {
-                  backgroundColor: sectionBg,
-                  borderColor: theme.cardBorder,
+                  backgroundColor: theme.bg,
                 },
               ]}
             >
@@ -438,9 +440,9 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 value={attandanceCount?.total_present || 0}
                 subtext="This month"
                 accentColor="#10B981"
-                valueColor={isDarkMode ? '#F9FAFB' : '#111827'}
+                valueColor={theme.text}
                 subtextColor="#10B981"
-                isDarkMode={isDarkMode}
+                theme={theme}
               />
               <StatCard
                 label="LEAVES TAKEN"
@@ -449,7 +451,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 accentColor="#EF4444"
                 valueColor="#EF4444"
                 subtextColor="#EF4444"
-                isDarkMode={isDarkMode}
+                theme={theme}
               />
               <StatCard
                 label="EARLY EXIT"
@@ -459,19 +461,19 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     : '0'
                 }
                 subtext="Before 7.30 pm"
-                accentColor="#F97316"
-                valueColor="#F97316"
-                subtextColor="#F97316"
-                isDarkMode={isDarkMode}
+                accentColor="#F59E0B"
+                valueColor="#F59E0B"
+                subtextColor="#F59E0B"
+                theme={theme}
               />
               <StatCard
                 label="HALF DAYS"
                 value={attandanceCount?.total_halfday || 0}
                 subtext="This month"
-                accentColor="#D97706"
-                valueColor="#D97706"
-                subtextColor="#D97706"
-                isDarkMode={isDarkMode}
+                accentColor="#F59E0B"
+                valueColor="#F59E0B"
+                subtextColor="#F59E0B"
+                theme={theme}
               />
               <StatCard
                 label="LATE TIME"
@@ -484,7 +486,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 accentColor="#F59E0B"
                 valueColor="#F59E0B"
                 subtextColor="#F59E0B"
-                isDarkMode={isDarkMode}
+                theme={theme}
               />
               <StatCard
                 label="TOTAL OVERTIME"
@@ -494,10 +496,10 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     : '0'
                 }
                 subtext="After 7.30 pm"
-                accentColor="#8B5CF6"
-                valueColor="#8B5CF6"
-                subtextColor="#8B5CF6"
-                isDarkMode={isDarkMode}
+                accentColor={theme.primary}
+                valueColor={theme.primary}
+                subtextColor={theme.primary}
+                theme={theme}
               />
             </View>
 
@@ -506,9 +508,8 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
               // ── Active punch-in card ──
               <View
                 style={[
-                  cardStyles.cardWithMargin,
-                  isDarkMode ? cardStyles.cardDark : cardStyles.cardLight,
                   styles.activePunchSection,
+                  { backgroundColor: theme.card, borderColor: theme.border },
                 ]}
               >
                 <View style={styles.activePunchHeader}>
@@ -520,9 +521,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[
                         styles.currentTimeLabel,
-                        isDarkMode
-                          ? cardStyles.textSecondaryDark
-                          : cardStyles.textSecondaryLight,
+                        { color: theme.sub },
                       ]}
                     >
                       Current Time
@@ -531,9 +530,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                       <Text
                         style={[
                           styles.currentTime,
-                          isDarkMode
-                            ? cardStyles.textPrimaryDark
-                            : cardStyles.textPrimaryLight,
+                          { color: theme.text },
                         ]}
                       >
                         {currentTime}
@@ -541,9 +538,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                       <Text
                         style={[
                           styles.currentTimePeriod,
-                          isDarkMode
-                            ? cardStyles.textMutedDark
-                            : cardStyles.textMutedLight,
+                          { color: theme.sub },
                         ]}
                       >
                         {currentPeriod}
@@ -551,35 +546,32 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     </View>
                   </View>
                 </View>
-                {/* Hours worked block — uses shared contentBlock */}
                 <View
                   style={[
-                    cardStyles.contentBlock,
-                    isDarkMode
-                      ? cardStyles.contentBlockDark
-                      : cardStyles.contentBlockLight,
-                    { width: '100%', marginBottom: verticalScale(10) },
+                    styles.contentBlock,
+                    { 
+                      backgroundColor: isDarkMode ? '#334155' : '#F1F5F9',
+                    },
                   ]}
                 >
-                  <AppIcon
-                    name="Clock"
-                    size={moderateScale(22)}
-                    color="#3B82F6"
-                    style={cardStyles.contentBlockIcon}
-                  />
+                  <View style={[styles.iconContainer, { backgroundColor: `${theme.primary}20` }]}>
+                    <AppIcon
+                      name="Clock"
+                      size={moderateScale(22)}
+                      color={theme.primary}
+                    />
+                  </View>
                   <View style={{ marginLeft: scale(11), flex: 1 }}>
                     <Text
                       style={[
                         styles.hoursWorkedLabel,
-                        isDarkMode
-                          ? cardStyles.textSecondaryDark
-                          : cardStyles.textSecondaryLight,
+                        { color: theme.sub },
                       ]}
                     >
                       HOURS WORKED TODAY
                     </Text>
                     <Text
-                      style={[styles.hoursWorkedValue, { color: blueText }]}
+                      style={[styles.hoursWorkedValue, { color: theme.primary }]}
                     >
                       {calculateWorkedHours()}
                     </Text>
@@ -609,9 +601,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                   <Text
                     style={[
                       styles.locationText,
-                      isDarkMode
-                        ? cardStyles.textMutedDark
-                        : cardStyles.textMutedLight,
+                      { color: theme.sub },
                     ]}
                   >
                     📍 {todayAttendance.in_location}
@@ -622,25 +612,24 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
               // ── Completed shift card ──
               <View
                 style={[
-                  cardStyles.cardWithMargin,
-                  isDarkMode ? cardStyles.cardDark : cardStyles.cardLight,
                   styles.completedSummarySection,
+                  { backgroundColor: theme.card, borderColor: theme.border },
                 ]}
               >
                 <View style={styles.completedSummaryHeader}>
                   <View
                     style={[
-                      cardStyles.badge,
-                      { backgroundColor: '#D1FAE5' },
+                      styles.badge,
+                      { backgroundColor: '#10B98120' },
                     ]}
                   >
                     <AppIcon
                       name="CheckCircle"
                       size={moderateScale(14)}
                       color="#10B981"
-                      style={cardStyles.badgeIcon}
+                      style={{ marginRight: scale(4) }}
                     />
-                    <Text style={[cardStyles.badgeText, { color: '#059669' }]}>
+                    <Text style={[styles.badgeText, { color: '#10B981' }]}>
                       SHIFT COMPLETED
                     </Text>
                   </View>
@@ -648,9 +637,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[
                         styles.timeItemLabel,
-                        isDarkMode
-                          ? cardStyles.textSecondaryDark
-                          : cardStyles.textSecondaryLight,
+                        { color: theme.sub },
                       ]}
                     >
                       TOTAL
@@ -658,9 +645,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[
                         styles.completedTotalHours,
-                        isDarkMode
-                          ? cardStyles.textPrimaryDark
-                          : cardStyles.textPrimaryLight,
+                        { color: theme.text },
                       ]}
                     >
                       {getTotalHours()}
@@ -669,11 +654,8 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 </View>
                 <View
                   style={[
-                    cardStyles.divider,
-                    isDarkMode
-                      ? cardStyles.dividerDark
-                      : cardStyles.dividerLight,
-                    { width: '100%' },
+                    styles.divider,
+                    { borderBottomColor: theme.border },
                   ]}
                 />
                 <View style={styles.timeRow}>
@@ -692,17 +674,15 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                       style={[
                         styles.completedTimeItem,
                         {
-                          backgroundColor: isDarkMode ? '#111827' : '#F9FAFB',
-                          borderColor: isDarkMode ? '#2E2E2E' : '#E5E7EB',
+                          backgroundColor: theme.bg,
+                          borderColor: theme.border,
                         },
                       ]}
                     >
                       <Text
                         style={[
                           styles.timeItemLabel,
-                          isDarkMode
-                            ? cardStyles.textSecondaryDark
-                            : cardStyles.textSecondaryLight,
+                          { color: theme.sub },
                         ]}
                       >
                         {t.label}
@@ -710,9 +690,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                       <Text
                         style={[
                           styles.timeItemValue,
-                          isDarkMode
-                            ? cardStyles.textPrimaryDark
-                            : cardStyles.textPrimaryLight,
+                          { color: theme.text },
                         ]}
                       >
                         {t.value}
@@ -729,9 +707,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 <Text
                   style={[
                     styles.recentTitle,
-                    isDarkMode
-                      ? cardStyles.textSecondaryDark
-                      : cardStyles.textSecondaryLight,
+                    { color: theme.sub },
                   ]}
                 >
                   RECENT ACTIVITY
@@ -748,7 +724,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                   <Text
                     style={{
                       fontSize: moderateScale(13),
-                      color: '#3B82F6',
+                      color: theme.primary,
                       fontWeight: '600',
                     }}
                   >
@@ -757,18 +733,16 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 </TouchableOpacity>
               </View>
               {filterJobData.length === 0 ? (
-                <View style={styles.noDataContainer}>
+                <View style={[styles.noDataContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
                   <AppIcon
-                    name="Calendar"
-                    size={moderateScale(40)}
-                    color="#D1D5DB"
+                    name="Inbox"
+                    size={moderateScale(56)}
+                    color="#CBD5E1"
                   />
                   <Text
                     style={[
                       styles.noDataText,
-                      isDarkMode
-                        ? cardStyles.textSecondaryDark
-                        : cardStyles.textSecondaryLight,
+                      { color: theme.text },
                     ]}
                   >
                     No Attendance Data
@@ -800,15 +774,14 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
           <View style={styles.modalOverlay}>
             <View
               style={[
-                cardStyles.card,
-                isDarkMode ? cardStyles.cardDark : cardStyles.cardLight,
                 styles.modalContent,
+                { backgroundColor: theme.card, borderColor: theme.border },
               ]}
             >
               {/* Modal header */}
               <View
                 style={[
-                  cardStyles.headerRow,
+                  styles.headerRow,
                   {
                     marginBottom: verticalScale(17),
                     justifyContent: 'space-between',
@@ -816,15 +789,15 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 ]}
               >
                 <View
-                  style={[cardStyles.badge, { backgroundColor: '#D1FAE5' }]}
+                  style={[styles.badge, { backgroundColor: '#10B98120' }]}
                 >
                   <AppIcon
                     name="CheckCircle"
                     size={moderateScale(18)}
                     color="#10B981"
-                    style={cardStyles.badgeIcon}
+                    style={{ marginRight: scale(4) }}
                   />
-                  <Text style={[cardStyles.badgeText, { color: '#059669' }]}>
+                  <Text style={[styles.badgeText, { color: '#10B981' }]}>
                     SHIFT COMPLETED
                   </Text>
                 </View>
@@ -835,24 +808,21 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                   <AppIcon
                     name="X"
                     size={moderateScale(22)}
-                    color={isDarkMode ? '#94A3B8' : '#6B7280'}
+                    color={theme.sub}
                   />
                 </TouchableOpacity>
               </View>
               {/* Divider */}
               <View
                 style={[
-                  cardStyles.divider,
-                  isDarkMode ? cardStyles.dividerDark : cardStyles.dividerLight,
+                  styles.divider,
+                  { borderBottomColor: theme.border },
                 ]}
               />
               <Text
                 style={[
                   styles.currentTimeLabel,
-                  { textAlign: 'center' },
-                  isDarkMode
-                    ? cardStyles.textSecondaryDark
-                    : cardStyles.textSecondaryLight,
+                  { textAlign: 'center', color: theme.sub },
                 ]}
               >
                 Today's Summary
@@ -860,10 +830,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
               <Text
                 style={[
                   styles.completedTotalHours,
-                  { textAlign: 'center', marginBottom: verticalScale(20) },
-                  isDarkMode
-                    ? cardStyles.textPrimaryDark
-                    : cardStyles.textPrimaryLight,
+                  { textAlign: 'center', marginBottom: verticalScale(20), color: theme.text },
                 ]}
               >
                 Total Hours: {getTotalHours()}
@@ -883,9 +850,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[
                         styles.timeItemLabel,
-                        isDarkMode
-                          ? cardStyles.textSecondaryDark
-                          : cardStyles.textSecondaryLight,
+                        { color: theme.sub },
                       ]}
                     >
                       {t.label}
@@ -893,9 +858,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[
                         styles.timeItemValue,
-                        isDarkMode
-                          ? cardStyles.textPrimaryDark
-                          : cardStyles.textPrimaryLight,
+                        { color: theme.text },
                       ]}
                     >
                       {t.value}
@@ -904,7 +867,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 ))}
               </View>
               <TouchableOpacity
-                style={styles.okButton}
+                style={[styles.okButton, { backgroundColor: theme.primary }]}
                 onPress={() => setShowCompletedModal(false)}
               >
                 <Text style={styles.okButtonText}>OK</Text>
@@ -922,62 +885,63 @@ export default Attendancelist;
 // ─── Local-only styles ────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   dateSelector: {
-    paddingHorizontal: scale(16),
     paddingTop: verticalScale(18),
     paddingBottom: verticalScale(14),
-    borderBottomWidth: 1,
+    borderWidth: 1,
+    borderRadius: moderateScale(16),
+    marginBottom: verticalScale(12),
+    paddingHorizontal: scale(16),
   },
   statsGrid: {
     flexDirection: 'row',
-    paddingHorizontal: scale(16),
     marginTop: verticalScale(14),
     gap: scale(10),
   },
   summaryPanel: {
-    marginHorizontal: scale(10),
-    marginTop: verticalScale(12),
-    borderWidth: 1,
-    borderRadius: moderateScale(14),
-    padding: scale(8),
+    marginTop: verticalScale(4),
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: scale(7),
+    gap: scale(10),
+    justifyContent: 'space-between',
   },
   summaryMetric: {
-    width: '31.8%',
-    minHeight: verticalScale(68),
+    width: '48%',
+    minHeight: verticalScale(74),
     position: 'relative',
     overflow: 'hidden',
     borderWidth: 1,
-    borderRadius: moderateScale(9),
-    paddingHorizontal: scale(9),
-    paddingVertical: verticalScale(8),
-  },
-  statLabel: {
-    fontSize: moderateScale(8),
-    fontWeight: '700',
-    letterSpacing: 0.2,
+    borderRadius: moderateScale(16),
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(10),
     marginBottom: verticalScale(4),
   },
+  statLabel: {
+    fontSize: moderateScale(9),
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: verticalScale(4),
+    textTransform: 'uppercase',
+  },
   statValue: {
-    fontSize: moderateScale(17),
+    fontSize: moderateScale(18),
     fontWeight: '700',
     marginBottom: verticalScale(2),
   },
-  statSubtext: { fontSize: moderateScale(9.5), fontWeight: '500' },
+  statSubtext: { fontSize: moderateScale(10), fontWeight: '500' },
   // Punch section
-  punchSection: { alignItems: 'center', marginTop: verticalScale(20) },
   activePunchSection: {
     alignItems: 'stretch',
-    marginTop: verticalScale(12),
-    padding: moderateScale(12),
+    marginTop: verticalScale(16),
+    padding: moderateScale(16),
+    borderWidth: 1,
+    borderRadius: moderateScale(16),
   },
   activePunchHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: scale(10),
-    marginBottom: verticalScale(10),
+    marginBottom: verticalScale(14),
   },
   currentTimeCompact: {
     alignItems: 'flex-end',
@@ -985,8 +949,10 @@ const styles = StyleSheet.create({
   },
   completedSummarySection: {
     alignItems: 'stretch',
-    marginTop: verticalScale(12),
-    padding: moderateScale(12),
+    marginTop: verticalScale(16),
+    padding: moderateScale(16),
+    borderWidth: 1,
+    borderRadius: moderateScale(16),
   },
   completedSummaryHeader: {
     flexDirection: 'row',
@@ -1001,10 +967,10 @@ const styles = StyleSheet.create({
   punchedInBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#D1FAE5',
-    paddingHorizontal: moderateScale(11),
-    paddingVertical: verticalScale(5),
-    borderRadius: moderateScale(11),
+    backgroundColor: '#10B98120',
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: verticalScale(6),
+    borderRadius: moderateScale(12),
   },
   punchedInDot: {
     width: scale(6),
@@ -1014,8 +980,20 @@ const styles = StyleSheet.create({
     marginRight: scale(6),
   },
   punchedInText: {
-    fontSize: moderateScale(9.5),
-    color: '#059669',
+    fontSize: moderateScale(10),
+    color: '#10B981',
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: verticalScale(6),
+    borderRadius: moderateScale(12),
+  },
+  badgeText: {
+    fontSize: moderateScale(10),
     fontWeight: '700',
     letterSpacing: 0.5,
   },
@@ -1028,7 +1006,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   currentTime: {
-    fontSize: moderateScale(26, 0.4),
+    fontSize: moderateScale(24, 0.4),
     fontWeight: '700',
   },
   currentTimePeriod: {
@@ -1036,21 +1014,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: scale(4),
   },
+  contentBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: moderateScale(12),
+    borderRadius: moderateScale(12),
+    marginBottom: verticalScale(16),
+    width: '100%',
+  },
+  iconContainer: {
+    width: moderateScale(40),
+    height: moderateScale(40),
+    borderRadius: moderateScale(10),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   hoursWorkedLabel: {
-    fontSize: moderateScale(9.5),
+    fontSize: moderateScale(10),
     fontWeight: '700',
     letterSpacing: 0.5,
     marginBottom: verticalScale(2),
+    textTransform: 'uppercase',
   },
-  hoursWorkedValue: { fontSize: moderateScale(15), fontWeight: '700' },
+  hoursWorkedValue: { fontSize: moderateScale(16), fontWeight: '700' },
   punchOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#EF4444',
-    paddingVertical: verticalScale(11),
-    paddingHorizontal: moderateScale(28),
-    borderRadius: moderateScale(11),
+    height: verticalScale(50),
+    borderRadius: moderateScale(12),
     width: '100%',
     shadowColor: '#EF4444',
     shadowOffset: { width: 0, height: 4 },
@@ -1065,9 +1058,9 @@ const styles = StyleSheet.create({
     marginLeft: scale(7),
   },
   locationText: {
-    fontSize: moderateScale(10.5),
+    fontSize: moderateScale(11),
     fontStyle: 'italic',
-    marginTop: verticalScale(7),
+    marginTop: verticalScale(10),
     textAlign: 'center',
   },
   completedTotalHours: {
@@ -1077,22 +1070,23 @@ const styles = StyleSheet.create({
   timeRow: {
     flexDirection: 'row',
     width: '100%',
-    gap: scale(8),
+    gap: scale(10),
   },
   completedTimeItem: {
     flex: 1,
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: moderateScale(9),
-    paddingVertical: verticalScale(8),
+    borderRadius: moderateScale(12),
+    paddingVertical: verticalScale(10),
   },
   timeItemLabel: {
-    fontSize: moderateScale(9.5),
+    fontSize: moderateScale(10),
     fontWeight: '700',
     letterSpacing: 0.5,
-    marginBottom: verticalScale(3),
+    marginBottom: verticalScale(4),
+    textTransform: 'uppercase',
   },
-  timeItemValue: { fontSize: moderateScale(16), fontWeight: '600' },
+  timeItemValue: { fontSize: moderateScale(15), fontWeight: '600' },
   // Recent activity
   recentSection: {
     marginTop: verticalScale(24),
@@ -1102,20 +1096,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: scale(16),
     marginBottom: verticalScale(14),
   },
   recentTitle: {
     fontSize: moderateScale(11),
     fontWeight: '700',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   noDataContainer: {
-    padding: moderateScale(34),
+    padding: moderateScale(40),
     alignItems: 'center',
-    gap: verticalScale(10),
+    gap: verticalScale(12),
+    borderWidth: 1,
+    borderRadius: moderateScale(16),
   },
-  noDataText: { fontSize: moderateScale(13) },
+  noDataText: { 
+    fontSize: moderateScale(14),
+    fontWeight: '500',
+  },
+  divider: {
+    width: '100%',
+    borderBottomWidth: 1,
+    marginVertical: verticalScale(14),
+  },
   // Modal
   modalOverlay: {
     flex: 1,
@@ -1127,16 +1131,20 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '100%',
     maxWidth: scale(400),
-    padding: moderateScale(22),
-    borderRadius: moderateScale(22),
+    padding: moderateScale(24),
+    borderRadius: moderateScale(16),
+    borderWidth: 1,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   okButton: {
-    backgroundColor: '#3B82F6',
-    paddingVertical: verticalScale(13),
-    paddingHorizontal: moderateScale(28),
-    borderRadius: moderateScale(11),
+    height: verticalScale(50),
+    borderRadius: moderateScale(12),
     alignItems: 'center',
-    marginTop: verticalScale(10),
+    justifyContent: 'center',
+    marginTop: verticalScale(16),
   },
   okButtonText: {
     fontSize: moderateScale(15),
@@ -1144,3 +1152,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+

@@ -18,8 +18,6 @@ import { AuthStackScreenProps } from '../../navigation/navigationTypes';
 import MainStyle from '../../assets/style/maincss';
 import {
   moderateScale,
-  moderateVerticalScale,
-  scale,
   verticalScale,
 } from 'react-native-size-matters';
 import { Eye, EyeOff } from 'lucide-react-native';
@@ -39,22 +37,18 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const isDarkMode = useColorScheme() === 'dark';
   const mainStyles = MainStyle();
+
   const theme = {
-    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
-    logoCard: isDarkMode ? '#1F2937' : '#FFFFFF',
-    title: isDarkMode ? '#F9FAFB' : '#111827',
-    subtitle: isDarkMode ? '#9CA3AF' : '#6B7280',
-    card: isDarkMode ? '#1F2937' : '#FFFFFF',
-    label: isDarkMode ? '#94A3B8' : '#9CA3AF',
-    inputBg: isDarkMode ? '#0F172A' : '#F9FAFB',
-    inputText: isDarkMode ? '#F9FAFB' : '#111827',
-    placeholder: isDarkMode ? '#64748B' : '#9CA3AF',
-    button: '#2563EB',
-    forgot: '#60A5FA',
-    version: isDarkMode ? '#64748B' : '#CBD5E1',
+    screenBg: isDarkMode ? '#0F172A' : '#F8FAFC',
+    heroBg: isDarkMode ? '#1E3A8A' : '#1D4ED8',
+    cardBg: isDarkMode ? '#1E293B' : '#FFFFFF',
+    textPrimary: isDarkMode ? '#F8FAFC' : '#0F172A',
+    textSecondary: isDarkMode ? '#94A3B8' : '#64748B',
+    inputBg: isDarkMode ? '#0F172A' : '#F8FAFC',
     inputBorder: isDarkMode ? '#334155' : '#E2E8F0',
-    cardBorder: isDarkMode ? '#1E293B' : '#E2E8F0',
+    button: '#2563EB',
   };
+
   const handleLogin = async () => {
     if (!mobileNo || !password) {
       ToastUtil.info('Please enter mobile number and password');
@@ -93,16 +87,16 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.screenBg }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.heroBg }} edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
-        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? verticalScale(80) : verticalScale(20)}
+        style={{ flex: 1, backgroundColor: theme.screenBg }}
       >
         <StatusBar
           backgroundColor={'transparent'}
           translucent
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          barStyle={'light-content'}
         />
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -111,49 +105,48 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
           bounces={false}
         >
           <View style={styles.wrapper}>
-            {/* Logo */}
-            <View
-              style={[
-                styles.logoContainer,
-                { backgroundColor: theme.logoCard },
-              ]}
-            >
-              <Image
-                source={require('../../assets/images/login_logo.jpeg')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
+            {/* Hero Section */}
+            <View style={[styles.heroSection, { backgroundColor: theme.heroBg }]}>
+              {/* Decorative circles */}
+              <View style={styles.circle1} />
+              <View style={styles.circle2} />
+
+              {/* Logo */}
+              <View style={styles.logoContainer}>
+                <Image
+                  source={require('../../assets/images/login_logo.jpeg')}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+              </View>
+
+              {/* Title */}
+              <Text style={styles.companyName}>Shantinath Motors Pvt Ltd</Text>
+              <Text style={styles.heroSubtitle}>Workforce Management Platform</Text>
             </View>
 
-            {/* Title */}
-            <Text style={styles.title}>
-              <Text style={[styles.titleBold, { color: theme.title }]}>
-                Shantinath Motors Pvt Ltd{' '}
-              </Text>
-            </Text>
-            <Text style={[styles.subtitle, { color: theme.subtitle }]}>
-              Workforce App
-            </Text>
+            {/* Login Card — floats over hero with negative marginTop */}
+            <View style={[styles.card, { backgroundColor: theme.cardBg }]}>
+              <Text style={[styles.welcomeTitle, { color: theme.textPrimary }]}>Welcome Back</Text>
+              <Text style={[styles.welcomeSubtitle, { color: theme.textSecondary }]}>Sign in to continue</Text>
 
-            {/* Card */}
-            <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder, borderWidth: 1 }]}>
-              <Text style={[styles.label, { color: theme.label }]}>
+              <Text style={[styles.label, { color: theme.textSecondary }]}>
                 MOBILE NUMBER
               </Text>
               <TextInput
-                placeholder="mobile number"
+                placeholder="Mobile number"
                 style={[
                   styles.input,
-                  { backgroundColor: theme.inputBg, color: theme.inputText, borderColor: theme.inputBorder, borderWidth: 1 },
+                  { backgroundColor: theme.inputBg, color: theme.textPrimary, borderColor: theme.inputBorder },
                 ]}
-                placeholderTextColor={theme.placeholder}
+                placeholderTextColor={theme.textSecondary}
                 value={mobileNo}
                 onChangeText={setMobileNo}
                 keyboardType="numeric"
                 maxLength={10}
               />
 
-              <Text style={[styles.label, { color: theme.label }]}>
+              <Text style={[styles.label, { color: theme.textSecondary }]}>
                 PASSWORD
               </Text>
               <View style={styles.passwordWrapper}>
@@ -161,9 +154,9 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
                   placeholder="••••••••"
                   style={[
                     styles.passwordInput,
-                    { backgroundColor: theme.inputBg, color: theme.inputText, borderColor: theme.inputBorder, borderWidth: 1 },
+                    { backgroundColor: theme.inputBg, color: theme.textPrimary, borderColor: theme.inputBorder },
                   ]}
-                  placeholderTextColor={theme.placeholder}
+                  placeholderTextColor={theme.textSecondary}
                   secureTextEntry={secure}
                   value={password ?? ''}
                   onChangeText={setPassword}
@@ -175,9 +168,9 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
                   activeOpacity={0.7}
                 >
                   {secure ? (
-                    <Eye size={20} color={theme.placeholder} />
+                    <Eye size={moderateScale(20)} color={theme.textSecondary} />
                   ) : (
-                    <EyeOff size={20} color={theme.placeholder} />
+                    <EyeOff size={moderateScale(20)} color={theme.textSecondary} />
                   )}
                 </TouchableOpacity>
               </View>
@@ -191,13 +184,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* <TouchableOpacity>
-              <Text style={[styles.forgot, { color: theme.forgot }]}>
-                Forgot Password?
-              </Text>
-            </TouchableOpacity> */}
-
-            <Text style={[styles.version, { color: theme.version }]}>
+            <Text style={[styles.version, { color: theme.textSecondary }]}>
               VERSION {VersionCheck.getCurrentVersion()} • ENTERPRISE EDITION
             </Text>
           </View>
@@ -217,129 +204,144 @@ export default SignIn;
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-  },
-  wrapper: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: verticalScale(30),
     paddingBottom: verticalScale(30),
   },
+  wrapper: {
+    flex: 1,
+  },
+  heroSection: {
+    height: verticalScale(260),
+    alignItems: 'center',
+    paddingTop: verticalScale(50),
+    overflow: 'hidden',
+  },
+  circle1: {
+    position: 'absolute',
+    top: verticalScale(-50),
+    left: moderateScale(-50),
+    width: moderateScale(200),
+    height: moderateScale(200),
+    borderRadius: moderateScale(100),
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  circle2: {
+    position: 'absolute',
+    bottom: verticalScale(-80),
+    right: moderateScale(-40),
+    width: moderateScale(250),
+    height: moderateScale(250),
+    borderRadius: moderateScale(125),
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
   logoContainer: {
-    width: moderateScale(96),
-    height: moderateVerticalScale(96),
-    borderRadius: moderateScale(24),
+    width: moderateScale(88),
+    height: moderateScale(88),
+    borderRadius: moderateScale(44),
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: verticalScale(20),
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
+    marginBottom: verticalScale(16),
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: moderateScale(12),
+    shadowOffset: { width: 0, height: verticalScale(4) },
+    elevation: 6,
   },
   logo: {
-    width: moderateScale(76),
-    height: moderateVerticalScale(76),
+    width: moderateScale(64),
+    height: moderateScale(64),
+    borderRadius: moderateScale(32),
   },
-  title: {
-    fontSize: moderateScale(22),
-    letterSpacing: 0.5,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 4,
-  },
-  titleBold: {
+  companyName: {
+    color: '#FFFFFF',
+    fontSize: moderateScale(20),
     fontWeight: '800',
-    color: '#0F172A',
+    marginBottom: verticalScale(4),
+    textAlign: 'center',
+    paddingHorizontal: moderateScale(20),
   },
-  titleLight: {
-    fontWeight: '400',
-    color: '#0F172A',
-  },
-  subtitle: {
-    fontSize: scale(13),
-    color: '#64748B',
-    marginBottom: verticalScale(28),
-    fontWeight: '500',
-    letterSpacing: 0.5,
+  heroSubtitle: {
+    color: '#FFFFFF',
+    opacity: 0.75,
+    fontSize: moderateScale(12),
+    letterSpacing: 0.4,
   },
   card: {
-    width: '90%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.06,
-    shadowRadius: 24,
-    elevation: 4,
+    marginTop: verticalScale(-40),
+    marginHorizontal: moderateScale(20),
+    borderRadius: moderateScale(24),
+    padding: moderateScale(24),
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: moderateScale(20),
+    shadowOffset: { width: 0, height: verticalScale(8) },
+    elevation: 8,
+  },
+  welcomeTitle: {
+    fontSize: moderateScale(22),
+    fontWeight: '800',
+    marginBottom: verticalScale(4),
+    letterSpacing: -0.3,
+  },
+  welcomeSubtitle: {
+    fontSize: moderateScale(14),
+    marginBottom: verticalScale(20),
   },
   label: {
-    fontSize: 11,
-    color: '#64748B',
-    marginBottom: 8,
-    marginTop: 14,
+    fontSize: moderateScale(11),
     fontWeight: '600',
     letterSpacing: 1.2,
+    marginBottom: verticalScale(8),
+    marginTop: verticalScale(10),
   },
   input: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    height: 52,
-    fontSize: 15,
-    color: '#0F172A',
+    height: verticalScale(52),
+    borderRadius: moderateScale(12),
+    borderWidth: 1,
+    paddingHorizontal: moderateScale(16),
+    fontSize: moderateScale(14),
+    marginBottom: verticalScale(4),
   },
   passwordWrapper: {
     position: 'relative',
     justifyContent: 'center',
   },
   passwordInput: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingRight: 48,
-    height: 52,
-    fontSize: 15,
-    color: '#0F172A',
+    height: verticalScale(52),
+    borderRadius: moderateScale(12),
+    borderWidth: 1,
+    paddingHorizontal: moderateScale(16),
+    paddingRight: moderateScale(48),
+    fontSize: moderateScale(14),
   },
   eyeButton: {
     position: 'absolute',
-    right: 16,
+    right: moderateScale(16),
     height: '100%',
     justifyContent: 'center',
   },
   signInButton: {
-    marginTop: 24,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: '#2563EB',
+    height: verticalScale(52),
+    borderRadius: moderateScale(14),
+    marginTop: verticalScale(28),
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#2563EB',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    shadowOpacity: 0.3,
+    shadowRadius: moderateScale(10),
+    shadowOffset: { width: 0, height: verticalScale(4) },
+    elevation: 4,
   },
   signInText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  forgot: {
-    color: '#2563EB',
-    marginVertical: 14,
-    fontSize: scale(13),
-    fontWeight: '600',
+    letterSpacing: 0.4,
   },
   version: {
-    marginTop: verticalScale(30),
-    fontSize: scale(10),
-    color: '#94A3B8',
+    textAlign: 'center',
+    marginTop: verticalScale(36),
+    fontSize: moderateScale(10),
     letterSpacing: 1.5,
     fontWeight: '500',
   },

@@ -16,7 +16,6 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { ChevronLeft } from 'lucide-react-native';
 import {
   moderateScale,
-  moderateVerticalScale,
   scale,
   verticalScale,
 } from 'react-native-size-matters';
@@ -32,24 +31,26 @@ interface OtpScreenProps extends AuthStackScreenProps<'otp'> {}
 const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
   const authContext = useContext(AuthContext);
   const isDarkMode = useColorScheme() === 'dark';
-  
+
   const theme = {
-    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
-    logoCard: isDarkMode ? '#1F2937' : '#FFFFFF',
-    title: isDarkMode ? '#F9FAFB' : '#111827',
-    subtitle: isDarkMode ? '#9CA3AF' : '#6B7280',
-    card: isDarkMode ? '#1F2937' : '#FFFFFF',
-    label: isDarkMode ? '#94A3B8' : '#9CA3AF',
-    inputBg: isDarkMode ? '#0F172A' : '#F9FAFB',
-    inputText: isDarkMode ? '#F9FAFB' : '#111827',
-    placeholder: isDarkMode ? '#64748B' : '#9CA3AF',
+    heroBg: isDarkMode ? '#1E3A8A' : '#1D4ED8',
+    screenBg: isDarkMode ? '#0F172A' : '#F8FAFC',
+    card: isDarkMode ? '#1E293B' : '#FFFFFF',
+    title: '#FFFFFF',
+    cardTitle: isDarkMode ? '#F8FAFC' : '#0F172A',
+    subtitle: isDarkMode ? '#94A3B8' : '#64748B',
+    heroSubtitle: isDarkMode ? '#93C5FD' : '#DBEAFE',
+    label: isDarkMode ? '#94A3B8' : '#64748B',
+    inputBg: isDarkMode ? '#0F172A' : '#F8FAFC',
+    inputText: isDarkMode ? '#F8FAFC' : '#0F172A',
+    placeholder: isDarkMode ? '#64748B' : '#94A3B8',
     button: '#2563EB',
-    buttonDisabled: isDarkMode ? '#4B5563' : '#CBD5E1',
+    buttonDisabled: isDarkMode ? '#334155' : '#E2E8F0',
     success: '#10B981',
     error: '#EF4444',
     warning: '#F59E0B',
     inputBorder: isDarkMode ? '#334155' : '#E2E8F0',
-    cardBorder: isDarkMode ? '#1E293B' : '#E2E8F0',
+    cardBorder: isDarkMode ? '#334155' : '#E2E8F0',
   };
 
   const otpLength = 6;
@@ -187,57 +188,69 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
   const isTimerExpiring = timeLeft < 60;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.screenBg }}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
-        style={{ flex: 1 }}
-      >
-        <StatusBar
-          backgroundColor={'transparent'}
-          translucent
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        />
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          bounces={false}
+    <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: theme.heroBg }]}>
+      <StatusBar
+        backgroundColor="transparent"
+        translucent
+        barStyle="light-content"
+      />
+      <View style={[styles.mainContainer, { backgroundColor: theme.screenBg }]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          style={styles.keyboardView}
         >
-          {/* Header with back button */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              activeOpacity={0.7}
-            >
-              <ChevronLeft
-                size={24}
-                color={theme.title}
-                strokeWidth={2.5}
-              />
-            </TouchableOpacity>
-          </View>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            {/* Hero Section */}
+            <View style={[styles.heroSection, { backgroundColor: theme.heroBg }]}>
+              {/* Decorative circles */}
+              <View style={styles.circleLarge} />
+              <View style={styles.circleSmall} />
+              
+              {/* Header with back button */}
+              <View style={styles.header}>
+                <TouchableOpacity
+                  onPress={() => navigation.goBack()}
+                  activeOpacity={0.7}
+                  style={styles.backButton}
+                >
+                  <ChevronLeft
+                    size={moderateScale(24)}
+                    color="#FFFFFF"
+                    strokeWidth={2.5}
+                  />
+                </TouchableOpacity>
+              </View>
+              
+              <View style={styles.heroContent}>
+                <Text style={[styles.heroTitle, { color: theme.title }]}>
+                  Verification
+                </Text>
+                <Text style={[styles.heroSubtitle, { color: theme.heroSubtitle }]}>
+                  We've sent a 6-digit code to {maskedMobileNumber}
+                </Text>
+              </View>
+            </View>
 
-          <View style={styles.wrapper}>
-            {/* Title */}
-            <Text style={[styles.title, { color: theme.title }]}>
-              Enter OTP
-            </Text>
-            <Text style={[styles.subtitle, { color: theme.subtitle }]}>
-              We've sent a 6-digit code to {maskedMobileNumber}
-            </Text>
-
-            {/* OTP Input Card */}
+            {/* Floating Card */}
             <View
               style={[
                 styles.card,
                 {
                   backgroundColor: theme.card,
                   borderColor: theme.cardBorder,
-                  borderWidth: 1,
+                  borderWidth: isDarkMode ? 1 : 0,
+                  shadowColor: isDarkMode ? 'transparent' : '#0F172A',
                 },
               ]}
             >
+              <Text style={[styles.cardTitle, { color: theme.cardTitle }]}>Enter OTP</Text>
+              
               {/* OTP Input Fields */}
               <View style={styles.otpContainer}>
                 {Array(otpLength)
@@ -256,7 +269,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
                           borderColor: otp[index]
                             ? theme.button
                             : theme.inputBorder,
-                          borderWidth: 2,
+                          borderWidth: 1,
                         },
                       ]}
                       value={otp[index]}
@@ -312,6 +325,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
                   onPress={handleResendOtp}
                   disabled={!canResend || resendLoading}
                   activeOpacity={0.7}
+                  style={styles.resendBtnContainer}
                 >
                   <Text
                     style={[
@@ -327,19 +341,15 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
               </View>
             </View>
 
-            {/* Helper Text */}
-            <Text style={[styles.helperText, { color: theme.subtitle }]}>
-              Enter the 6-digit code sent to your phone number
-            </Text>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
 
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={theme.button} />
-        </View>
-      )}
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={theme.button} />
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -347,77 +357,108 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ navigation, route }) => {
 export default OtpScreen;
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  mainContainer: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    paddingBottom: verticalScale(40),
+  },
+  heroSection: {
+    height: verticalScale(200),
+    paddingHorizontal: moderateScale(20),
+    borderBottomLeftRadius: moderateScale(24),
+    borderBottomRightRadius: moderateScale(24),
+    overflow: 'hidden',
+  },
+  circleLarge: {
+    position: 'absolute',
+    top: verticalScale(-50),
+    right: moderateScale(-20),
+    width: moderateScale(150),
+    height: moderateScale(150),
+    borderRadius: moderateScale(75),
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  circleSmall: {
+    position: 'absolute',
+    top: verticalScale(60),
+    right: moderateScale(-30),
+    width: moderateScale(80),
+    height: moderateScale(80),
+    borderRadius: moderateScale(40),
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
   header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  wrapper: {
-    width: '100%',
+    marginTop: verticalScale(10),
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: verticalScale(20),
+    marginBottom: verticalScale(20),
   },
-  title: {
-    fontSize: moderateScale(24),
+  backButton: {
+    padding: moderateScale(8),
+    marginLeft: moderateScale(-8),
+    borderRadius: moderateScale(8),
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  heroContent: {
+    marginTop: verticalScale(10),
+  },
+  heroTitle: {
+    fontSize: moderateScale(28),
     fontWeight: '800',
     letterSpacing: 0.5,
-    textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
   },
-  subtitle: {
-    fontSize: scale(13),
+  heroSubtitle: {
+    fontSize: moderateScale(14),
     fontWeight: '500',
-    letterSpacing: 0.3,
-    textAlign: 'center',
-    marginBottom: verticalScale(28),
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
   },
   card: {
-    width: '100%',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.06,
-    shadowRadius: 24,
+    marginHorizontal: moderateScale(20),
+    marginTop: verticalScale(-40),
+    borderRadius: moderateScale(16),
+    padding: moderateScale(24),
+    shadowOpacity: 0.08,
+    shadowRadius: moderateScale(16),
+    shadowOffset: { width: 0, height: verticalScale(4) },
     elevation: 4,
+  },
+  cardTitle: {
+    fontSize: moderateScale(18),
+    fontWeight: '700',
+    marginBottom: verticalScale(20),
   },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
-    gap: 8,
+    marginBottom: verticalScale(24),
   },
   otpInput: {
-    flex: 1,
-    height: moderateVerticalScale(56),
-    borderRadius: 14,
+    width: moderateScale(42),
+    height: moderateScale(48),
+    borderRadius: moderateScale(12),
     fontSize: moderateScale(20),
     fontWeight: '700',
     textAlign: 'center',
-    letterSpacing: 8,
   },
   verifyButton: {
-    height: 52,
-    borderRadius: 14,
+    height: verticalScale(52),
+    borderRadius: moderateScale(14),
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#2563EB',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-    marginBottom: 16,
+    marginBottom: verticalScale(20),
   },
   verifyButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '700',
     letterSpacing: 0.5,
   },
@@ -425,30 +466,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 16,
+    paddingTop: verticalScale(16),
     borderTopWidth: 1,
     borderTopColor: 'rgba(100, 116, 139, 0.1)',
   },
   timerText: {
-    fontSize: scale(13),
+    fontSize: moderateScale(13),
     fontWeight: '500',
   },
+  resendBtnContainer: {
+    paddingVertical: verticalScale(4),
+    paddingHorizontal: moderateScale(8),
+  },
   resendButton: {
-    fontSize: scale(13),
+    fontSize: moderateScale(13),
     fontWeight: '700',
     letterSpacing: 0.3,
   },
-  helperText: {
-    fontSize: scale(12),
-    textAlign: 'center',
-    fontWeight: '400',
-    marginTop: 8,
-  },
   loadingOverlay: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
 });
+

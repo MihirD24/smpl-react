@@ -1,97 +1,241 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Smpl — Workforce Management App
 
-# Getting Started
+> A modern, enterprise-grade HRMS (Human Resource Management System) mobile application built with **React Native**, designed for **Shantinath Motors Pvt Ltd**.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 📱 App Overview
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+Smpl is a full-featured workforce management platform featuring:
+- **Employee attendance** tracking with GPS punch-in/out
+- **Leave management** with approval workflows
+- **Service visit** management
+- **Dashboard** with real-time HR metrics
+- **Profile** management with salary & holiday views
+- **Notifications** system
+- **Admin & Employee** dual-role support
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 🎨 UI/UX Design System
 
-# OR using Yarn
-yarn start
+This app follows a strict, modern design system inspired by enterprise HRMS apps like **Darwinbox, Keka, and Workday**.
+
+### Color Palette
+
+| Role | Light Mode | Dark Mode |
+|---|---|---|
+| **Primary Brand** | `#2563EB` | `#3B82F6` |
+| **Screen Background** | `#F8FAFC` | `#0F172A` |
+| **Surface / Card** | `#FFFFFF` | `#1E293B` |
+| **Text Primary** | `#0F172A` | `#F8FAFC` |
+| **Text Secondary** | `#64748B` | `#94A3B8` |
+| **Border** | `#E2E8F0` | `#334155` |
+| **Success** | `#10B981` | `#10B981` |
+| **Error** | `#EF4444` | `#F87171` |
+| **Warning** | `#F59E0B` | `#FBBF24` |
+
+### Typography Scale
+All font sizes use `moderateScale()` from `react-native-size-matters` to ensure consistent rendering across all screen densities.
+
+| Element | Size | Weight |
+|---|---|---|
+| Hero Title | `moderateScale(24)` | 800 |
+| Section Title | `moderateScale(20)` | 700 |
+| Card Value | `moderateScale(22–24)` | 800 |
+| Body | `moderateScale(14)` | 400 |
+| Label (uppercase) | `moderateScale(11)` | 600, letterSpacing: 1.2 |
+| Caption | `moderateScale(12)` | 400 |
+
+### Spacing & Sizing
+All spacing uses `verticalScale()` and `moderateScale()`:
+
+| Component | Spec |
+|---|---|
+| Card border radius | `moderateScale(16–18)` |
+| Input height | `verticalScale(52)` |
+| Button height | `verticalScale(50–52)` |
+| Button radius | `moderateScale(12–14)` |
+| Icon container | `moderateScale(36–44)` |
+| Screen H-padding | `moderateScale(16)` |
+
+---
+
+## 🏗 Architecture
+
+```
+src/
+├── assets/
+│   ├── images/          # Logo, profile placeholder
+│   └── style/
+│       ├── maincss.tsx       # Global shared styles (MainStyle hook)
+│       ├── cardStyles.tsx    # Shared card styles + getCardTheme()
+│       ├── formStyles.tsx    # Form field shared styles
+│       └── commonFilter.tsx  # Filter bar shared styles
+├── components/          # Reusable UI components
+│   ├── appIcon.tsx          # Lucide icon wrapper
+│   ├── screenWrapper.tsx    # Screen layout with header/safe area
+│   ├── searchBarComponent.tsx
+│   ├── button/addButton.tsx # FAB add button
+│   └── filterBottomSheet/  # Reusable filter bottom sheet
+├── context/
+│   └── authContext.tsx  # Auth state & token management
+├── navigation/          # React Navigation stacks & tab navigators
+├── screens/
+│   ├── signIn/          # Login & OTP verification
+│   ├── home/            # Dashboard with metric cards
+│   ├── attandance/      # Attendance list, punch, card, filters
+│   ├── leave/           # Leave requests, add leave, card
+│   ├── notification/    # Notification feed
+│   ├── profile/         # User profile, quick access, settings
+│   └── serviceVisit/   # Service visit management
+├── services/            # API service layer
+├── skeletonview/        # Skeleton loading placeholders
+├── types/               # TypeScript type definitions
+└── utils/               # Helpers (date, toast, etc.)
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## 📐 Responsive Design Principles
 
-### Android
+### 1. React Native Size Matters
+Every dimension in the app uses scaling functions:
 
-```sh
-# Using npm
-npm run android
+```ts
+import { moderateScale, verticalScale, scale } from 'react-native-size-matters';
 
-# OR using Yarn
-yarn android
+// Use moderateScale for font sizes & horizontal dimensions (less aggressive scaling)
+fontSize: moderateScale(14)
+borderRadius: moderateScale(16)
+paddingHorizontal: moderateScale(16)
+
+// Use verticalScale for heights and vertical spacing
+height: verticalScale(52)
+paddingTop: verticalScale(20)
+marginBottom: verticalScale(12)
+
+// Use scale only when you want 1:1 width-based scaling
+width: scale(40)
+```
+
+### 2. Safe Area Handling
+All screens use `<SafeAreaView>` from `react-native-safe-area-context` to properly handle notches, status bars, and home indicators across iOS and Android devices.
+
+### 3. Keyboard Handling
+Login and form screens use `<KeyboardAvoidingView>` from `react-native-keyboard-controller` to push content above the keyboard, preventing input fields from being obscured.
+
+### 4. Flex-based Layouts
+Avoid fixed widths/heights for containers. Use `flex: 1`, `flexDirection`, `justifyContent`, and `alignItems` for fluid, screen-size-agnostic layouts.
+
+---
+
+## 🌓 Dark Mode
+
+The app uses `useColorScheme()` from React Native to automatically detect the system theme. A `theme` or `t` object is computed at the top of each screen:
+
+```ts
+const isDarkMode = useColorScheme() === 'dark';
+const t = {
+  bg:     isDarkMode ? '#0F172A' : '#F8FAFC',
+  card:   isDarkMode ? '#1E293B' : '#FFFFFF',
+  text:   isDarkMode ? '#F8FAFC' : '#0F172A',
+  sub:    isDarkMode ? '#94A3B8' : '#64748B',
+  border: isDarkMode ? '#334155' : '#E2E8F0',
+  primary: '#2563EB',
+};
+```
+
+---
+
+## 🔧 Running the App
+
+### Prerequisites
+- Node.js 18+
+- React Native CLI
+- Android Studio (for Android) / Xcode (for iOS)
+- CocoaPods (for iOS)
+
+### Install
+
+```bash
+yarn install
+# or
+npm install
 ```
 
 ### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
+```bash
+cd ios && pod install && cd ..
 yarn ios
+# or for production
+yarn ios:prod
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Android
+```bash
+yarn android
+# or for production APK
+yarn android:release:apk
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Start Metro Bundler
+```bash
+yarn start
+```
 
-## Step 3: Modify your app
+---
 
-Now that you have successfully run the app, let's make changes!
+## 📦 Key Dependencies
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+| Package | Purpose |
+|---|---|
+| `react-native` | Core framework |
+| `@react-navigation/native` | Navigation |
+| `@gorhom/bottom-sheet` | Bottom sheets |
+| `react-native-size-matters` | Responsive scaling |
+| `react-native-safe-area-context` | Safe area handling |
+| `react-native-keyboard-controller` | Keyboard avoidance |
+| `lucide-react-native` | Icon library |
+| `moment` | Date formatting |
+| `@react-native-async-storage/async-storage` | Local storage |
+| `react-native-gesture-handler` | Touch gestures |
+| `react-native-maps` | Location/map features |
+| `react-native-version-check` | App version display |
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+---
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 🖼 Screen Descriptions
 
-## Congratulations! :tada:
+| Screen | Path | Description |
+|---|---|---|
+| **Sign In** | `screens/signIn/signIn.tsx` | Login with mobile + password, hero banner design |
+| **OTP** | `screens/signIn/OtpScreen.tsx` | 6-digit OTP verification with countdown |
+| **Home** | `screens/home/home.tsx` | Dashboard with greeting, metric cards, quick actions |
+| **Attendance List** | `screens/attandance/attendanceList.tsx` | Full attendance history with date filter |
+| **Punch** | `screens/attandance/punch.tsx` | GPS-based punch in/out |
+| **Attendance Card** | `screens/attandance/attendanceCard.tsx` | Single day attendance detail card |
+| **Leave List** | `screens/leave/leaveList.tsx` | Leave requests with search & filter |
+| **Add Leave** | `screens/leave/addLeave.tsx` | Leave application form |
+| **Leave Card** | `screens/leave/leaveRquestCard.tsx` | Leave request card with approval actions |
+| **Profile** | `screens/profile/profile.tsx` | User profile with hero banner, quick access, menu |
+| **Notifications** | `screens/notification/notificationScreen.tsx` | Notification feed |
+| **Service Visits** | `screens/serviceVisit/` | Service visit tracking |
 
-You've successfully run and modified your React Native App. :partying_face:
+---
 
-### Now what?
+## 👨‍💻 Code Style Guidelines
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+1. **TypeScript** — All components are typed with proper interfaces/types
+2. **Functional Components** — Use React hooks, no class components
+3. **No hardcoded colors** — Always use the `theme`/`t` object or named constants
+4. **No hardcoded sizes** — Always use `moderateScale`, `verticalScale`, or `scale`
+5. **Consistent naming** — camelCase for variables/functions, PascalCase for components
+6. **Comments** — Section separators use `// ─── Section Name ──────` format
+7. **StyleSheet** — Always define styles in `StyleSheet.create({})` at the bottom of the file
 
-# Troubleshooting
+---
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## 📄 License
 
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Private — Shantinath Motors Pvt Ltd. All rights reserved.

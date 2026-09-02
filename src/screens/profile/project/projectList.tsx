@@ -18,8 +18,8 @@ const ProjectList: React.FC<AppStackScreenProps<'Project'>> = ({
   const MainStyles = MainStyle();
   const isDarkMode = useColorScheme() === 'dark';
   const theme = {
-    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
-    text: isDarkMode ? '#F9FAFB' : '#1E293B',
+    screenBg: isDarkMode ? '#0F172A' : '#F8FAFC',
+    text: isDarkMode ? '#F8FAFC' : '#0F172A',
   };
   const [search, setSearch] = useState('');
   const [filteredData, setFilteredData] = useState<StaffProject[]>([]);
@@ -64,7 +64,7 @@ const ProjectList: React.FC<AppStackScreenProps<'Project'>> = ({
       withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
+      backgroundColor={isDarkMode ? '#0F172A' : '#F8FAFC'}
     >
       <NetInfoComponent onReconnect={handleProjectData} />
     <View

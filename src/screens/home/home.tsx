@@ -385,6 +385,28 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             />
           }
         >
+          {/* Welcome Header */}
+          <View style={[styles.headerCard, { backgroundColor: t.card, borderColor: t.border }]}>
+            <View style={styles.headerLeft}>
+              <Text style={[styles.greetingText, { color: t.sub }]}>
+                {(() => { const h = new Date().getHours(); return h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening'; })()} 👋
+              </Text>
+              <Text style={[styles.userNameText, { color: t.text }]} numberOfLines={1}>
+                {loginuserName || 'User'}
+              </Text>
+              <Text style={[styles.dateText, { color: t.sub }]}>
+                {moment().format('dddd, MMM D')}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.quickActionsTrigger, { backgroundColor: t.primary }]}
+              onPress={openQuickActions}
+              activeOpacity={0.8}
+            >
+              <AppIcon name="Plus" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+
           {/* Counts Grid */}
           <View style={styles.gridContainer}>
             {isLoading ? (
@@ -532,7 +554,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             )}
           </View>
 
-          {/* Branding */}
+          {/* Branding — subtle watermark */}
           <Text style={[styles.brandName, { color: isDarkMode ? '#2A2D38' : '#EAEDFF' }]}>
             Shantinath Motors Pvt Ltd
           </Text>
@@ -639,13 +661,41 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: verticalScale(2),
   },
+  // ── Welcome Header Card ───────────────────────────────────────────────────
+  headerCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: moderateScale(18),
+    borderRadius: moderateScale(18),
+    borderWidth: 1,
+    marginBottom: verticalScale(16),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  headerLeft: {
+    flex: 1,
+  },
+  greetingText: {
+    fontSize: moderateScale(13),
+    fontWeight: '500',
+    marginBottom: verticalScale(2),
+  },
+  userNameText: {
+    fontSize: moderateScale(20),
+    fontWeight: '800',
+    letterSpacing: -0.3,
+    marginBottom: verticalScale(2),
+  },
   quickActionsTrigger: {
     width: moderateScale(42),
     height: moderateScale(42),
     borderRadius: moderateScale(12),
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
   },
   gridContainer: {
     flexDirection: 'row',
@@ -655,7 +705,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '48%',
-    borderRadius: moderateScale(16),
+    borderRadius: moderateScale(18),
     padding: moderateScale(16),
     borderWidth: 1,
     shadowOffset: { width: 0, height: 4 },
@@ -663,7 +713,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
     marginBottom: verticalScale(16),
-    minHeight: scale(120),
+    minHeight: verticalScale(110),
     justifyContent: 'space-between',
   },
   cardHeader: {
@@ -696,6 +746,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(24),
     marginBottom: verticalScale(8),
     textAlign: 'right',
+    opacity: 0.12,
   },
 
   // ── Bottom Sheet ──────────────────────────────────────────────────────────

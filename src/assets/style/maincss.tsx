@@ -66,8 +66,8 @@ const MainStyle = () => {
     topView: {
       width: '100%',
       padding: 10,
-      backgroundColor: '#232323',
-      borderColor: '#232323',
+      backgroundColor: '#0F172A',
+      borderColor: '#0F172A',
       borderBottomWidth: 0.5,
     },
     row: {
@@ -135,7 +135,7 @@ const MainStyle = () => {
       marginRight: 10,
     },
     boxTitle: {
-      color: '#232323',
+      color: '#0F172A',
       fontSize: 20,
       alignSelf: 'center',
       marginTop: 13,
@@ -258,22 +258,22 @@ const MainStyle = () => {
       color: '#fff',
     },
     buttonGreen: {
-      backgroundColor: '#0eaa6e',
+      backgroundColor: '#10B981',
     },
     buttonDarkGreen: {
-      backgroundColor: '#3a3a3a',
+      backgroundColor: '#1E293B',
     },
     buttonBlue: {
-      backgroundColor: '#4169E1',
+      backgroundColor: '#2563EB',
     },
     buttonWhite: {
       backgroundColor: '#FFF',
     },
     buttonBlack: {
-      backgroundColor: '#232323',
+      backgroundColor: '#0F172A',
     },
     buttonSoftGray: {
-      backgroundColor: '#4169E1',
+      backgroundColor: '#2563EB',
     },
     buttonBroun: {
       backgroundColor: '#832b29',
@@ -330,7 +330,7 @@ const MainStyle = () => {
       borderRadius: moderateScale(8),
       paddingHorizontal: moderateScale(10),
       alignItems: 'center',
-      // shadowColor: '#232323',
+      // shadowColor: '#0F172A',
       // elevation: 5,
       marginBottom: moderateScale(10),
     },
@@ -343,7 +343,7 @@ const MainStyle = () => {
       fontSize: moderateScale(16), // Explicit font size
       height: moderateScale(40), // Define a consistent height
       padding: 0, // Remove default padding
-      color: isDarkMode ? '#FFFFFF' : '#232323', // Text color
+      color: isDarkMode ? '#FFFFFF' : '#0F172A', // Text color
       paddingLeft: moderateScale(5), // Spacing for input text
     },
     viewBtn: {
@@ -356,7 +356,7 @@ const MainStyle = () => {
     btn: {
       height: moderateScale(70),
       width: moderateScale(70),
-      backgroundColor: '#232323',
+      backgroundColor: '#0F172A',
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: moderateScale(50),
@@ -377,7 +377,7 @@ const MainStyle = () => {
       justifyContent: 'center',
     },
     noDataText: {
-      color: isDarkMode ? '#f5f5f5' : '#232323',
+      color: isDarkMode ? '#f5f5f5' : '#0F172A',
       alignSelf: 'center',
     },
     disabledButton: {
@@ -393,7 +393,7 @@ const MainStyle = () => {
       marginVertical: moderateScale(8),
       borderRadius: 13,
       elevation: 6,
-      shadowColor: '#232323',
+      shadowColor: '#0F172A',
       shadowRadius: moderateScale(10),
       shadowOffset: { width: moderateScale(2), height: moderateScale(2) }, // Optional: rounded corners
     },

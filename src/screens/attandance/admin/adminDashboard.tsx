@@ -47,10 +47,10 @@ const useTheme = () => {
       textDeepPrimary: isDark ? '#F8FAFC' : '#0F172A',
 
       // Links / Accent
-      accent: '#3B82F6',
+      accent: '#2563EB',
 
       // Avatar
-      avatarBg: isDark ? '#1D4ED8' : '#3B82F6',
+      avatarBg: isDark ? '#1D4ED8' : '#2563EB',
 
       // Timeline
       timelineLine: isDark ? '#334155' : '#E2E8F0',
@@ -594,7 +594,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#3B82F6']}
+            colors={['#2563EB']}
             tintColor="#3B82F6"
             progressBackgroundColor={colors.cardBg}
           />

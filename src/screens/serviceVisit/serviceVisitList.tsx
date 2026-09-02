@@ -30,12 +30,12 @@ const ServiceVisitList = ({ navigation }: any) => {
   const { userInfo } = useAuth();
 
   const theme = {
-    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
-    cardBg: isDarkMode ? '#1F2937' : '#FFFFFF',
+    screenBg: isDarkMode ? '#0F172A' : '#F8FAFC',
+    cardBg: isDarkMode ? '#1E293B' : '#FFFFFF',
     border: isDarkMode ? '#334155' : '#E2E8F0',
-    text: isDarkMode ? '#F9FAFB' : '#1E293B',
+    text: isDarkMode ? '#F8FAFC' : '#0F172A',
     subText: isDarkMode ? '#94A3B8' : '#64748B',
-    primary: '#3B82F6',
+    primary: '#2563EB',
     success: '#10B981',
     warning: '#F59E0B',
     danger: '#EF4444',
