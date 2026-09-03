@@ -113,37 +113,25 @@ export default function TabNavigator() {
           headerBackVisible: false,
           headerLeft: () => null,
           headerStyle: {
-            backgroundColor: tabTheme.background,
+            backgroundColor: tabTheme.headerBackground,
           },
           headerTitleStyle: {
             color: tabTheme.headerText,
-            fontSize: 17,
-            fontWeight: '800',
           },
           headerTintColor: tabTheme.headerText,
-          headerShadowVisible: false,
           tabBarActiveTintColor: tabTheme.active,
           tabBarInactiveTintColor: tabTheme.inactive,
           tabBarStyle: {
             position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 14,
-            height: 64,
-            borderTopWidth: 1,
-            borderTopColor: isDarkMode ? '#26334A' : '#E7EDF6',
-            borderRadius: 20,
-            backgroundColor: isDarkMode ? '#111827' : '#FFFFFF',
-            paddingTop: 5,
-            paddingBottom: 5,
-            shadowColor: '#0B1220',
-            shadowOpacity: isDarkMode ? 0 : 0.08,
-            shadowRadius: 20,
-            shadowOffset: { width: 0, height: 8 },
-            elevation: 7,
+            left: 12, right: 12, bottom: 12,
+            height: 72, borderRadius: 24,
+            backgroundColor: tabTheme.background,
+            borderTopWidth: 0,
+            paddingBottom: 10, paddingTop: 10,
+            shadowColor: '#101828', shadowOffset: {width: 0, height: 8},
+            shadowOpacity: 0.10, shadowRadius: 20, elevation: 10,
           },
           tabBarItemStyle: { paddingVertical: 1 },
-          tabBarLabelStyle: { fontSize: 10, fontWeight: '700', marginBottom: 1 },
         }}
       >
         {/* Home — custom Welcome Back header */}
@@ -151,11 +139,12 @@ export default function TabNavigator() {
           name="Home"
           component={Home}
           options={({ navigation }) => ({
-            headerShown: false,
             tabBarLabel: 'Home',
             tabBarIcon: ({ color, size }) => (
               <AppIcon name="Home" color={color} size={size} />
             ),
+            // Fully custom header for Home tab only
+            header: () => <HomeHeader navigation={navigation} />,
           })}
         />
 
@@ -180,7 +169,6 @@ export default function TabNavigator() {
             name="Punch"
             component={Punch}
             options={{
-              headerShown: false,
               tabBarLabel: 'Punch',
               tabBarIcon: ({ color, size }) => (
                 <AppIcon name="Camera" color={color} size={size} />

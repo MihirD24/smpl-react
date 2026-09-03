@@ -1,5 +1,44 @@
 import React from 'react';
-import { View, ViewProps, StyleSheet, useColorScheme } from 'react-native';
-import { getTheme, radius, elevation } from '../../theme';
-export default function AppCard({style,...props}:ViewProps){const dark=useColorScheme()==='dark'; const t=getTheme(dark); return <View {...props} style={[styles.card,{backgroundColor:t.surface,borderColor:t.border},style]}/>}
-const styles=StyleSheet.create({card:{borderWidth:1,borderRadius:radius.lg,padding:16,...elevation}});
+import { View, StyleSheet, ViewStyle } from 'react-native';
+import { useAppTheme, shadows } from '../../constant/theme';
+
+interface AppCardProps {
+  children: React.ReactNode;
+  style?: ViewStyle | ViewStyle[];
+  noPadding?: boolean;
+}
+
+const AppCard: React.FC<AppCardProps> = ({ children, style, noPadding = false }) => {
+  const { colors, isDark } = useAppTheme();
+  const shadowStyle = isDark ? shadows.dark : shadows.light;
+
+  return (
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          borderColor: isDark ? colors.border : 'transparent',
+          borderWidth: isDark ? 1 : 0,
+        },
+        shadowStyle,
+        !noPadding && styles.padding,
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  padding: {
+    padding: 16,
+  },
+});
+
+export default AppCard;

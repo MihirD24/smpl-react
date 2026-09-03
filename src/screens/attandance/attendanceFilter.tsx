@@ -16,7 +16,7 @@ import { AttendanceItem } from '../../types/adminAttendance';
 import { getAttendance } from '../../services';
 import AppIcon from '../../components/appIcon';
 import MonthSelector from '../../components/monthSelector';
-import ScreenWrapper from '../../components/screenWrapper';
+import AppScreen from '../../components/ui/AppScreen';
 import AttendanceCard from '../attandance/attendanceCard';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
 import NetInfoComponent from '../../components/netinfoComponent';
@@ -686,12 +686,7 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
   };
 
   return (
-    <ScreenWrapper
-      withHeader
-      statusBarTranslucent
-      statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
-    >
+    <AppScreen padding={false} safeTop={false}>
         <NetInfoComponent onReconnect={fetchAttendanceData} />
       <View style={[s.container, { backgroundColor: screenBg }]}>
         {/* Month Selector */}
@@ -793,7 +788,7 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
 
         {viewMode === 'calendar' ? renderCalendarView() : renderListView()}
       </View>
-    </ScreenWrapper>
+    </AppScreen>
   );
 };
 

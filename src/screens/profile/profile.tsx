@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
   statGridCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: moderateScale(16),
+    borderRadius: moderateScale(18),
     padding: moderateScale(16),
     borderWidth: 1,
     borderColor: '#E2E8F0',
@@ -978,7 +978,7 @@ const styles = StyleSheet.create({
   // ── Menu Card ─────────────────────────────────────────────────
   menuCard: {
     marginHorizontal: moderateScale(16),
-    borderRadius: moderateScale(16),
+    borderRadius: moderateScale(18),
     marginBottom: verticalScale(18),
     borderWidth: 1,
     overflow: 'hidden',

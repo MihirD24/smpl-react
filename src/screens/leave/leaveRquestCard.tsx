@@ -290,9 +290,9 @@ export default function LeaveRequestCard({
 
 const styles = StyleSheet.create({
   cardOverride: {
-    padding: scale(14),
-    marginBottom: scale(10),
-    borderRadius: scale(20),
+    padding: scale(16),
+    marginBottom: scale(12),
+    borderRadius: scale(16),
     ...Platform.select({
       ios: {
         shadowColor: '#3B82F6',
@@ -456,4 +456,6 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(12),
     fontWeight: '600',
   },
+
+  // polished card geometry
 });

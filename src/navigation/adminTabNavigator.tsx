@@ -40,28 +40,23 @@ export default function AdminTabNavigator() {
         screenOptions={{
           headerShown: false,
 
+          headerLeft: () => null,
+          headerStyle: {
+            backgroundColor: tabTheme.headerBackground,
+          },
+          headerTitleStyle: {
+            color: tabTheme.headerText,
+          },
+          headerTintColor: tabTheme.headerText,
           tabBarActiveTintColor: tabTheme.active,
           tabBarInactiveTintColor: tabTheme.inactive,
           tabBarStyle: {
-            position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 14,
-            height: 64,
-            borderTopWidth: 1,
-            borderTopColor: isDarkMode ? '#26334A' : '#E7EDF6',
-            borderRadius: 20,
-            backgroundColor: isDarkMode ? '#111827' : '#FFFFFF',
-            paddingTop: 5,
-            paddingBottom: 5,
-            shadowColor: '#0B1220',
-            shadowOpacity: isDarkMode ? 0 : 0.08,
-            shadowRadius: 20,
-            shadowOffset: { width: 0, height: 8 },
-            elevation: 7,
+            position: 'absolute', left: 12, right: 12, bottom: 12, height: 72,
+            borderRadius: 24, backgroundColor: tabTheme.background, borderTopWidth: 0,
+            paddingBottom: 10, paddingTop: 10,
+            shadowColor: '#101828', shadowOffset: {width:0,height:8}, shadowOpacity:0.10, shadowRadius:20, elevation:10,
           },
-          tabBarItemStyle: { paddingVertical: 1 },
-          tabBarLabelStyle: { fontSize: 10, fontWeight: '700', marginBottom: 1 },
+          tabBarItemStyle: {paddingVertical:1},
         }}
       >
         <Tab.Screen
@@ -122,6 +117,7 @@ export default function AdminTabNavigator() {
           name="Profile"
           component={ProfilePage}
           options={{
+            headerShown: true,
             tabBarLabel: 'Profile',
             tabBarIcon: ({ color, size }) => (
               <AppIcon name="User" color={color} size={size} />

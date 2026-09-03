@@ -19,6 +19,8 @@ import { getAttendance, getCount } from '../../services';
 import { AppStackScreenProps } from '../../navigation/navigationTypes';
 import { AttendanceItem } from '../../types/adminAttendance';
 import AppIcon from '../../components/appIcon';
+import AppScreen from '../../components/ui/AppScreen';
+import { ProTopBar, ProPill, PRO } from '../../components/modern/ProScreen';
 import ScreenWrapper from '../../components/screenWrapper';
 import AttendanceCard, { fmtMins } from '../attandance/attendanceCard';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
@@ -382,12 +384,8 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
   };
 
   return (
-    <ScreenWrapper
-      withHeader={false}
-      statusBarTranslucent
-      statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
-    >
+    <AppScreen safeTop={false} padding={false}>
+      <ProTopBar title="Attendance" subtitle="Monthly overview" onAction={()=>{}} />
       <NetInfoComponent onReconnect={handleRefresh} />
       <>
         {!isReady ? (
@@ -407,21 +405,6 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
               />
             }
           >
-            <View style={styles.attHeader}>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.attKicker, { color: '#64748B' }]}>TIME & ATTENDANCE</Text>
-                <Text style={[styles.attTitle, { color: isDarkMode ? '#F8FAFC' : '#0F172A' }]}>Attendance</Text>
-                <Text style={[styles.attSubtitle, { color: isDarkMode ? '#94A3B8' : '#64748B' }]}>Your monthly work-time overview</Text>
-              </View>
-              <View style={[styles.liveTag, { backgroundColor: isDarkMode ? '#052E16' : '#ECFDF5' }]}><View style={styles.liveDot} /><Text style={styles.liveText}>LIVE</Text></View>
-            </View>
-            <View style={[styles.primaryMetric, { backgroundColor: isDarkMode ? '#172554' : '#EFF6FF', borderColor: isDarkMode ? '#1E40AF' : '#DBEAFE' }]}>
-              <View>
-                <Text style={[styles.primaryMetricLabel, { color: isDarkMode ? '#93C5FD' : '#2563EB' }]}>PRESENT THIS MONTH</Text>
-                <Text style={[styles.primaryMetricValue, { color: isDarkMode ? '#F8FAFC' : '#0F172A' }]}>{attandanceCount?.total_present || 0}<Text style={styles.primaryMetricUnit}> days</Text></Text>
-              </View>
-              <View style={styles.primaryMetricIcon}><AppIcon name="CalendarCheck2" size={moderateScale(22)} color="#2563EB" /></View>
-            </View>
             {/* ── Month Selector ── */}
             <View
               style={[
@@ -928,7 +911,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
           </View>
         </Modal>
       </>
-    </ScreenWrapper>
+    </AppScreen>
   );
 };
 
@@ -936,56 +919,230 @@ export default Attendancelist;
 
 // ─── Local-only styles ────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  attHeader: { paddingHorizontal: scale(18), paddingTop: verticalScale(10), paddingBottom: verticalScale(14), flexDirection: 'row', alignItems: 'center' },
-  attKicker: { fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1.7 },
-  attTitle: { fontSize: moderateScale(24), fontWeight: '800', letterSpacing: -0.7, marginTop: verticalScale(3) },
-  attSubtitle: { fontSize: moderateScale(10.5), marginTop: verticalScale(4), fontWeight: '500' },
-  liveTag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(10), paddingVertical: verticalScale(6), borderRadius: 99 },
-  liveDot: { width: moderateScale(6), height: moderateScale(6), borderRadius: 3, backgroundColor: '#16A34A', marginRight: moderateScale(5) },
-  liveText: { fontSize: moderateScale(8), fontWeight: '800', color: '#15803D', letterSpacing: 0.8 },
-  primaryMetric: { marginHorizontal: scale(14), marginBottom: verticalScale(8), paddingHorizontal: scale(18), paddingVertical: verticalScale(17), borderRadius: moderateScale(22), borderWidth: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', shadowColor: '#2563EB', shadowOpacity: 0.08, shadowRadius: 14, shadowOffset: { width: 0, height: 8 }, elevation: 2 },
-  primaryMetricLabel: { fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1.3 },
-  primaryMetricValue: { fontSize: moderateScale(31), fontWeight: '800', marginTop: verticalScale(2), letterSpacing: -1 },
-  primaryMetricUnit: { fontSize: moderateScale(11), fontWeight: '600' },
-  primaryMetricIcon: { width: moderateScale(50), height: moderateScale(50), borderRadius: moderateScale(17), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  dateSelector: { paddingHorizontal: scale(18), paddingTop: verticalScale(8), paddingBottom: verticalScale(13), borderBottomWidth: 0 },
-  statsGrid: { flexDirection: 'row', paddingHorizontal: scale(18), marginTop: verticalScale(14), gap: scale(10) },
-  summaryPanel: { marginHorizontal: scale(14), marginTop: verticalScale(11), borderWidth: 0, borderRadius: moderateScale(20), padding: scale(4), flexDirection: 'row', flexWrap: 'wrap', gap: scale(7) },
-  summaryMetric: { width: '31.2%', minHeight: verticalScale(74), position: 'relative', overflow: 'hidden', borderWidth: 1, borderRadius: moderateScale(14), paddingHorizontal: scale(9), paddingVertical: verticalScale(9) },
-  statLabel: { fontSize: moderateScale(7.5), fontWeight: '800', letterSpacing: 0.4, marginBottom: verticalScale(4) },
-  statValue: { fontSize: moderateScale(18), fontWeight: '800', marginBottom: verticalScale(2) },
-  statSubtext: { fontSize: moderateScale(8.5), fontWeight: '600' },
+  dateSelector: {
+    paddingHorizontal: scale(16),
+    paddingTop: verticalScale(6),
+    paddingBottom: verticalScale(10),
+    borderBottomWidth: 1,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    paddingHorizontal: scale(16),
+    marginTop: verticalScale(14),
+    gap: scale(10),
+  },
+  summaryPanel: {
+    marginHorizontal: scale(10),
+    marginTop: verticalScale(12),
+    borderWidth: 1,
+    borderRadius: moderateScale(14),
+    padding: scale(8),
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: scale(7),
+  },
+  summaryMetric: {
+    width: '31.8%',
+    minHeight: verticalScale(68),
+    position: 'relative',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderRadius: moderateScale(9),
+    paddingHorizontal: scale(9),
+    paddingVertical: verticalScale(8),
+  },
+  statLabel: {
+    fontSize: moderateScale(8),
+    fontWeight: '700',
+    letterSpacing: 0.2,
+    marginBottom: verticalScale(4),
+  },
+  statValue: {
+    fontSize: moderateScale(17),
+    fontWeight: '700',
+    marginBottom: verticalScale(2),
+  },
+  statSubtext: { fontSize: moderateScale(9.5), fontWeight: '500' },
+  // Punch section
   punchSection: { alignItems: 'center', marginTop: verticalScale(20) },
-  activePunchSection: { alignItems: 'stretch', marginTop: verticalScale(12), padding: moderateScale(15) },
-  activePunchHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: scale(10), marginBottom: verticalScale(10) },
-  currentTimeCompact: { alignItems: 'flex-end', flexShrink: 0 },
-  completedSummarySection: { alignItems: 'stretch', marginTop: verticalScale(12), padding: moderateScale(15) },
-  completedSummaryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: scale(10) },
-  totalHoursPill: { alignItems: 'flex-end', flexShrink: 0 },
-  punchedInBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#ECFDF5', paddingHorizontal: moderateScale(10), paddingVertical: verticalScale(6), borderRadius: 99 },
-  punchedInDot: { width: scale(6), height: scale(6), borderRadius: scale(3), backgroundColor: '#16A34A', marginRight: scale(6) },
-  punchedInText: { fontSize: moderateScale(8.5), color: '#15803D', fontWeight: '800', letterSpacing: 0.6 },
-  currentTimeLabel: { fontSize: moderateScale(9), marginBottom: verticalScale(2) },
-  currentTimeContainer: { flexDirection: 'row', alignItems: 'baseline' },
-  currentTime: { fontSize: moderateScale(27, 0.4), fontWeight: '800', letterSpacing: -0.7 },
-  currentTimePeriod: { fontSize: moderateScale(12), fontWeight: '700', marginLeft: scale(4) },
-  hoursWorkedLabel: { fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 0.6, marginBottom: verticalScale(2) },
-  hoursWorkedValue: { fontSize: moderateScale(17), fontWeight: '800' },
-  punchOutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#DC2626', paddingVertical: verticalScale(13), paddingHorizontal: moderateScale(24), borderRadius: moderateScale(14), width: '100%', elevation: 2 },
-  punchOutButtonText: { fontSize: moderateScale(14), color: '#FFFFFF', fontWeight: '800', marginLeft: scale(7) },
-  locationText: { fontSize: moderateScale(9.5), fontStyle: 'italic', marginTop: verticalScale(7), textAlign: 'center' },
-  completedTotalHours: { fontSize: moderateScale(17), fontWeight: '800' },
-  timeRow: { flexDirection: 'row', width: '100%', gap: scale(8) },
-  completedTimeItem: { flex: 1, alignItems: 'center', borderWidth: 1, borderRadius: moderateScale(12), paddingVertical: verticalScale(10) },
-  timeItemLabel: { fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 0.5, marginBottom: verticalScale(3) },
-  timeItemValue: { fontSize: moderateScale(16), fontWeight: '700' },
-  recentSection: { marginTop: verticalScale(24), marginBottom: verticalScale(24) },
-  recentHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: scale(18), marginBottom: verticalScale(12) },
-  recentTitle: { fontSize: moderateScale(13), fontWeight: '800', letterSpacing: -0.1 },
-  noDataContainer: { padding: moderateScale(34), alignItems: 'center', gap: verticalScale(10) },
-  noDataText: { fontSize: moderateScale(13), fontWeight: '600' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.55)', justifyContent: 'center', alignItems: 'center', padding: scale(20) },
-  modalContent: { width: '100%', maxWidth: scale(400), padding: moderateScale(22), borderRadius: moderateScale(24) },
-  okButton: { backgroundColor: '#2563EB', paddingVertical: verticalScale(13), paddingHorizontal: moderateScale(28), borderRadius: moderateScale(13), alignItems: 'center', marginTop: verticalScale(10) },
-  okButtonText: { fontSize: moderateScale(14), color: '#FFFFFF', fontWeight: '800' },
+  activePunchSection: {
+    alignItems: 'stretch',
+    marginTop: verticalScale(12),
+    padding: moderateScale(12),
+  },
+  activePunchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: scale(10),
+    marginBottom: verticalScale(10),
+  },
+  currentTimeCompact: {
+    alignItems: 'flex-end',
+    flexShrink: 0,
+  },
+  completedSummarySection: {
+    alignItems: 'stretch',
+    marginTop: verticalScale(12),
+    padding: moderateScale(12),
+  },
+  completedSummaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: scale(10),
+  },
+  totalHoursPill: {
+    alignItems: 'flex-end',
+    flexShrink: 0,
+  },
+  punchedInBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: moderateScale(11),
+    paddingVertical: verticalScale(5),
+    borderRadius: moderateScale(11),
+  },
+  punchedInDot: {
+    width: scale(6),
+    height: scale(6),
+    borderRadius: scale(3),
+    backgroundColor: '#10B981',
+    marginRight: scale(6),
+  },
+  punchedInText: {
+    fontSize: moderateScale(9.5),
+    color: '#059669',
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  currentTimeLabel: {
+    fontSize: moderateScale(10),
+    marginBottom: verticalScale(2),
+  },
+  currentTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  currentTime: {
+    fontSize: moderateScale(26, 0.4),
+    fontWeight: '700',
+  },
+  currentTimePeriod: {
+    fontSize: moderateScale(13, 0.4),
+    fontWeight: '600',
+    marginLeft: scale(4),
+  },
+  hoursWorkedLabel: {
+    fontSize: moderateScale(9.5),
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: verticalScale(2),
+  },
+  hoursWorkedValue: { fontSize: moderateScale(15), fontWeight: '700' },
+  punchOutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EF4444',
+    paddingVertical: verticalScale(11),
+    paddingHorizontal: moderateScale(28),
+    borderRadius: moderateScale(11),
+    width: '100%',
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  punchOutButtonText: {
+    fontSize: moderateScale(15),
+    color: '#FFFFFF',
+    fontWeight: '700',
+    marginLeft: scale(7),
+  },
+  locationText: {
+    fontSize: moderateScale(10.5),
+    fontStyle: 'italic',
+    marginTop: verticalScale(7),
+    textAlign: 'center',
+  },
+  completedTotalHours: {
+    fontSize: moderateScale(16),
+    fontWeight: '700',
+  },
+  timeRow: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: scale(8),
+  },
+  completedTimeItem: {
+    flex: 1,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: moderateScale(9),
+    paddingVertical: verticalScale(8),
+  },
+  timeItemLabel: {
+    fontSize: moderateScale(9.5),
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: verticalScale(3),
+  },
+  timeItemValue: { fontSize: moderateScale(16), fontWeight: '600' },
+  // Recent activity
+  recentSection: {
+    marginTop: verticalScale(24),
+    marginBottom: verticalScale(24),
+  },
+  recentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: scale(16),
+    marginBottom: verticalScale(14),
+  },
+  recentTitle: {
+    fontSize: moderateScale(11),
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  noDataContainer: {
+    padding: moderateScale(34),
+    alignItems: 'center',
+    gap: verticalScale(10),
+  },
+  noDataText: { fontSize: moderateScale(13) },
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: scale(20),
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: scale(400),
+    padding: moderateScale(22),
+    borderRadius: moderateScale(22),
+  },
+  okButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: verticalScale(13),
+    paddingHorizontal: moderateScale(28),
+    borderRadius: moderateScale(11),
+    alignItems: 'center',
+    marginTop: verticalScale(10),
+  },
+  okButtonText: {
+    fontSize: moderateScale(15),
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+
+  dateSelector:{paddingHorizontal:14,paddingTop:2,paddingBottom:10,borderBottomWidth:0,backgroundColor:'#F6F8FC'},
+  summaryPanel:{marginHorizontal:14,marginTop:6,borderWidth:0,borderRadius:20,padding:7,backgroundColor:'#fff',flexDirection:'row',flexWrap:'wrap',gap:7,shadowColor:'#142238',shadowOffset:{width:0,height:6},shadowOpacity:.05,shadowRadius:16,elevation:2},
+  summaryMetric:{width:'31.8%',minHeight:72,borderWidth:0,borderRadius:15,paddingHorizontal:10,paddingVertical:9,backgroundColor:'#F8FAFC'},
 });
