@@ -69,7 +69,7 @@ const CalculateSalary = () => {
 
   return (
     <ScreenWrapper
-      withHeader
+      withHeader={false}
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
@@ -186,23 +186,23 @@ const CalculateSalary = () => {
 };
 
 const styles = StyleSheet.create({
-  payrollHeader: { marginHorizontal: moderateScale(16), marginTop: verticalScale(10), marginBottom: verticalScale(10), paddingHorizontal: moderateScale(19), paddingVertical: verticalScale(18), borderRadius: moderateScale(20), flexDirection: 'row', alignItems: 'center', overflow: 'hidden' },
-  payrollKicker: { color: '#93C5FD', fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.5, marginBottom: verticalScale(4) },
-  payrollTitle: { color: '#FFFFFF', fontSize: moderateScale(21), fontWeight: '800', letterSpacing: -0.3 },
-  payrollSub: { color: '#CBD5E1', fontSize: moderateScale(11), lineHeight: moderateScale(17), marginTop: verticalScale(4), maxWidth: moderateScale(270) },
-  payrollIcon: { width: moderateScale(46), height: moderateScale(46), borderRadius: moderateScale(15), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  resultCard: { marginTop: verticalScale(18), padding: moderateScale(17), borderRadius: moderateScale(18), borderWidth: 1, shadowColor: '#0F172A', shadowOpacity: 0.04, shadowRadius: 9, elevation: 1 },
-  resultHeadingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: verticalScale(10) },
-  resultEyebrow: { fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1.2 },
-  resultTitle: { fontSize: moderateScale(17), fontWeight: '800', marginTop: verticalScale(2) },
-  netHero: { paddingHorizontal: moderateScale(14), paddingVertical: verticalScale(12), borderRadius: moderateScale(13), marginBottom: verticalScale(9) },
-  netLabel: { fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1.1 },
-  netValue: { fontSize: moderateScale(25), fontWeight: '800', marginTop: verticalScale(2) },
-  resultRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: verticalScale(8) },
+  payrollHeader: { marginHorizontal: 0, marginTop: 0, marginBottom: verticalScale(8), paddingHorizontal: moderateScale(19), paddingVertical: verticalScale(15), borderRadius: 0, flexDirection: 'row', alignItems: 'center', overflow: 'hidden' },
+  payrollKicker: { color: '#A9C6FF', fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1.6, marginBottom: verticalScale(5) },
+  payrollTitle: { color: '#FFFFFF', fontSize: moderateScale(23), fontWeight: '800', letterSpacing: -0.5 },
+  payrollSub: { color: '#CAD4E2', fontSize: moderateScale(10.5), lineHeight: moderateScale(16), marginTop: verticalScale(5), maxWidth: moderateScale(280) },
+  payrollIcon: { width: moderateScale(48), height: moderateScale(48), borderRadius: moderateScale(16), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  resultCard: { marginTop: verticalScale(18), padding: moderateScale(17), borderRadius: moderateScale(19), borderWidth: 1, shadowColor: '#0F172A', shadowOpacity: 0.06, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 2 },
+  resultHeadingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: verticalScale(12) },
+  resultEyebrow: { fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1.25 },
+  resultTitle: { fontSize: moderateScale(18), fontWeight: '800', marginTop: verticalScale(2), letterSpacing: -0.2 },
+  netHero: { paddingHorizontal: moderateScale(16), paddingVertical: verticalScale(16), borderRadius: moderateScale(17), marginBottom: verticalScale(11) },
+  netLabel: { fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1.2 },
+  netValue: { fontSize: moderateScale(30), fontWeight: '800', marginTop: verticalScale(3), letterSpacing: -0.8 },
+  resultRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: verticalScale(9) },
   resultValue: { fontWeight: '700' },
-  totalRow: { marginTop: verticalScale(7), paddingTop: verticalScale(11), borderTopWidth: 1 },
-  totalText: { fontSize: moderateScale(14), fontWeight: '800', color: '#374151' },
-  totalValue: { fontSize: moderateScale(16), fontWeight: '800' },
+  totalRow: { marginTop: verticalScale(8), paddingTop: verticalScale(12), borderTopWidth: 1 },
+  totalText: { fontSize: moderateScale(14), fontWeight: '800', color: '#334155' },
+  totalValue: { fontSize: moderateScale(17), fontWeight: '800' },
 });
 
 export default CalculateSalary;

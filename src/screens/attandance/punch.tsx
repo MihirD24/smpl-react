@@ -21,6 +21,7 @@ import { BarIndicator } from 'react-native-indicators';
 import PunchStyle from '../../assets/style/punch';
 import MainStyle from '../../assets/style/maincss';
 import { BlurView } from '@react-native-community/blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 
 import {
@@ -67,6 +68,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
   const viewRef = useRef<ViewShot>(null);
   const punchStyles = PunchStyle();
   const mainStyles = MainStyle();
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const [mapRegion, setMapRegion] = useState({
     latitude: 37.78825,
@@ -474,535 +476,93 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
 
   if (screenLoading) {
     return (
-      <View
-        style={{
-          height: verticalScale(100),
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: verticalScale(200),
-        }}
-      >
-        <BarIndicator size={30} color="#2563EB" count={5} />
-        <Text style={styles.loaderText}>
-          {' '}
-          Fetching attendance & location...
-        </Text>
+      <View style={styles.loadingScreen}>
+        <View style={styles.loadingIcon}><AppIcon name="Clock" size={24} color="#2563EB" /></View>
+        <Text style={styles.loadingTitle}>Preparing attendance</Text>
+        <Text style={styles.loadingSub}>Checking your location and today’s punch status…</Text>
+        <BarIndicator size={22} color="#2563EB" count={5} />
       </View>
     );
   }
-  const handleReconnect = async () => {
-  try {
-    setScreenLoading(true);
 
-    await Promise.all([
-      handlecheckPunch(currentDate),
-      checkLocation(),
-    ]);
-  } catch (e) {
-    console.log('Reconnect error', e);
-  } finally {
-    setScreenLoading(false);
-  }
-};
+  const isPunchIn = punchLabel === 'Punch_in';
+  const statusCopy = punchStatus === 'AFTER_PUNCH_IN' ? 'READY TO PUNCH OUT' : isPunchIn ? 'READY TO PUNCH IN' : 'READY TO PUNCH OUT';
+  const timeDisplay = moment(currentTime, ['HH:mm:ss','H:mm:ss','HH:mm','H:mm']).isValid() ? moment(currentTime, ['HH:mm:ss','H:mm:ss','HH:mm','H:mm']).format('hh:mm:ss A') : currentTime;
 
   return (
-    <>
-        <NetInfoComponent onReconnect={handleReconnect} />
-
-      {address && punchStatus !== 'AFTER_PUNCH_OUT' && (
-        <View style={styles.mapContainer}>
-          <MapView
-            // provider={PROVIDER_GOOGLE}
-            style={punchStyles.map}
-            region={mapRegion}
-            showsUserLocation={false}
-            followsUserLocation={true}
-          >
-            <Marker
-              coordinate={mapRegion}
-              title="Your Location"
-              description={address}
-            >
-              <CustomMarker />
-            </Marker>
-          </MapView>
+    <View style={[styles.page, { backgroundColor: isDarkMode ? '#0B1220' : '#F5F7FB' }]}>
+      <NetInfoComponent onReconnect={handleReconnect} />
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerRow}>
+          <View style={styles.headerIcon}><AppIcon name="Clock" size={21} color="#2563EB" /></View>
+          <View style={{ flex:1 }}><Text style={styles.kicker}>TIME & ATTENDANCE</Text><Text style={styles.title}>Punch</Text><Text style={styles.subtitle}>{moment().format('dddd, DD MMMM YYYY')}</Text></View>
+          <View style={styles.gpsPill}><View style={styles.gpsDot}/><Text style={styles.gpsText}>GPS READY</Text></View>
         </View>
-      )}
-      {/* BEFORE PUNCH IN */}
-      {punchStatus === 'BEFORE_PUNCH_IN' && (
-        <>
-          <View
-            style={[
-              styles.bottomCard,
-              { backgroundColor: isDarkMode ? '#1E1E2E' : '#FFFFFF' },
-            ]}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <View>
-                <View style={styles.statusPill}>
-                  <View style={styles.statusDot} />
-                  <Text style={styles.statusPillText}>{punchLabel === 'Punch_in' ? 'READY TO START' : 'READY TO FINISH'}</Text>
-                </View>
-                <Text
-                  style={[
-                    styles.currentTimeLabel,
-                    { color: isDarkMode ? '#6C757D' : 'blue' },
-                  ]}
-                >
-                  CURRENT TIME
-                </Text>
-                <Text
-                  style={[
-                    styles.bigTime,
-                    { color: isDarkMode ? '#bfd6f5' : 'black' },
-                  ]}
-                >
-                  {currentTime}
-                </Text>
-                <Text style={styles.subText}>
-                  {' '}
-                  {moment(Date.now()).format('dddd, MMMM D, YYYY')}
-                </Text>
-              </View>
-            </View>
 
-            <View
-              style={[
-                styles.locationContainer,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f5f5f7' },
-              ]}
-            >
-              <Navigation
-                color="#2563EB"
-                size={20}
-                style={{
-                  position: 'absolute',
-                  top: verticalScale(16),
-                  left: scale(10),
-                }}
-              />
-              <Text style={styles.locationLabel}>CURRENT LOCATION</Text>
-              <Text style={styles.locationHint}>GPS location used for attendance verification</Text>
-              <Text style={styles.address}>{address || 'Locating your current position…'}</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.rowBetween}>
-              <View>
-                <Text style={styles.shiftCaption}>YOUR SHIFT</Text>
-                <Text
-                  style={[
-                    styles.locationLabel,
-                    { color: isDarkMode ? '#bfd6f5' : 'black' },
-                  ]}
-                >
-                  SHIFT
-                </Text>
-                <Text
-                  style={[
-                    styles.shiftText,
-                    { color: isDarkMode ? '#bfd6f5' : 'black' },
-                  ]}
-                >
-                  Day Shift (10:00 - 07:30)
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.sliderWrapper}>
-            <SlideToPunchButton
-              onComplete={launchCameraHandler}
-              title={`Slide to ${punchLabel === 'Punch_in' ? 'Punch In' : 'Punch Out'}`}
-            />
-          </View>
-        </>
-      )}
-      {/* AFTER PUNCH IN */}
-      {punchStatus === 'AFTER_PUNCH_IN' && (
-        <>
-          <View
-            style={[
-              styles.bottomCard,
-              { backgroundColor: isDarkMode ? '#1E1E2E' : '#FFFFFF' },
-            ]}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <View>
-                <View style={styles.statusPill}>
-                  <View style={styles.statusDot} />
-                  <Text style={styles.statusPillText}>{punchLabel === 'Punch_in' ? 'READY TO START' : 'READY TO FINISH'}</Text>
-                </View>
-                <Text
-                  style={[
-                    styles.currentTimeLabel,
-                    { color: isDarkMode ? '#6C757D' : 'blue' },
-                  ]}
-                >
-                  CURRENT TIME
-                </Text>
-                <Text
-                  style={[
-                    styles.bigTime,
-                    { color: isDarkMode ? '#bfd6f5' : 'black' },
-                  ]}
-                >
-                  {currentTime}
-                </Text>
-                <Text style={styles.subText}>
-                  {moment(Date.now()).format('dddd, MMMM D, YYYY')}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={[
-                styles.locationContainer,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f5f5f7' },
-              ]}
-            >
-              <Navigation
-                color="#2563EB"
-                size={20}
-                style={{
-                  position: 'absolute',
-                  top: verticalScale(16),
-                  left: scale(10),
-                }}
-              />
-              <Text style={styles.locationLabel}>CURRENT LOCATION</Text>
-              <Text style={styles.locationHint}>GPS location used for attendance verification</Text>
-              <Text style={styles.address}>{address || 'Locating your current position…'}</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.rowBetween}>
-              <View>
-                <Text style={styles.shiftCaption}>YOUR SHIFT</Text>
-                <Text
-                  style={[
-                    styles.locationLabel,
-                    { color: isDarkMode ? '#bfd6f5' : 'black' },
-                  ]}
-                >
-                  SHIFT
-                </Text>
-                <Text
-                  style={[
-                    styles.shiftText,
-                    { color: isDarkMode ? '#bfd6f5' : 'black' },
-                  ]}
-                >
-                  Day Shift (10:00 - 07:30)
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.sliderWrapper}>
-            <SlideToPunchButton
-              onComplete={launchCameraHandler}
-              title={`Slide to ${punchLabel === 'Punch_in' ? 'Punch In' : 'Punch Out'}`}
-            />
-          </View>
-        </>
-      )}
-
-      {/* AFTER PUNCH OUT */}
-      {punchStatus === 'AFTER_PUNCH_OUT' && (
-        <View
-          style={[
-            styles.bottomCardOut,
-            { backgroundColor: isDarkMode ? '#1E1E2E' : '#FFFFFF' },
-          ]}
-        >
-          <View
-            style={[
-              styles.completedCard,
-              { backgroundColor: isDarkMode ? '#bfd6f5' : '#FFFFFF' },
-            ]}
-          >
-            <Image
-              source={require('../../assets/images/checkmark.png')}
-              style={{ height: moderateScale(50), width: moderateScale(50) }}
-            />
-            <View style={styles.completedBadge}><View style={styles.completedBadgeDot} /><Text style={styles.completedBadgeText}>DAY COMPLETED</Text></View>
-            <Text style={styles.completedTitle}>Attendance completed</Text>
-            <Text style={styles.completedDesc}>
-              You're all set. Your shifts ended and your hours are recorded.
-            </Text>
-          </View>
-
-          <View style={styles.timeRow}>
-            <View
-              style={[
-                styles.timeBox,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f8f4f4' },
-              ]}
-            >
-              <Text style={styles.locationLabel}>
-                <LogIn size={11} /> PUNCHED IN
-              </Text>
-              <Text style={styles.timeValue}>
-                {moment(inTime, 'HH:mm:ss').format('hh:mm A') ?? '---'}
-              </Text>
-            </View>
-
-            <View
-              style={[
-                styles.timeBox,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f8f4f4' },
-              ]}
-            >
-              <Text style={styles.locationLabel}>
-                <LogOut size={11} /> PUNCHED OUT
-              </Text>
-              <Text style={styles.timeValue}>
-                {moment(outTime, 'HH:mm:ss').format('hh:mm A') ?? '---'}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.miniMap}>
-            {/* ✅ Floating chip on top of map */}
-            <View
-              style={[
-                styles.punchOutChip,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f8f4f4' },
-              ]}
-            >
-              <View style={styles.punchOutChipLeft}>
-                <MapPin size={13} color="#2563EB" />
-                <Text style={styles.punchOutChipTitle}>Punch-out Location</Text>
-              </View>
-              <Text style={styles.punchOutChipAddress} numberOfLines={1}>
-                {getShortAddress(outAddress || address)}
-              </Text>
-            </View>
-            <MapView
-              // provider={PROVIDER_GOOGLE}
-              style={punchStyles.map}
-              region={mapRegion}
-              showsUserLocation={false}
-              followsUserLocation={true}
-            >
-              <Marker
-                coordinate={mapRegion}
-                title="Your Location"
-                description={address}
-              >
-                <CustomMarker />
-              </Marker>
+        {address && punchStatus !== 'AFTER_PUNCH_OUT' && (
+          <View style={styles.mapCard}>
+            <MapView style={punchStyles.map} region={mapRegion} showsUserLocation={false} followsUserLocation={true}>
+              <Marker coordinate={mapRegion} title="Your Location" description={address}><CustomMarker /></Marker>
             </MapView>
+            <View style={styles.mapOverlay}><View style={styles.mapPin}><AppIcon name="MapPin" size={15} color="#2563EB"/></View><View style={{flex:1}}><Text style={styles.mapLabel}>CURRENT LOCATION</Text><Text numberOfLines={1} style={styles.mapAddress}>{getShortAddress(address) || 'Locating current position…'}</Text></View><View style={styles.verified}><AppIcon name="CheckCircle" size={13} color="#16A34A"/><Text style={styles.verifiedText}>Verified</Text></View></View>
           </View>
-        </View>
-      )}
-      {/* ON LEAVE */}
-      {punchStatus === 'ON_LEAVE' && (
-        <>
-          <View
-            style={[
-              styles.bottomCard,
-              { backgroundColor: isDarkMode ? '#1E1E2E' : '#FFFFFF' },
-            ]}
-          >
-            <View>
-              <Text style={styles.currentTimeLabel}>STATUS</Text>
-              <Text style={styles.bigTime}>On Leave</Text>
-              <Text style={styles.subText}>
-                Your leave for today has been approved
-              </Text>
+        )}
+
+        {punchStatus === 'BEFORE_PUNCH_IN' || punchStatus === 'AFTER_PUNCH_IN' ? (
+          <View style={styles.actionCard}>
+            <View style={styles.readyPill}><View style={styles.readyDot}/><Text style={styles.readyText}>{statusCopy}</Text></View>
+            <Text style={styles.currentCaption}>CURRENT TIME</Text>
+            <Text style={styles.timeHero}>{timeDisplay}</Text>
+            <View style={styles.dateRow}><AppIcon name="Calendar" size={14} color="#64748B"/><Text style={styles.dateText}>{moment().format('dddd, DD MMMM YYYY')}</Text></View>
+
+            <View style={styles.locationStrip}>
+              <View style={styles.locationIcon}><AppIcon name="Navigation" size={18} color="#2563EB"/></View>
+              <View style={{flex:1}}><Text style={styles.locationTitle}>Attendance location</Text><Text numberOfLines={2} style={styles.locationValue}>{address || 'Locating your current position…'}</Text></View>
+              <View style={styles.verifiedSmall}><AppIcon name="CheckCircle" size={14} color="#16A34A"/></View>
             </View>
 
-            <View
-              style={[
-                styles.locationContainer,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f5f5f7' },
-              ]}
-            >
-              <Navigation
-                color="#2563EB"
-                size={20}
-                style={{
-                  position: 'absolute',
-                  top: verticalScale(16),
-                  left: scale(10),
-                }}
-              />
-              <Text style={styles.locationLabel}>LOCATION ADDRESS</Text>
+            <View style={styles.shiftRow}><View><Text style={styles.shiftCaption}>TODAY’S SHIFT</Text><Text style={styles.shiftTitle}>Day Shift</Text><Text style={styles.shiftTime}>10:00 AM — 07:30 PM</Text></View><View style={styles.shiftBadge}><AppIcon name="Briefcase" size={15} color="#2563EB"/></View></View>
 
-              <Text style={styles.address}>{address}</Text>
-            </View>
-            <View style={styles.divider} />
+            <View style={styles.divider}/>
+            <SlideToPunchButton onComplete={launchCameraHandler} title={`Slide to ${isPunchIn ? 'Punch In' : 'Punch Out'}`} />
+            <Text style={styles.actionHint}>Your photo and GPS location are recorded for attendance verification.</Text>
           </View>
-        </>
-      )}
-      {cameraVisible && (
-        <Modal
-          visible={cameraVisible}
-          transparent={false}
-          animationType="slide"
-          onRequestClose={() => setCameraVisible(false)}
-        >
-          <CameraScreen
-            onCapture={onPhotoCaptured}
-            onClose={() => setCameraVisible(false)}
-          />
-        </Modal>
-      )}
-      {fileUri !== null && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={attendanceModalVisible}
-          onRequestClose={() => {
-            setAttendanceModalVisible(false);
-          }}
-        >
-          <View style={punchStyles.modalOverlay}>
-            {Platform.OS === 'ios' && (
-              <BlurView
-                style={StyleSheet.absoluteFill}
-                blurAmount={10}
-                blurType="extraDark"
-              />
-            )}
-            <View style={punchStyles.modalContainer}>
-              <View style={punchStyles.BottomView}>
-                <View>
-                  <Text style={styles.modalEyebrow}>ATTENDANCE EVIDENCE</Text>
-                  <Text style={mainStyles.labelTitle}>
-                    <AppIcon
-                      name="Clock"
-                      size={15}
-                      color={colors.notification}
-                    />{' '}
-                    : {currentDateLabel} {currentTimeLabel}
-                  </Text>
-                  <Text style={[mainStyles.labelTitle, { marginTop: 10 }]}>
-                    <AppIcon
-                      name="MapPin"
-                      size={15}
-                      color={colors.notification}
-                    />{' '}
-                    : {address}
-                  </Text>
-                </View>
-                <ViewShot ref={viewRef} style={punchStyles.imageWithTimestamp}>
-                  <Image
-                    style={[
-                      mainStyles.backBtn,
-                      {
-                        width: moderateScale(250),
-                        height: moderateScale(300),
-                      },
-                    ]}
-                    source={{ uri: fileUri }}
-                  />
-                  <Text style={punchStyles.timestamp}>{captureTime}</Text>
-                </ViewShot>
-                {punchLabel == 'Punch_in' && <ButtonOrWaitingMessage />}
-                {punchLabel == 'Punch_out' && <ButtonOrWaitingMessage />}
-              </View>
+        ) : null}
+
+        {punchStatus === 'AFTER_PUNCH_OUT' && (
+          <View style={styles.completedCard}>
+            <View style={styles.completedHero}><View style={styles.completedIcon}><AppIcon name="Check" size={25} color="#059669"/></View><View style={{flex:1}}><View style={styles.donePill}><View style={styles.doneDot}/><Text style={styles.doneText}>DAY COMPLETED</Text></View><Text style={styles.completedTitle}>Attendance recorded</Text><Text style={styles.completedSub}>Your workday has been successfully closed.</Text></View></View>
+            <View style={styles.timeGrid}>
+              <View style={styles.timeBlock}><Text style={styles.timeBlockLabel}>PUNCHED IN</Text><Text style={styles.timeBlockValue}>{inTime ? moment(inTime,'HH:mm:ss').format('hh:mm A') : '--:--'}</Text></View>
+              <View style={styles.timeBlock}><Text style={styles.timeBlockLabel}>PUNCHED OUT</Text><Text style={styles.timeBlockValue}>{outTime ? moment(outTime,'HH:mm:ss').format('hh:mm A') : '--:--'}</Text></View>
             </View>
+            <View style={styles.totalBar}><View><Text style={styles.totalLabel}>TOTAL WORKED</Text><Text style={styles.totalValue}>{typeof todayAttendance?.total_minutes === 'number' ? `${Math.floor(Math.abs(todayAttendance.total_minutes)/60)}h ${Math.abs(todayAttendance.total_minutes)%60}m` : 'Recorded'}</Text></View><AppIcon name="Clock" size={22} color="#FFFFFF"/></View>
+            <View style={styles.miniMap}><MapView style={punchStyles.map} region={mapRegion} showsUserLocation={false}><Marker coordinate={mapRegion}><CustomMarker /></Marker></MapView><View style={styles.miniMapChip}><AppIcon name="MapPin" size={13} color="#2563EB"/><Text numberOfLines={1} style={styles.miniMapText}>{getShortAddress(outAddress || address) || 'Punch-out location'}</Text></View></View>
           </View>
-        </Modal>
-      )}
-    </>
+        )}
+
+        {punchStatus === 'ON_LEAVE' && (
+          <View style={styles.leaveCard}><View style={styles.leaveIcon}><AppIcon name="Calendar" size={23} color="#7C3AED"/></View><Text style={styles.leaveOverline}>TODAY’S STATUS</Text><Text style={styles.leaveTitle}>You’re on leave</Text><Text style={styles.leaveSub}>Your approved leave covers today. No punch is required.</Text><View style={styles.leaveLine}><AppIcon name="MapPin" size={15} color="#64748B"/><Text numberOfLines={2} style={styles.leaveAddress}>{address}</Text></View></View>
+        )}
+
+        <View style={styles.trustNote}><AppIcon name="ShieldCheck" size={17} color="#2563EB"/><Text style={styles.trustText}>Location is used only for attendance verification.</Text></View>
+      </ScrollView>
+
+      {cameraVisible && <Modal visible={cameraVisible} transparent={false} animationType="slide" onRequestClose={() => setCameraVisible(false)}><CameraScreen onCapture={onPhotoCaptured} onClose={() => setCameraVisible(false)} /></Modal>}
+      {fileUri !== null && <Modal animationType="slide" transparent visible={attendanceModalVisible} onRequestClose={() => setAttendanceModalVisible(false)}><View style={punchStyles.modalOverlay}>{Platform.OS === 'ios' && <BlurView style={StyleSheet.absoluteFill} blurAmount={10} blurType="extraDark" />}<View style={punchStyles.modalContainer}><View style={punchStyles.BottomView}><Text style={styles.modalEyebrow}>ATTENDANCE EVIDENCE</Text><Text style={mainStyles.labelTitle}><AppIcon name="Clock" size={15} color={colors.notification}/> {currentDateLabel} {currentTimeLabel}</Text><Text style={[mainStyles.labelTitle,{marginTop:10}]}><AppIcon name="MapPin" size={15} color={colors.notification}/> {address}</Text><ViewShot ref={viewRef} style={punchStyles.imageWithTimestamp}><Image style={[mainStyles.backBtn,{width:moderateScale(250),height:moderateScale(300)}]} source={{uri:fileUri}}/><Text style={punchStyles.timestamp}>{captureTime}</Text></ViewShot>{punchLabel == 'Punch_in' && <ButtonOrWaitingMessage />}{punchLabel == 'Punch_out' && <ButtonOrWaitingMessage />}</View></View></View></Modal>}
+    </View>
   );
 };
 
 export default Punch;
 
 const styles = StyleSheet.create({
-  sliderWrapper: {
-    left: 0,
-    right: 0,
-    bottom: verticalScale(18),
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: moderateScale(18),
-    position: 'absolute',
-  },
-  mapContainer: {
-    marginHorizontal: moderateScale(14),
-    marginTop: verticalScale(10),
-    width: '100%',
-    height: verticalScale(300),
-    borderRadius: moderateScale(22),
-    overflow: 'hidden',
-    alignSelf: 'center',
-    backgroundColor: '#E8EEF7',
-  },
-  bottomCard: {
-    padding: moderateScale(20),
-    borderRadius: moderateScale(20),
-    width: '92%',
-    alignSelf: 'center',
-    elevation: 5,
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.10,
-    shadowRadius: 18,
-    shadowOffset: {width: 0, height: 7},
-    position: 'absolute',
-    top: verticalScale(208),
-  },
-  bottomCardOut: {
-    padding: moderateScale(16),
-    borderRadius: moderateScale(20),
-    width: '92%',
-    alignSelf: 'center',
-    elevation: 3,
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.08,
-    shadowRadius: 14,
-    shadowOffset: {width: 0, height: 5},
-    marginTop: verticalScale(18),
-  },
-  statusPill: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: moderateScale(10),
-    paddingVertical: verticalScale(6),
-    borderRadius: 99,
-    backgroundColor: '#ECFDF5',
-    marginBottom: verticalScale(10),
-  },
-  statusDot: {width: moderateScale(6), height: moderateScale(6), borderRadius: 6, backgroundColor: '#10B981', marginRight: moderateScale(6)},
-  statusPillText: {fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 0.8, color: '#047857'},
-  currentTimeLabel: {fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.2, color: '#64748B'},
-  bigTime: {fontSize: moderateScale(34), fontWeight: '800', letterSpacing: -1, marginTop: verticalScale(2)},
-  subText: {fontSize: moderateScale(11), color: '#64748B', marginTop: verticalScale(2), marginBottom: verticalScale(12), fontWeight: '500'},
-  divider: {height: 1, backgroundColor: '#E8EDF3', marginVertical: verticalScale(15)},
-  locationContainer: {paddingHorizontal: moderateScale(40), paddingVertical: verticalScale(13), borderRadius: moderateScale(14), marginTop: verticalScale(6)},
-  locationLabel: {fontSize: moderateScale(9.5), fontWeight: '800', letterSpacing: 0.7},
-  locationHint: {fontSize: moderateScale(8.5), color: '#64748B', marginTop: verticalScale(2), marginBottom: verticalScale(2)},
-  address: {fontSize: moderateScale(11.5), color: '#111827', marginTop: verticalScale(3), lineHeight: moderateScale(16)},
-  shiftCaption: {fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1, color: '#94A3B8', marginBottom: verticalScale(3)},
-  rowBetween: {marginTop: verticalScale(2), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  shiftText: {fontSize: moderateScale(13), fontWeight: '700', color: '#111827'},
-  completedCard: {padding: moderateScale(20), borderRadius: moderateScale(18), backgroundColor: '#F8FAFC', alignItems: 'center', borderWidth: 1, borderColor: '#E2E8F0'},
-  completedBadge: {flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(9), paddingVertical: verticalScale(5), borderRadius: 99, backgroundColor: '#ECFDF5', marginBottom: verticalScale(10)},
-  completedBadgeDot: {width: moderateScale(5), height: moderateScale(5), borderRadius: 5, backgroundColor: '#10B981', marginRight: moderateScale(5)},
-  completedBadgeText: {fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 0.9, color: '#047857'},
-  completedTitle: {fontSize: moderateScale(18), fontWeight: '800', color: '#0F172A'},
-  completedDesc: {marginTop: verticalScale(5), textAlign: 'center', fontSize: moderateScale(11), lineHeight: moderateScale(16), color: '#64748B'},
-  timeRow: {flexDirection: 'row', justifyContent: 'space-between', marginTop: verticalScale(14), gap: moderateScale(8)},
-  timeBox: {width: '50%', padding: moderateScale(14), borderRadius: moderateScale(14), backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0'},
-  timeValue: {marginTop: verticalScale(5), fontSize: moderateScale(18), fontWeight: '800', color: '#0F172A'},
-  miniMap: {height: verticalScale(150), borderRadius: moderateScale(16), overflow: 'hidden', marginTop: verticalScale(14)},
-  punchOutChip: {backgroundColor: 'rgba(255,255,255,0.96)', paddingHorizontal: moderateScale(12), paddingVertical: verticalScale(10), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2},
-  punchOutChipLeft: {flexDirection: 'row', alignItems: 'center', gap: scale(4)},
-  punchOutChipTitle: {fontSize: moderateScale(10), fontWeight: '800', color: '#0F172A', marginLeft: scale(4)},
-  punchOutChipAddress: {fontSize: moderateScale(9.5), color: '#64748B', flexShrink: 1, marginLeft: scale(8), textAlign: 'right'},
-  modalEyebrow: {fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.2, color: '#64748B', marginBottom: verticalScale(5)},
-  loaderText: {marginTop: verticalScale(12), fontSize: moderateScale(13), color: '#64748B', fontWeight: '500'},
+  page:{flex:1}, content:{paddingHorizontal:moderateScale(16),paddingTop:verticalScale(8),paddingBottom:verticalScale(30)},
+  loadingScreen:{flex:1,backgroundColor:'#F5F7FB',alignItems:'center',justifyContent:'center',padding:28}, loadingIcon:{width:54,height:54,borderRadius:18,backgroundColor:'#EAF2FF',alignItems:'center',justifyContent:'center',marginBottom:14},loadingTitle:{fontSize:18,fontWeight:'900',color:'#0F172A'},loadingSub:{fontSize:10.5,color:'#64748B',textAlign:'center',marginTop:5,marginBottom:18,lineHeight:16},
+  headerRow:{flexDirection:'row',alignItems:'center',marginBottom:14},headerIcon:{width:42,height:42,borderRadius:14,backgroundColor:'#EAF2FF',alignItems:'center',justifyContent:'center',marginRight:11},kicker:{fontSize:7.5,fontWeight:'900',letterSpacing:1.7,color:'#64748B'},title:{fontSize:23,fontWeight:'900',color:'#0F172A',letterSpacing:-.6,marginTop:2},subtitle:{fontSize:9.5,fontWeight:'600',color:'#64748B',marginTop:2},gpsPill:{flexDirection:'row',alignItems:'center',backgroundColor:'#ECFDF5',borderRadius:99,paddingHorizontal:9,paddingVertical:6},gpsDot:{width:6,height:6,borderRadius:3,backgroundColor:'#16A34A',marginRight:5},gpsText:{fontSize:7.5,fontWeight:'900',letterSpacing:.7,color:'#15803D'},
+  mapCard:{height:178,borderRadius:20,overflow:'hidden',backgroundColor:'#E2E8F0',marginBottom:12,borderWidth:1,borderColor:'#E1E8F2'},mapOverlay:{position:'absolute',left:10,right:10,bottom:10,backgroundColor:'rgba(255,255,255,.97)',borderRadius:14,padding:9,flexDirection:'row',alignItems:'center',gap:8},mapPin:{width:30,height:30,borderRadius:10,backgroundColor:'#EEF4FF',alignItems:'center',justifyContent:'center'},mapLabel:{fontSize:7.5,fontWeight:'900',letterSpacing:1,color:'#64748B'},mapAddress:{fontSize:10,fontWeight:'800',color:'#0F172A',marginTop:2},verified:{flexDirection:'row',alignItems:'center',gap:3,paddingHorizontal:7,paddingVertical:5,borderRadius:99,backgroundColor:'#ECFDF5'},verifiedText:{fontSize:7.5,fontWeight:'900',color:'#15803D'},
+  actionCard:{backgroundColor:'#FFF',borderRadius:24,borderWidth:1,borderColor:'#E3E9F1',padding:16,shadowColor:'#0F172A',shadowOpacity:.05,shadowRadius:16,shadowOffset:{width:0,height:7},elevation:2},readyPill:{alignSelf:'flex-start',flexDirection:'row',alignItems:'center',backgroundColor:'#ECFDF5',borderRadius:99,paddingHorizontal:10,paddingVertical:6},readyDot:{width:6,height:6,borderRadius:3,backgroundColor:'#16A34A',marginRight:6},readyText:{fontSize:7.5,fontWeight:'900',letterSpacing:1,color:'#15803D'},currentCaption:{fontSize:7.5,fontWeight:'900',letterSpacing:1.5,color:'#2563EB',marginTop:17},timeHero:{fontSize:43,fontWeight:'900',color:'#0B1220',letterSpacing:-2,marginTop:2},dateRow:{flexDirection:'row',alignItems:'center',gap:6,marginTop:1},dateText:{fontSize:9.5,fontWeight:'600',color:'#64748B'},locationStrip:{flexDirection:'row',alignItems:'center',backgroundColor:'#F6F8FB',borderRadius:15,padding:10,marginTop:14,gap:9},locationIcon:{width:34,height:34,borderRadius:11,backgroundColor:'#EAF2FF',alignItems:'center',justifyContent:'center'},locationTitle:{fontSize:9,fontWeight:'900',color:'#334155'},locationValue:{fontSize:9.5,color:'#64748B',fontWeight:'600',marginTop:2,lineHeight:14},verifiedSmall:{width:26,height:26,borderRadius:13,backgroundColor:'#ECFDF5',alignItems:'center',justifyContent:'center'},shiftRow:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:15},shiftCaption:{fontSize:7.5,fontWeight:'900',letterSpacing:1.2,color:'#94A3B8'},shiftTitle:{fontSize:12.5,fontWeight:'900',color:'#0F172A',marginTop:3},shiftTime:{fontSize:9.5,color:'#64748B',fontWeight:'600',marginTop:1},shiftBadge:{width:34,height:34,borderRadius:12,backgroundColor:'#EEF4FF',alignItems:'center',justifyContent:'center'},divider:{height:1,backgroundColor:'#EEF2F7',marginVertical:15},actionHint:{fontSize:8.5,color:'#94A3B8',textAlign:'center',lineHeight:13,marginTop:9,fontWeight:'600'},
+  completedCard:{backgroundColor:'#FFF',borderRadius:24,borderWidth:1,borderColor:'#E3E9F1',padding:16},completedHero:{flexDirection:'row',alignItems:'center',gap:11},completedIcon:{width:48,height:48,borderRadius:16,backgroundColor:'#ECFDF5',alignItems:'center',justifyContent:'center'},donePill:{alignSelf:'flex-start',flexDirection:'row',alignItems:'center',gap:5,backgroundColor:'#ECFDF5',borderRadius:99,paddingHorizontal:7,paddingVertical:4},doneDot:{width:5,height:5,borderRadius:3,backgroundColor:'#16A34A'},doneText:{fontSize:7,fontWeight:'900',letterSpacing:.8,color:'#15803D'},completedTitle:{fontSize:17,fontWeight:'900',color:'#0F172A',marginTop:5},completedSub:{fontSize:9.5,color:'#64748B',marginTop:2},timeGrid:{flexDirection:'row',gap:8,marginTop:15},timeBlock:{flex:1,backgroundColor:'#F8FAFC',borderRadius:13,padding:11,borderWidth:1,borderColor:'#EEF2F7'},timeBlockLabel:{fontSize:7.2,fontWeight:'900',letterSpacing:.8,color:'#94A3B8'},timeBlockValue:{fontSize:14,fontWeight:'900',color:'#0F172A',marginTop:5},totalBar:{marginTop:9,backgroundColor:'#2563EB',borderRadius:15,padding:12,flexDirection:'row',alignItems:'center',justifyContent:'space-between'},totalLabel:{fontSize:7.5,fontWeight:'900',letterSpacing:1,color:'#CFE0FF'},totalValue:{fontSize:18,fontWeight:'900',color:'#FFF',marginTop:3},miniMap:{height:135,borderRadius:16,overflow:'hidden',marginTop:10,position:'relative'},miniMapChip:{position:'absolute',left:9,right:9,bottom:9,backgroundColor:'rgba(255,255,255,.96)',borderRadius:12,padding:8,flexDirection:'row',alignItems:'center',gap:5},miniMapText:{flex:1,fontSize:8.5,fontWeight:'800',color:'#334155'},
+  leaveCard:{backgroundColor:'#FFF',borderRadius:24,padding:20,borderWidth:1,borderColor:'#E6E8F0'},leaveIcon:{width:48,height:48,borderRadius:16,backgroundColor:'#F3EEFF',alignItems:'center',justifyContent:'center',marginBottom:18},leaveOverline:{fontSize:7.5,fontWeight:'900',letterSpacing:1.4,color:'#7C3AED'},leaveTitle:{fontSize:26,fontWeight:'900',color:'#0F172A',marginTop:4},leaveSub:{fontSize:10.5,color:'#64748B',lineHeight:16,marginTop:6},leaveLine:{marginTop:18,paddingTop:13,borderTopWidth:1,borderTopColor:'#EEF2F7',flexDirection:'row',gap:7},leaveAddress:{flex:1,fontSize:9.5,color:'#64748B'},
+  trustNote:{flexDirection:'row',alignItems:'center',gap:8,marginTop:13,paddingHorizontal:12,paddingVertical:11,borderRadius:14,backgroundColor:'#EFF6FF'},trustText:{fontSize:8.5,color:'#4A6080',fontWeight:'700'},modalEyebrow:{fontSize:8,fontWeight:'900',letterSpacing:1.3,color:'#2563EB',marginBottom:8},
 });

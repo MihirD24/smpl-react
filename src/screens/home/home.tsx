@@ -367,381 +367,137 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
   }, []);
 
   // ── Render ────────────────────────────────────────────────────────────────
+  const metricItems = loginuserRole === 'Employee'
+    ? [
+        { label: 'Pending visits', value: dashboardCounts.pendingServiceVisits, icon: 'MapPin', tone: '#2563EB' },
+        { label: 'Reminders', value: dashboardCounts.reminderCount, icon: 'Bell', tone: '#7C3AED' },
+        { label: 'Open points', value: dashboardCounts.remainPointCount, icon: 'ClipboardList', tone: '#059669' },
+      ]
+    : [
+        { label: 'Employees', value: dashboardCounts.employeesCount, icon: 'Users', tone: '#2563EB' },
+        { label: 'Departments', value: dashboardCounts.departmentsCount, icon: 'Network', tone: '#7C3AED' },
+        { label: 'Pending visits', value: dashboardCounts.pendingServiceVisits, icon: 'MapPin', tone: '#D97706' },
+      ];
+
   return (
-    <>
+    <View style={[styles.page, { backgroundColor: t.bg }]}> 
       <NetInfoComponent onReconnect={onRefresh} />
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <ScrollView
-          style={{ flex: 1, backgroundColor: t.bg }}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={t.primary} // iOS
-              colors={[t.primary]} // Android
-              progressBackgroundColor={isDarkMode ? '#1E2028' : '#FFFFFF'}
-            />
-          }
-        >
-          {/* Product-style dashboard header */}
-          <View style={styles.dashboardHeader}>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.dashboardKicker, { color: t.sub }]}>OVERVIEW</Text>
-              <Text numberOfLines={1} style={[styles.dashboardTitle, { color: t.text }]}>Hi, {loginuserName || 'there'} 👋</Text>
-              <Text style={[styles.dashboardDate, { color: t.sub }]}>{moment().format('dddd, D MMMM YYYY')}</Text>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={t.primary} colors={[t.primary]} />}
+      >
+        <View style={styles.appHeader}>
+          <View style={styles.brandCluster}>
+            <View style={styles.brandLogo}><Text style={styles.brandLogoText}>SM</Text></View>
+            <View>
+              <Text style={[styles.brandNameTop, { color: t.text }]}>Shantinath Motors</Text>
+              <Text style={[styles.brandMeta, { color: t.sub }]}>Employee workspace</Text>
             </View>
-            <TouchableOpacity style={[styles.profileButton, { backgroundColor: t.card, borderColor: t.border }]} activeOpacity={0.8}>
-              <Text style={[styles.profileInitial, { color: t.primary }]}>{(loginuserName || 'U').charAt(0).toUpperCase()}</Text>
+          </View>
+          <TouchableOpacity style={[styles.avatar, { backgroundColor: '#E9F1FF', borderColor: t.border }]} activeOpacity={0.8}>
+            <Text style={[styles.avatarText, { color: t.primary }]}>{(loginuserName || 'U').charAt(0).toUpperCase()}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.greetingRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.overline, { color: t.sub }]}>OVERVIEW</Text>
+            <Text numberOfLines={1} style={[styles.greetingTitle, { color: t.text }]}>Hi, {loginuserName || 'there'} 👋</Text>
+            <Text style={[styles.greetingDate, { color: t.sub }]}>{moment().format('dddd, DD MMM YYYY')}</Text>
+          </View>
+          <View style={styles.liveBadge}><Animated.View style={[styles.liveDot, { opacity: livePulse }]} /><Text style={styles.liveBadgeText}>LIVE</Text></View>
+        </View>
+
+        <View style={styles.heroCard}>
+          <View style={styles.heroOrbOne} />
+          <View style={styles.heroOrbTwo} />
+          <Text style={styles.heroOverline}>{loginuserRole || 'EMPLOYEE'} WORKSPACE</Text>
+          <Text style={styles.heroTitle}>Everything important, in one place.</Text>
+          <Text style={styles.heroSub}>Attendance, field work and team activity—at a glance.</Text>
+          <View style={styles.heroFooter}>
+            <Text style={styles.heroFooterText}>Today</Text>
+            <Text style={styles.heroFooterDate}>{moment().format('03 MMM YYYY').replace('03 MMM YYYY', moment().format('DD MMM YYYY'))}</Text>
+          </View>
+        </View>
+
+        <View style={styles.sectionRow}>
+          <View>
+            <Text style={[styles.sectionOverline, { color: t.sub }]}>AT A GLANCE</Text>
+            <Text style={[styles.sectionTitle, { color: t.text }]}>Your workspace</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('ServiceVisitList')} style={styles.viewLink}>
+            <Text style={[styles.viewLinkText, { color: t.primary }]}>View all</Text>
+            <AppIcon name="ChevronRight" size={15} color={t.primary} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.metricsGrid}>
+          {isLoading ? metricItems.map((m, i) => <View key={i} style={[styles.metricCard, { backgroundColor: t.card, borderColor: t.border }]}><SkeletonBox width={38} height={38} borderRadius={12} isDark={isDarkMode} /><SkeletonBox width="40%" height={22} style={{ marginTop: 12 }} isDark={isDarkMode} /><SkeletonBox width="65%" height={10} style={{ marginTop: 7 }} isDark={isDarkMode} /></View>) : metricItems.map((m, i) => (
+            <TouchableOpacity key={m.label} activeOpacity={0.82} onPress={() => m.label === 'Pending visits' && navigation.navigate('ServiceVisitList')} style={[styles.metricCard, { backgroundColor: t.card, borderColor: t.border }] }>
+              <View style={[styles.metricIcon, { backgroundColor: m.tone + '12' }]}><AppIcon name={m.icon as any} size={19} color={m.tone} /></View>
+              <Text style={[styles.metricValue, { color: t.text }]}>{m.value}</Text>
+              <Text style={[styles.metricLabel, { color: t.sub }]}>{m.label}</Text>
             </TouchableOpacity>
-          </View>
-          <View style={[styles.focusCard, { backgroundColor: t.primary }]}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.focusLabel}>{loginuserRole || 'EMPLOYEE'} WORKSPACE</Text>
-              <Text style={styles.focusTitle}>Everything important, in one place.</Text>
-              <Text style={styles.focusSub}>Stay on top of attendance, service work and team activity.</Text>
-            </View>
-            <View style={styles.focusIcon}>
-              <AppIcon name="LayoutDashboard" size={moderateScale(24)} color={t.primary} />
-            </View>
-          </View>
-          <View style={styles.sectionHeader}>
-            <View><Text style={[styles.sectionKicker, { color: t.sub }]}>AT A GLANCE</Text><Text style={[styles.sectionTitle, { color: t.text }]}>Workforce overview</Text></View>
-            <View style={[styles.liveTag, { backgroundColor: isDarkMode ? '#052E16' : '#ECFDF5' }]}><View style={styles.liveDot} /><Text style={styles.liveText}>LIVE</Text></View>
-          </View>
-          {/* Counts Grid */}
-          <View style={styles.gridContainer}>
-            {isLoading ? (
-              <>
-                <View
-                  style={[
-                    styles.card,
-                    {
-                      backgroundColor: t.card,
-                      borderColor: t.border,
-                      width: loginuserRole === 'Employee' ? '100%' : '48%',
-                    },
-                  ]}
-                >
-                  <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
-                  <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
-                  <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
-                </View>
-                {loginuserRole !== 'Employee' && (
-                  <>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
-                      <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
-                      <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
-                      <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
-                    </View>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
-                      <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
-                      <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
-                      <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
-                    </View>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
-                      <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
-                      <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
-                      <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
-                    </View>
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                {/* Pending Service Visits Card */}
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() => navigation.navigate('ServiceVisitList')}
-                  style={[
-                    styles.card,
-                    {
-                      backgroundColor: t.card,
-                      borderColor: t.border,
-                      shadowColor: t.shadow,
-                      width: loginuserRole === 'Employee' ? '100%' : '48%',
-                    },
-                  ]}
-                >
-                  <View style={styles.cardHeader}>
-                    <View style={[styles.iconBg, { backgroundColor: '#FEE2E2' }]}>
-                      <AppIcon name="Clock" size={20} color="#EF4444" />
-                    </View>
-                    <AppIcon name="ChevronRight" size={16} color={t.sub} />
-                  </View>
-                  <Text style={[styles.cardValue, { color: t.text }]}>
-                    {dashboardCounts.pendingServiceVisits}
-                  </Text>
-                  <Text style={[styles.cardLabel, { color: t.sub }]}>
-                    Pending Service Visits
-                  </Text>
-                </TouchableOpacity>
+          ))}
+        </View>
 
-                {loginuserRole !== 'Employee' && (
-                  <>
-                    {/* Departments Card */}
-                    <View
-                      style={[
-                        styles.card,
-                        {
-                          backgroundColor: t.card,
-                          borderColor: t.border,
-                          shadowColor: t.shadow,
-                        },
-                      ]}
-                    >
-                      <View style={styles.cardHeader}>
-                        <View style={[styles.iconBg, { backgroundColor: '#DBEAFE' }]}>
-                          <AppIcon name="Network" size={20} color="#3B82F6" />
-                        </View>
-                      </View>
-                      <Text style={[styles.cardValue, { color: t.text }]}>
-                        {dashboardCounts.departmentsCount}
-                      </Text>
-                      <Text style={[styles.cardLabel, { color: t.sub }]}>
-                        Departments
-                      </Text>
-                    </View>
+        <View style={styles.sectionRow}>
+          <View><Text style={[styles.sectionOverline, { color: t.sub }]}>SHORTCUTS</Text><Text style={[styles.sectionTitle, { color: t.text }]}>Quick actions</Text></View>
+          <TouchableOpacity onPress={openQuickActions} style={styles.viewLink}><Text style={[styles.viewLinkText, { color: t.primary }]}>More</Text><AppIcon name="Plus" size={14} color={t.primary} /></TouchableOpacity>
+        </View>
 
-                    {/* Designations Card */}
-                    <View
-                      style={[
-                        styles.card,
-                        {
-                          backgroundColor: t.card,
-                          borderColor: t.border,
-                          shadowColor: t.shadow,
-                        },
-                      ]}
-                    >
-                      <View style={styles.cardHeader}>
-                        <View style={[styles.iconBg, { backgroundColor: '#D1FAE5' }]}>
-                          <AppIcon name="Briefcase" size={20} color="#10B981" />
-                        </View>
-                      </View>
-                      <Text style={[styles.cardValue, { color: t.text }]}>
-                        {dashboardCounts.designationsCount}
-                      </Text>
-                      <Text style={[styles.cardLabel, { color: t.sub }]}>
-                        Designations
-                      </Text>
-                    </View>
+        <View style={styles.quickGrid}>
+          <TouchableOpacity style={[styles.quickTile, { backgroundColor: t.card, borderColor: t.border }]} onPress={() => navigation.navigate('Punch')} activeOpacity={0.8}>
+            <View style={[styles.quickIcon, { backgroundColor: '#EEF4FF' }]}><AppIcon name="Clock" size={20} color="#2563EB" /></View><Text style={[styles.quickTitle,{color:t.text}]}>Punch</Text><Text style={[styles.quickSub,{color:t.sub}]}>Attendance</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.quickTile, { backgroundColor: t.card, borderColor: t.border }]} onPress={() => navigation.navigate('LeaveList')} activeOpacity={0.8}>
+            <View style={[styles.quickIcon, { backgroundColor: '#F3EEFF' }]}><AppIcon name="Calendar" size={20} color="#7C3AED" /></View><Text style={[styles.quickTitle,{color:t.text}]}>Leave</Text><Text style={[styles.quickSub,{color:t.sub}]}>Time off</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.quickTile, { backgroundColor: t.card, borderColor: t.border }]} onPress={() => navigation.navigate('ServiceVisitList')} activeOpacity={0.8}>
+            <View style={[styles.quickIcon, { backgroundColor: '#ECFDF5' }]}><AppIcon name="MapPin" size={20} color="#059669" /></View><Text style={[styles.quickTitle,{color:t.text}]}>Visits</Text><Text style={[styles.quickSub,{color:t.sub}]}>Field work</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.quickTile, { backgroundColor: t.card, borderColor: t.border }]} onPress={() => navigation.navigate('StaffSalary')} activeOpacity={0.8}>
+            <View style={[styles.quickIcon, { backgroundColor: '#FFF7E8' }]}><AppIcon name="IndianRupee" size={20} color="#D97706" /></View><Text style={[styles.quickTitle,{color:t.text}]}>Salary</Text><Text style={[styles.quickSub,{color:t.sub}]}>Payroll</Text>
+          </TouchableOpacity>
+        </View>
 
-                    {/* Total Employees Card */}
-                    <View
-                      style={[
-                        styles.card,
-                        {
-                          backgroundColor: t.card,
-                          borderColor: t.border,
-                          shadowColor: t.shadow,
-                        },
-                      ]}
-                    >
-                      <View style={styles.cardHeader}>
-                        <View style={[styles.iconBg, { backgroundColor: '#E0E7FF' }]}>
-                          <AppIcon name="Users" size={20} color="#6366F1" />
-                        </View>
-                      </View>
-                      <Text style={[styles.cardValue, { color: t.text }]}>
-                        {dashboardCounts.employeesCount}
-                      </Text>
-                      <Text style={[styles.cardLabel, { color: t.sub }]}>
-                        Total Employees
-                      </Text>
-                    </View>
-                  </>
-                )}
-              </>
-            )}
-          </View>
+        <View style={[styles.securityNote, { backgroundColor: isDarkMode ? '#14213D' : '#EFF6FF', borderColor: isDarkMode ? '#1D4ED8' : '#DBEAFE' }]}>
+          <View style={styles.securityIcon}><AppIcon name="ShieldCheck" size={17} color={t.primary} /></View>
+          <View style={{ flex:1 }}><Text style={[styles.securityTitle,{color:t.text}]}>Secure employee workspace</Text><Text style={[styles.securitySub,{color:t.sub}]}>Your activity and attendance data stay protected.</Text></View>
+          <AppIcon name="ChevronRight" size={16} color={t.sub} />
+        </View>
 
-          {/* Branding */}
-          <Text style={[styles.brandName, { color: isDarkMode ? '#2A2D38' : '#EAEDFF' }]}>
-            Shantinath Motors Pvt Ltd
-          </Text>
-        </ScrollView>
+        <Text style={[styles.footerBrand, { color: t.sub }]}>Shantinath Motors Pvt Ltd</Text>
+      </ScrollView>
 
-        {/* ── Quick Actions Bottom Sheet ── */}
-        <BottomSheet
-          ref={quickActionsBottomSheetRef}
-          index={-1}
-          snapPoints={quickActionsSnapPoints}
-          enablePanDownToClose
-          backdropComponent={renderBackdrop}
-          backgroundStyle={[
-            styles.bottomSheetBackground,
-            { backgroundColor: isDarkMode ? '#1E2028' : '#FFFFFF' },
-          ]}
-          handleIndicatorStyle={styles.bottomSheetIndicator}
-        >
-          <BottomSheetView style={styles.bottomSheetContent}>
-            {/* Header */}
-            <View style={styles.quickActionsHeader}>
-              <Text
-                style={[
-                  styles.quickActionsTitle,
-                  { color: isDarkMode ? '#F0F0F0' : '#1A1D2E' },
-                ]}
-              >
-                Quick Actions
-              </Text>
-              <TouchableOpacity
-                style={[
-                  styles.closeBtn,
-                  { backgroundColor: isDarkMode ? '#2A2D38' : '#F1F5F9' },
-                ]}
-                onPress={closeQuickActions}
-              >
-                <AppIcon
-                  name="X"
-                  size={16}
-                  color={isDarkMode ? '#F0F0F0' : '#1A1D2E'}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Action Items */}
-            <View style={styles.quickActionsContainer}>
-              {quickActionItems.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.quickActionItem,
-                    { backgroundColor: isDarkMode ? '#2A2D38' : '#F8FAFC' },
-                  ]}
-                  onPress={item.onPress}
-                  activeOpacity={0.75}
-                >
-                  <View
-                    style={[
-                      styles.quickActionIconWrap,
-                      { backgroundColor: item.iconBg },
-                    ]}
-                  >
-                    <AppIcon name={item.icon} size={20} color="#FFFFFF" />
-                  </View>
-                  <Text
-                    style={[
-                      styles.quickActionLabel,
-                      { color: isDarkMode ? '#F0F0F0' : '#1A1D2E' },
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                  <AppIcon name="ChevronRight" size={18} color="#9098B1" />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </BottomSheetView>
-        </BottomSheet>
-      </GestureHandlerRootView>
-    </>
+      <BottomSheet ref={quickActionsBottomSheetRef} index={-1} snapPoints={quickActionsSnapPoints} enablePanDownToClose backdropComponent={renderBackdrop} backgroundStyle={[styles.bottomSheetBackground,{backgroundColor:t.card}]} handleIndicatorStyle={styles.bottomSheetIndicator}>
+        <BottomSheetView style={styles.bottomSheetContent}>
+          <View style={styles.quickActionsHeader}><View><Text style={[styles.sheetOverline,{color:t.sub}]}>WORKSPACE</Text><Text style={[styles.quickActionsTitle,{color:t.text}]}>Quick actions</Text></View><TouchableOpacity style={styles.closeBtn} onPress={closeQuickActions}><AppIcon name="X" size={16} color={t.text}/></TouchableOpacity></View>
+          <View style={styles.quickActionsContainer}>{quickActionItems.map((item,index)=><TouchableOpacity key={index} style={[styles.quickActionItem,{backgroundColor:t.bg,borderColor:t.border}]} onPress={item.onPress} activeOpacity={0.8}><View style={[styles.quickActionIconWrap,{backgroundColor:item.iconBg}]}><AppIcon name={item.icon} size={18} color="#FFF"/></View><Text style={[styles.quickActionLabel,{color:t.text}]}>{item.label}</Text><AppIcon name="ChevronRight" size={17} color={t.sub}/></TouchableOpacity>)}</View>
+        </BottomSheetView>
+      </BottomSheet>
+    </View>
   );
 };
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  scrollContent: { paddingHorizontal: moderateScale(16), paddingTop: verticalScale(14), paddingBottom: verticalScale(100) },
-  dashboardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(14) },
-  dashboardKicker: { fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.5, marginBottom: verticalScale(3) },
-  dashboardTitle: { fontSize: moderateScale(23), fontWeight: '800', letterSpacing: -0.5 },
-  dashboardDate: { fontSize: moderateScale(11), marginTop: verticalScale(4), fontWeight: '500' },
-  profileButton: { width: moderateScale(46), height: moderateScale(46), borderRadius: moderateScale(15), borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  profileInitial: { fontSize: moderateScale(18), fontWeight: '800' },
-  focusCard: { minHeight: verticalScale(126), borderRadius: moderateScale(20), padding: moderateScale(18), flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(18), overflow: 'hidden' },
-  focusLabel: { color: '#BFDBFE', fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.4, marginBottom: verticalScale(6) },
-  focusTitle: { color: '#FFFFFF', fontSize: moderateScale(17), lineHeight: moderateScale(22), fontWeight: '800', maxWidth: '82%' },
-  focusSub: { color: '#CBD5E1', fontSize: moderateScale(10.5), lineHeight: moderateScale(16), marginTop: verticalScale(4), maxWidth: '84%' },
-  focusIcon: { position: 'absolute', right: moderateScale(14), top: moderateScale(14), width: moderateScale(48), height: moderateScale(48), borderRadius: moderateScale(16), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: verticalScale(10) },
-  sectionKicker: { fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.3 },
-  sectionTitle: { fontSize: moderateScale(16), fontWeight: '800', marginTop: verticalScale(3) },
-  liveTag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(9), paddingVertical: verticalScale(5), borderRadius: 99 },
-  liveDot: { width: moderateScale(6), height: moderateScale(6), borderRadius: 3, backgroundColor: '#10B981', marginRight: moderateScale(5) },
-  liveText: { fontSize: moderateScale(8), fontWeight: '800', color: '#059669', letterSpacing: 0.8 },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginVertical: verticalScale(8),
-  },
-  card: { width: '48%', borderRadius: moderateScale(17), padding: moderateScale(14), borderWidth: 1, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 7, elevation: 1, marginBottom: verticalScale(12), minHeight: scale(108), justifyContent: 'space-between' },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  iconBg: {
-    width: moderateScale(36),
-    height: moderateScale(36),
-    borderRadius: moderateScale(10),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardValue: { fontSize: moderateScale(22), fontWeight: '800', marginTop: verticalScale(10) },
-  cardLabel: { fontSize: moderateScale(11), fontWeight: '600', marginTop: verticalScale(3) },
-  brandName: { fontSize: moderateScale(24), fontWeight: '800', lineHeight: moderateScale(30), marginTop: verticalScale(20), marginBottom: verticalScale(6), textAlign: 'right' },
-
-  // ── Bottom Sheet ──────────────────────────────────────────────────────────
-  bottomSheetBackground: {
-    borderTopLeftRadius: moderateScale(24),
-    borderTopRightRadius: moderateScale(24),
-  },
-  bottomSheetIndicator: {
-    backgroundColor: '#E0E4EF',
-    width: 40,
-  },
-  bottomSheetContent: {
-    flex: 1,
-    paddingHorizontal: moderateScale(20),
-    paddingTop: verticalScale(4),
-  },
-  quickActionsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingBottom: verticalScale(16),
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F3FF',
-    marginBottom: verticalScale(16),
-  },
-  quickActionsTitle: {
-    fontSize: moderateScale(14),
-    fontWeight: '800',
-    letterSpacing: 0.2,
-  },
-  closeBtn: {
-    width: moderateScale(28),
-    height: moderateScale(28),
-    borderRadius: moderateScale(16),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  quickActionsContainer: {
-    gap: 10,
-    paddingBottom: verticalScale(14),
-  },
-  quickActionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    paddingVertical: verticalScale(12),
-    paddingHorizontal: moderateScale(16),
-    borderRadius: moderateScale(14),
-  },
-  quickActionIconWrap: {
-    width: moderateScale(32),
-    height: moderateScale(32),
-    borderRadius: moderateScale(12),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  quickActionLabel: {
-    flex: 1,
-    fontSize: moderateScale(13),
-    fontWeight: '600',
-  },
+  page:{flex:1},
+  scrollContent:{paddingHorizontal:moderateScale(18),paddingTop:verticalScale(8),paddingBottom:verticalScale(38)},
+  appHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginBottom:verticalScale(16)},
+  brandCluster:{flexDirection:'row',alignItems:'center',gap:10},
+  brandLogo:{width:38,height:38,borderRadius:12,backgroundColor:'#2563EB',alignItems:'center',justifyContent:'center'},
+  brandLogoText:{color:'#FFF',fontSize:13,fontWeight:'900'}, brandNameTop:{fontSize:12,fontWeight:'800'}, brandMeta:{fontSize:9,marginTop:2,fontWeight:'600'},
+  avatar:{width:40,height:40,borderRadius:14,borderWidth:1,alignItems:'center',justifyContent:'center'}, avatarText:{fontSize:16,fontWeight:'900'},
+  greetingRow:{flexDirection:'row',alignItems:'flex-end',marginBottom:verticalScale(14)}, overline:{fontSize:8,fontWeight:'900',letterSpacing:1.8}, greetingTitle:{fontSize:25,fontWeight:'900',letterSpacing:-0.8,marginTop:3}, greetingDate:{fontSize:10.5,fontWeight:'600',marginTop:4},
+  liveBadge:{flexDirection:'row',alignItems:'center',paddingHorizontal:10,paddingVertical:6,borderRadius:99,backgroundColor:'#ECFDF5',marginBottom:2}, liveDot:{width:6,height:6,borderRadius:3,backgroundColor:'#16A34A',marginRight:5}, liveBadgeText:{fontSize:8,fontWeight:'900',letterSpacing:1,color:'#15803D'},
+  heroCard:{minHeight:172,borderRadius:26,backgroundColor:'#2563EB',padding:20,overflow:'hidden',marginBottom:verticalScale(22),position:'relative'}, heroOrbOne:{position:'absolute',width:170,height:170,borderRadius:85,backgroundColor:'rgba(255,255,255,0.07)',right:-55,top:-65}, heroOrbTwo:{position:'absolute',width:110,height:110,borderRadius:55,backgroundColor:'rgba(255,255,255,0.06)',right:75,bottom:-55}, heroOverline:{color:'#CFE0FF',fontSize:8,fontWeight:'900',letterSpacing:1.8}, heroTitle:{color:'#FFF',fontSize:22,fontWeight:'900',lineHeight:27,letterSpacing:-0.5,maxWidth:'88%',marginTop:8}, heroSub:{color:'#DBEAFE',fontSize:10.5,lineHeight:16,maxWidth:'90%',marginTop:8,fontWeight:'500'}, heroFooter:{flexDirection:'row',alignItems:'center',gap:10,marginTop:17}, heroFooterText:{color:'#FFF',fontSize:9,fontWeight:'800'}, heroFooterDate:{color:'#BFDBFE',fontSize:9,fontWeight:'600'},
+  sectionRow:{flexDirection:'row',alignItems:'flex-end',justifyContent:'space-between',marginBottom:verticalScale(10)}, sectionOverline:{fontSize:8,fontWeight:'900',letterSpacing:1.7}, sectionTitle:{fontSize:18,fontWeight:'900',letterSpacing:-0.3,marginTop:4}, viewLink:{flexDirection:'row',alignItems:'center',gap:2,paddingBottom:2}, viewLinkText:{fontSize:10,fontWeight:'800'},
+  metricsGrid:{flexDirection:'row',gap:9,marginBottom:verticalScale(20)}, metricCard:{flex:1,minHeight:116,borderRadius:18,borderWidth:1,padding:12,shadowColor:'#0F172A',shadowOpacity:.035,shadowRadius:12,shadowOffset:{width:0,height:5},elevation:1}, metricIcon:{width:36,height:36,borderRadius:12,alignItems:'center',justifyContent:'center'}, metricValue:{fontSize:24,fontWeight:'900',marginTop:12,letterSpacing:-.5}, metricLabel:{fontSize:9,fontWeight:'700',marginTop:2,lineHeight:13},
+  quickGrid:{flexDirection:'row',flexWrap:'wrap',gap:9,marginBottom:verticalScale(18)}, quickTile:{width:'48.5%',minHeight:94,borderWidth:1,borderRadius:17,padding:12}, quickIcon:{width:36,height:36,borderRadius:12,alignItems:'center',justifyContent:'center',marginBottom:8}, quickTitle:{fontSize:12,fontWeight:'900'}, quickSub:{fontSize:9,fontWeight:'600',marginTop:2},
+  securityNote:{flexDirection:'row',alignItems:'center',borderRadius:16,borderWidth:1,padding:12,gap:10}, securityIcon:{width:32,height:32,borderRadius:11,backgroundColor:'#FFF',alignItems:'center',justifyContent:'center'}, securityTitle:{fontSize:10.5,fontWeight:'800'}, securitySub:{fontSize:9,lineHeight:13,marginTop:2}, footerBrand:{fontSize:9,fontWeight:'700',textAlign:'center',marginTop:22,opacity:.65},
+  bottomSheetBackground:{borderTopLeftRadius:26,borderTopRightRadius:26},bottomSheetIndicator:{backgroundColor:'#CBD5E1',width:42,height:4},bottomSheetContent:{flex:1,paddingHorizontal:20,paddingTop:5},sheetOverline:{fontSize:8,fontWeight:'900',letterSpacing:1.6},quickActionsHeader:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingBottom:14,borderBottomWidth:1,borderBottomColor:'#EEF2F7',marginBottom:14},quickActionsTitle:{fontSize:19,fontWeight:'900',marginTop:3},closeBtn:{width:32,height:32,borderRadius:16,backgroundColor:'#F1F5F9',alignItems:'center',justifyContent:'center'},quickActionsContainer:{gap:9},quickActionItem:{flexDirection:'row',alignItems:'center',padding:12,borderRadius:15,borderWidth:1,gap:12},quickActionIconWrap:{width:34,height:34,borderRadius:11,alignItems:'center',justifyContent:'center'},quickActionLabel:{flex:1,fontSize:12,fontWeight:'800'},
 });
 export default Home;

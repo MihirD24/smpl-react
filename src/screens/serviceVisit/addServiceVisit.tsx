@@ -453,6 +453,17 @@ const AddServiceVisit = ({ navigation }: any) => {
     >
       <StatusBar translucent barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
 
+      <View style={styles.pageHeader}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton} activeOpacity={0.8}>
+          <AppIcon name="ChevronLeft" size={20} color="#0F172A" />
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.headerEyebrow}>FIELD OPERATIONS</Text>
+          <Text style={styles.headerTitle}>New service visit</Text>
+        </View>
+        <View style={styles.headerBadge}><AppIcon name="FilePlus2" size={18} color="#2563EB" /></View>
+      </View>
+
       {loading && (
         <View style={styles.overlayLoading}>
           <ActivityIndicator size="large" color="#3B82F6" />
@@ -995,6 +1006,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 999,
   },
+  pageHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 18, paddingTop: 7, paddingBottom: 10, },
+  backButton: { width: 40, height: 40, borderRadius: 13, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E3EAF3', alignItems: 'center', justifyContent: 'center' },
+  headerEyebrow: { fontSize: 7.5, fontWeight: '900', letterSpacing: 1.5, color: '#64748B' },
+  headerTitle: { fontSize: 21, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5, marginTop: 2 },
+  headerBadge: { width: 40, height: 40, borderRadius: 13, backgroundColor: '#EAF1FF', alignItems: 'center', justifyContent: 'center' },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',

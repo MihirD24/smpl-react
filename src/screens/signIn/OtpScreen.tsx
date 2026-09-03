@@ -349,7 +349,9 @@ export default OtpScreen;
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: verticalScale(26),
+    paddingBottom: verticalScale(36),
   },
   header: {
     paddingHorizontal: 16,

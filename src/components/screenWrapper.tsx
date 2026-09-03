@@ -53,7 +53,7 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           : 0
         : padding,
     paddingVertical:
-      typeof padding === 'boolean' ? (padding ? verticalScale(7) : 0) : padding,
+      typeof padding === 'boolean' ? (padding ? verticalScale(4) : 0) : padding,
   };
 
   const content = scrollable ? (
@@ -86,16 +86,6 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
       />
 
       <View style={{ flex: 1, backgroundColor }}>
-        {/* Top Safe Area (conditionally rendered) */}
-        {!withHeader && safeTop && (
-          <View
-            style={{
-              height: insets.top,
-              backgroundColor: safeAreaTopColor ?? backgroundColor,
-            }}
-          />
-        )}
-
         {/* Main Content */}
         {keyboardAvoiding ? (
           <KeyboardAvoidingView
@@ -108,14 +98,8 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           content
         )}
 
-        {/* Bottom Safe Area (conditionally rendered) */}
-        {safeBottom && (
-          <View
-            style={{
-              height: Platform.OS === 'ios' ? insets.bottom : 0,
-              backgroundColor: safeAreaBottomColor ?? backgroundColor,
-            }}
-          />
+        {safeBottom && Platform.OS === 'ios' && (
+          <View style={{ height: insets.bottom, backgroundColor: safeAreaBottomColor ?? backgroundColor }} />
         )}
       </View>
     </>

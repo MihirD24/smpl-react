@@ -322,6 +322,16 @@ const ServiceVisitList = ({ navigation }: any) => {
     <View style={[styles.container, { backgroundColor: theme.screenBg }]}>
       {/* Filters & Actions Header */}
       <View style={styles.headerContainer}>
+        <View style={styles.serviceHeaderRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.serviceEyebrow}>FIELD OPERATIONS</Text>
+            <Text style={styles.serviceTitle}>Service visits</Text>
+            <Text style={styles.serviceSub}>{filteredVisits.length} visible · {statusFilter}</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('AddServiceVisit')} style={styles.serviceAddBtn}>
+            <AppIcon name="Plus" size={18} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
         {/* Search Bar */}
         <CustomInput
           value={searchQuery}
@@ -531,308 +541,71 @@ const ServiceVisitList = ({ navigation }: any) => {
   );
 };
 
-export default ServiceVisitList;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  headerContainer: {
-    paddingHorizontal: moderateScale(16),
-    paddingTop: verticalScale(12),
-    paddingBottom: verticalScale(4),
-  },
-  filterRow: {
-    flexDirection: 'row',
-    gap: moderateScale(8),
-    marginTop: verticalScale(8),
-    marginBottom: verticalScale(4),
-  },
-  filterTab: {
-    flex: 1,
-    paddingVertical: verticalScale(8),
-    alignItems: 'center',
-    borderRadius: moderateScale(8),
-    borderWidth: 1,
-  },
-  filterTabText: {
-    fontSize: moderateScale(12),
-    fontWeight: '600',
-  },
-  selectAllRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: verticalScale(8),
-    paddingVertical: verticalScale(4),
-  },
-  selectAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  selectAllText: {
-    fontSize: moderateScale(13),
-    fontWeight: '600',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listContent: {
-    padding: moderateScale(16),
-    paddingBottom: verticalScale(100),
-  },
-  card: {
-    borderWidth: 1,
-    borderRadius: moderateScale(14),
-    padding: moderateScale(14),
-    marginBottom: verticalScale(14),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  cardMainRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  checkboxContainer: {
-    marginRight: moderateScale(10),
-    marginTop: verticalScale(2),
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: verticalScale(10),
-  },
-  badgeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: moderateScale(6),
-  },
-  badge: {
-    paddingHorizontal: moderateScale(8),
-    paddingVertical: verticalScale(4),
-    borderRadius: moderateScale(6),
-  },
-  badgeText: {
-    fontSize: moderateScale(10),
-    fontWeight: '700',
-  },
-  amountContainer: {
-    alignItems: 'flex-end',
-  },
-  deductionText: {
-    fontSize: moderateScale(10),
-    color: '#EF4444',
-    fontWeight: '600',
-  },
-  amountText: {
-    fontSize: moderateScale(15),
-    fontWeight: '800',
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: verticalScale(3),
-  },
-  detailIcon: {
-    marginRight: moderateScale(8),
-  },
-  detailText: {
-    fontSize: moderateScale(13),
-    fontWeight: '500',
-  },
-  remarksRow: {
-    marginTop: verticalScale(8),
-    padding: moderateScale(8),
-    borderRadius: moderateScale(6),
-  },
-  remarksText: {
-    fontSize: moderateScale(11),
-    fontStyle: 'italic',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E2E8F0',
-    marginVertical: verticalScale(10),
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  footerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  footerIcon: {
-    marginRight: moderateScale(4),
-  },
-  footerText: {
-    fontSize: moderateScale(11),
-    fontWeight: '500',
-  },
-  footerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: moderateScale(8),
-  },
-  notesText: {
-    fontSize: moderateScale(11),
-    maxWidth: moderateScale(120),
-  },
-  svrButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    paddingHorizontal: moderateScale(8),
-    paddingVertical: verticalScale(4),
-    borderRadius: moderateScale(6),
-  },
-  svrText: {
-    fontSize: moderateScale(11),
-    fontWeight: '700',
-    marginLeft: scale(2),
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: verticalScale(100),
-    gap: verticalScale(12),
-  },
-  emptyText: {
-    fontSize: moderateScale(15),
-    fontWeight: '600',
-  },
-  actionBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    borderTopWidth: 1,
-    paddingHorizontal: moderateScale(16),
-    paddingVertical: verticalScale(12),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 10,
-  },
-  actionBarLeft: {
-    flex: 1,
-  },
-  selectedCountText: {
-    fontSize: moderateScale(14),
-    fontWeight: '700',
-  },
-  actionBarButtons: {
-    flexDirection: 'row',
-    gap: moderateScale(8),
-  },
-  actionBtn: {
-    paddingHorizontal: moderateScale(12),
-    paddingVertical: verticalScale(8),
-    borderRadius: moderateScale(8),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  deselectBtn: {
-    borderWidth: 1,
-  },
-  deselectBtnText: {
-    fontSize: moderateScale(13),
-    fontWeight: '600',
-  },
-  approveBtn: {
-    minWidth: scale(80),
-  },
-  approveBtnText: {
-    color: '#FFF',
-    fontSize: moderateScale(13),
-    fontWeight: '700',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: moderateScale(20),
-  },
-  modalContent: {
-    width: '100%',
-    borderRadius: moderateScale(16),
-    padding: moderateScale(20),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: moderateScale(18),
-    fontWeight: '800',
-    marginBottom: verticalScale(6),
-  },
-  modalSubText: {
-    fontSize: moderateScale(13),
-    marginBottom: verticalScale(16),
-    lineHeight: verticalScale(18),
-  },
-  inputGroup: {
-    marginBottom: verticalScale(14),
-  },
-  inputLabel: {
-    fontSize: moderateScale(12),
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: verticalScale(6),
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderRadius: moderateScale(8),
-    paddingHorizontal: moderateScale(12),
-    height: verticalScale(40),
-    fontSize: moderateScale(14),
-  },
-  modalTextArea: {
-    height: verticalScale(80),
-    textAlignVertical: 'top',
-    paddingTop: verticalScale(8),
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: moderateScale(10),
-    marginTop: verticalScale(8),
-  },
-  modalBtn: {
-    paddingHorizontal: moderateScale(16),
-    paddingVertical: verticalScale(10),
-    borderRadius: moderateScale(8),
-    minWidth: scale(90),
-    alignItems: 'center',
-  },
-  cancelBtn: {
-    borderWidth: 1,
-  },
-  cancelBtnText: {
-    fontSize: moderateScale(14),
-    fontWeight: '600',
-  },
-  confirmBtn: {
-    justifyContent: 'center',
-  },
-  confirmBtnText: {
-    color: '#FFF',
-    fontSize: moderateScale(14),
-    fontWeight: '700',
-  },
+  container: { flex: 1 },
+  headerContainer: { paddingHorizontal: moderateScale(16), paddingTop: verticalScale(7), paddingBottom: verticalScale(3) },
+  serviceHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(10) },
+  serviceEyebrow: { fontSize: 7.5, fontWeight: '900', letterSpacing: 1.5, color: '#64748B' },
+  serviceTitle: { fontSize: 22, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5, marginTop: 2 },
+  serviceSub: { fontSize: 9, color: '#64748B', marginTop: 2, fontWeight: '600' },
+  serviceAddBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: '#2563EB', alignItems: 'center', justifyContent: 'center', marginLeft: 10, shadowColor: '#2563EB', shadowOpacity: 0.16, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 2 },
+  filterRow: { flexDirection: 'row', gap: moderateScale(8), marginTop: verticalScale(8), marginBottom: verticalScale(4) },
+  filterTab: { flex: 1, paddingVertical: verticalScale(9), alignItems: 'center', borderRadius: moderateScale(12), borderWidth: 1, backgroundColor: '#FFFFFF' },
+  filterTabText: { fontSize: moderateScale(11.5), fontWeight: '800' },
+  selectAllRow: { flexDirection: 'row', alignItems: 'center', marginTop: verticalScale(7), paddingVertical: verticalScale(4) },
+  selectAllButton: { flexDirection: 'row', alignItems: 'center' },
+  selectAllText: { fontSize: moderateScale(11.5), fontWeight: '700' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  listContent: { paddingHorizontal: moderateScale(16), paddingBottom: verticalScale(110), paddingTop: verticalScale(5) },
+  card: { backgroundColor: '#FFFFFF', borderRadius: moderateScale(19), borderWidth: 1, padding: moderateScale(14), marginBottom: verticalScale(12), borderColor: '#E5EBF3', shadowColor: '#0F172A', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.035, shadowRadius: 15, elevation: 1 },
+  cardMainRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  checkboxContainer: { marginRight: moderateScale(10), marginTop: verticalScale(2) },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: verticalScale(11) },
+  badgeContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: moderateScale(5), flex: 1, paddingRight: moderateScale(8) },
+  badge: { paddingHorizontal: moderateScale(8), paddingVertical: verticalScale(4), borderRadius: 99 },
+  badgeText: { fontSize: moderateScale(8.5), fontWeight: '800' },
+  amountContainer: { alignItems: 'flex-end' },
+  deductionText: { fontSize: 8.5, color: '#EF4444', fontWeight: '700' },
+  amountText: { fontSize: moderateScale(17), fontWeight: '900' },
+  detailRow: { flexDirection: 'row', alignItems: 'center', marginVertical: verticalScale(4) },
+  detailIcon: { marginRight: moderateScale(8) },
+  detailText: { fontSize: moderateScale(12), fontWeight: '600' },
+  remarksRow: { marginTop: verticalScale(8), padding: moderateScale(9), borderRadius: moderateScale(10) },
+  remarksText: { fontSize: 9.5, fontStyle: 'italic', lineHeight: 13 },
+  divider: { height: 1, backgroundColor: '#EEF2F7', marginVertical: verticalScale(11) },
+  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footerItem: { flexDirection: 'row', alignItems: 'center' },
+  footerIcon: { marginRight: 4 },
+  footerText: { fontSize: moderateScale(9.5), fontWeight: '600' },
+  footerRight: { flexDirection: 'row', alignItems: 'center', gap: 8, maxWidth: '60%' },
+  notesText: { fontSize: 9.5, maxWidth: 95 },
+  svrButton: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 10 },
+  svrText: { fontSize: 9.5, fontWeight: '800', marginLeft: 3 },
+  emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: verticalScale(95), gap: 10 },
+  emptyText: { fontSize: 15, fontWeight: '800' },
+  actionBar: { position: 'absolute', bottom: 0, left: 0, right: 0, borderTopWidth: 1, paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', shadowColor: '#0F172A', shadowOffset: { width: 0, height: -5 }, shadowOpacity: 0.08, shadowRadius: 15, elevation: 10 },
+  actionBarLeft: { flex: 1 },
+  selectedCountText: { fontSize: 13, fontWeight: '800' },
+  actionBarButtons: { flexDirection: 'row', gap: 8 },
+  actionBtn: { minWidth: 86, alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 11, borderWidth: 1 },
+  deselectBtn: { backgroundColor: '#FFFFFF' },
+  deselectBtnText: { fontSize: 11, fontWeight: '800' },
+  approveBtn: { borderColor: '#2563EB' },
+  approveBtnText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.55)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { width: '100%', maxWidth: 400, padding: 22, borderRadius: 24 },
+  modalTitle: { fontSize: 18, fontWeight: '800' },
+  modalSubText: { fontSize: 11, lineHeight: 16, marginTop: 6, marginBottom: 14 },
+  inputGroup: { marginBottom: 12 },
+  inputLabel: { fontSize: 11, fontWeight: '800', marginBottom: 6 },
+  modalInput: { minHeight: 44, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, fontSize: 12 },
+  modalTextArea: { minHeight: 78, textAlignVertical: 'top', paddingTop: 10 },
+  modalActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  modalBtn: { flex: 1, minHeight: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  cancelBtn: { backgroundColor: '#FFF' },
+  cancelBtnText: { fontSize: 11, fontWeight: '800' },
+  confirmBtn: { borderColor: '#2563EB' },
+  confirmBtnText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
 });
 
+export default ServiceVisitList;

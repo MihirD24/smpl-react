@@ -93,7 +93,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.screenBg }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDarkMode ? '#0E244A' : '#0E2A59' }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
@@ -105,7 +105,7 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         />
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.screenBg }]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -225,127 +225,33 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
 export default SignIn;
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
+  scrollContent: { flexGrow: 1, paddingBottom: verticalScale(26) },
   wrapper: { width: '100%', alignItems: 'center', paddingBottom: verticalScale(24) },
-  topBrand: { width: '100%', minHeight: verticalScale(170), borderBottomLeftRadius: moderateScale(28), borderBottomRightRadius: moderateScale(28), paddingHorizontal: moderateScale(24), paddingTop: verticalScale(20), paddingBottom: verticalScale(22), overflow: 'hidden' },
-  topBrandGlow: { position: 'absolute', width: moderateScale(170), height: moderateScale(170), borderRadius: moderateScale(85), right: moderateScale(-45), top: moderateScale(-60), backgroundColor: 'rgba(96,165,250,0.14)' },
-  topBrandKicker: { color: '#BFDBFE', fontSize: moderateScale(10), fontWeight: '800', letterSpacing: 1.7, marginBottom: verticalScale(10) },
-  topBrandTitle: { color: '#FFFFFF', fontSize: moderateScale(26), fontWeight: '800', letterSpacing: -0.5 },
-  topBrandSub: { color: '#CBD5E1', fontSize: moderateScale(12), lineHeight: moderateScale(18), marginTop: verticalScale(7), maxWidth: moderateScale(290) },
-  logoContainer: {
-    width: moderateScale(88),
-    height: moderateVerticalScale(88),
-    borderRadius: moderateScale(20),
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: verticalScale(-42),
-    marginBottom: verticalScale(14),
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
-  },
-  logo: {
-    width: moderateScale(76),
-    height: moderateVerticalScale(76),
-  },
-  welcomeBlock: { alignItems: 'center', paddingHorizontal: moderateScale(22), marginBottom: verticalScale(18) },
-  eyebrow: { fontSize: moderateScale(10), fontWeight: '800', letterSpacing: 1.5, marginBottom: verticalScale(6) },
-  title: { fontSize: moderateScale(28), fontWeight: '800', letterSpacing: -0.6, textAlign: 'center', marginBottom: verticalScale(4) },
-  titleBold: {
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  titleLight: {
-    fontWeight: '400',
-    color: '#0F172A',
-  },
-  subtitle: { fontSize: moderateScale(12), color: '#64748B', lineHeight: moderateScale(18), textAlign: 'center', fontWeight: '500', maxWidth: moderateScale(300) },
-  cardTopRow: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(4) },
-  cardTopIndicator: { width: moderateScale(4), height: moderateScale(38), borderRadius: 4, backgroundColor: '#2563EB', marginRight: moderateScale(11) },
-  cardTitle: { fontSize: moderateScale(18), fontWeight: '800' },
-  cardHint: { fontSize: moderateScale(10.5), marginTop: verticalScale(2) },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: moderateScale(20),
-    padding: moderateScale(18),
-    marginHorizontal: moderateScale(18),
-    alignSelf: 'stretch',
-    marginBottom: verticalScale(18),
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.06,
-    shadowRadius: 24,
-    elevation: 4,
-  },
-  label: {
-    fontSize: moderateScale(10),
-    color: '#64748B',
-    marginBottom: 8,
-    marginTop: 14,
-    fontWeight: '600',
-    letterSpacing: 1.2,
-  },
-  input: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: moderateScale(14),
-    paddingHorizontal: moderateScale(14),
-    height: verticalScale(52),
-    fontSize: 15,
-    color: '#0F172A',
-  },
-  passwordWrapper: {
-    position: 'relative',
-    justifyContent: 'center',
-  },
-  passwordInput: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: moderateScale(14),
-    paddingHorizontal: moderateScale(14),
-    paddingRight: moderateScale(48),
-    height: verticalScale(52),
-    fontSize: 15,
-    color: '#0F172A',
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: 16,
-    height: '100%',
-    justifyContent: 'center',
-  },
-  signInButton: {
-    marginTop: verticalScale(20),
-    height: verticalScale(50),
-    borderRadius: moderateScale(12),
-    backgroundColor: '#2563EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#2563EB',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-  signInText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  forgot: {
-    color: '#2563EB',
-    marginVertical: 14,
-    fontSize: scale(13),
-    fontWeight: '600',
-  },
-  version: {
-    marginTop: verticalScale(30),
-    fontSize: scale(10),
-    color: '#94A3B8',
-    letterSpacing: 1.5,
-    fontWeight: '500',
-  },
+  topBrand: { width: '100%', minHeight: verticalScale(214), paddingHorizontal: moderateScale(24), paddingTop: verticalScale(32), paddingBottom: verticalScale(24), overflow: 'hidden' },
+  topBrandGlow: { position: 'absolute', width: moderateScale(210), height: moderateScale(210), borderRadius: moderateScale(105), right: moderateScale(-65), top: moderateScale(-70), backgroundColor: 'rgba(96,165,250,0.13)' },
+  topBrandKicker: { color: '#BFD3F6', fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.7, marginBottom: verticalScale(9) },
+  topBrandTitle: { color: '#FFFFFF', fontSize: moderateScale(29), fontWeight: '800', letterSpacing: -0.8 },
+  topBrandSub: { color: '#C7D2E0', fontSize: moderateScale(11.5), lineHeight: moderateScale(18), marginTop: verticalScale(7), maxWidth: moderateScale(295) },
+  logoContainer: { width: moderateScale(78), height: moderateVerticalScale(78), borderRadius: moderateScale(22), backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', marginTop: verticalScale(-36), marginBottom: verticalScale(14), shadowColor: '#0F172A', shadowOpacity: 0.10, shadowRadius: 18, elevation: 4 },
+  logo: { width: moderateScale(66), height: moderateVerticalScale(66) },
+  welcomeBlock: { alignItems: 'flex-start', alignSelf: 'stretch', paddingHorizontal: moderateScale(22), marginBottom: verticalScale(14) },
+  eyebrow: { fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1.6, marginBottom: verticalScale(5) },
+  title: { fontSize: moderateScale(26), fontWeight: '800', letterSpacing: -0.7, marginBottom: verticalScale(4) },
+  titleBold: { fontWeight: '800', color: '#0F172A' },
+  titleLight: { fontWeight: '400', color: '#0F172A' },
+  subtitle: { fontSize: moderateScale(11.5), color: '#64748B', lineHeight: moderateScale(18), fontWeight: '500', maxWidth: moderateScale(305) },
+  cardTopRow: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(3) },
+  cardTopIndicator: { width: moderateScale(4), height: moderateScale(36), borderRadius: 4, backgroundColor: '#2563EB', marginRight: moderateScale(10) },
+  cardTitle: { fontSize: moderateScale(17), fontWeight: '800' },
+  cardHint: { fontSize: moderateScale(10), marginTop: verticalScale(2) },
+  card: { backgroundColor: '#FFFFFF', borderRadius: moderateScale(22), paddingHorizontal: moderateScale(18), paddingTop: moderateScale(17), paddingBottom: moderateScale(20), marginHorizontal: moderateScale(18), alignSelf: 'stretch', marginBottom: verticalScale(16), shadowColor: '#0F172A', shadowOpacity: 0.07, shadowRadius: 22, shadowOffset: { width: 0, height: 10 }, elevation: 4 },
+  label: { fontSize: moderateScale(9.5), color: '#64748B', marginBottom: 7, marginTop: 14, fontWeight: '700', letterSpacing: 1.1 },
+  input: { backgroundColor: '#F7F9FC', borderRadius: moderateScale(13), paddingHorizontal: moderateScale(14), height: verticalScale(52), fontSize: 15, color: '#0F172A' },
+  passwordWrapper: { position: 'relative', justifyContent: 'center' },
+  passwordInput: { backgroundColor: '#F7F9FC', borderRadius: moderateScale(13), paddingHorizontal: moderateScale(14), paddingRight: moderateScale(48), height: verticalScale(52), fontSize: 15, color: '#0F172A' },
+  eyeButton: { position: 'absolute', right: 16, height: '100%', justifyContent: 'center' },
+  signInButton: { marginTop: verticalScale(20), height: verticalScale(52), borderRadius: moderateScale(14), backgroundColor: '#2563EB', justifyContent: 'center', alignItems: 'center', shadowColor: '#2563EB', shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
+  signInText: { color: '#FFFFFF', fontSize: 15.5, fontWeight: '800', letterSpacing: 0.2 },
+  forgot: { color: '#2563EB', marginVertical: 14, fontSize: scale(13), fontWeight: '600' },
+  version: { marginTop: verticalScale(10), fontSize: scale(9), color: '#94A3B8', letterSpacing: 1.2, fontWeight: '600' },
 });

@@ -262,7 +262,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <ScreenWrapper
-      withHeader
+      withHeader={false}
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
@@ -421,28 +421,22 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
 };
 
 const styles = StyleSheet.create({
-  leaveHeader: { paddingHorizontal: moderateScale(16), paddingTop: verticalScale(14), paddingBottom: verticalScale(11), flexDirection: 'row', alignItems: 'center' },
-  leaveKicker: { fontSize: moderateScale(9), fontWeight: '800', letterSpacing: 1.3 },
-  leaveTitle: { fontSize: moderateScale(22), fontWeight: '800', letterSpacing: -0.3, marginTop: verticalScale(2) },
-  leaveSubtitle: { fontSize: moderateScale(11), marginTop: verticalScale(3), fontWeight: '500' },
-  leaveCount: { width: moderateScale(58), height: moderateScale(58), borderRadius: moderateScale(17), alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#DBEAFE' },
-  leaveCountValue: { fontSize: moderateScale(19), fontWeight: '800', lineHeight: moderateScale(21) },
-  leaveCountLabel: { fontSize: moderateScale(7), fontWeight: '800', letterSpacing: 0.7, marginTop: verticalScale(1) },
-  statusRail: { marginHorizontal: moderateScale(16), marginBottom: verticalScale(8), paddingHorizontal: moderateScale(12), paddingVertical: verticalScale(11), borderRadius: moderateScale(16), borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between' },
-  statusRailItem: { flexDirection: 'row', alignItems: 'center', minWidth: moderateScale(75) },
-  statusRailDot: { width: moderateScale(7), height: moderateScale(7), borderRadius: 4, marginRight: moderateScale(7) },
-  statusRailValue: { fontSize: moderateScale(16), fontWeight: '800' },
-  statusRailLabel: { fontSize: moderateScale(8.5), fontWeight: '600', marginTop: verticalScale(1) },
+  leaveHeader: { paddingHorizontal: moderateScale(18), paddingTop: verticalScale(10), paddingBottom: verticalScale(13), flexDirection: 'row', alignItems: 'center' },
+  leaveKicker: { fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1.7 },
+  leaveTitle: { fontSize: moderateScale(24), fontWeight: '800', letterSpacing: -0.7, marginTop: verticalScale(3) },
+  leaveSubtitle: { fontSize: moderateScale(10.5), marginTop: verticalScale(4), fontWeight: '500' },
+  leaveCount: { width: moderateScale(62), height: moderateScale(62), borderRadius: moderateScale(19), alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#D7E5F8' },
+  leaveCountValue: { fontSize: moderateScale(20), fontWeight: '800', lineHeight: moderateScale(22) },
+  leaveCountLabel: { fontSize: moderateScale(7), fontWeight: '800', letterSpacing: 0.8, marginTop: verticalScale(1) },
+  statusRail: { marginHorizontal: moderateScale(18), marginBottom: verticalScale(10), paddingHorizontal: moderateScale(13), paddingVertical: verticalScale(12), borderRadius: moderateScale(18), borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', shadowColor: '#0F172A', shadowOpacity: 0.035, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 1 },
+  statusRailItem: { flexDirection: 'row', alignItems: 'center', minWidth: moderateScale(78) },
+  statusRailDot: { width: moderateScale(8), height: moderateScale(8), borderRadius: 4, marginRight: moderateScale(7) },
+  statusRailValue: { fontSize: moderateScale(17), fontWeight: '800' },
+  statusRailLabel: { fontSize: moderateScale(8), fontWeight: '700', marginTop: verticalScale(1) },
   content: { flex: 1 },
-  listContent: { paddingHorizontal: moderateScale(13), paddingTop: moderateScale(10), paddingBottom: scale(90) },
-  noDataContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: scale(40),
-    paddingTop: scale(60),
-  },
-  noDataText: { fontSize: moderateScale(16), fontWeight: '700', marginTop: scale(14), marginBottom: scale(7) },
+  listContent: { paddingHorizontal: moderateScale(15), paddingTop: moderateScale(9), paddingBottom: scale(120) },
+  noDataContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: scale(40), paddingTop: scale(60) },
+  noDataText: { fontSize: moderateScale(16), fontWeight: '800', marginTop: scale(14), marginBottom: scale(7) },
 });
 
 export default LeaveList;

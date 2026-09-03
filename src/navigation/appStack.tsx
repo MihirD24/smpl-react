@@ -47,12 +47,10 @@ const AppStack = ({
   const detailHeaderOptions = (title: string) => ({
     headerShown: true,
     title,
-    headerStyle,
+    headerStyle: { backgroundColor: isDarkMode ? '#0B1220' : '#F3F6FA' },
     headerTintColor,
-    headerTitleStyle: {
-      color: headerTintColor,
-      fontWeight: '600' as const,
-    },
+    headerShadowVisible: false,
+    headerTitleStyle: { color: headerTintColor, fontWeight: '800' as const, fontSize: 17 },
     headerBackTitle: '',
     headerBackVisible: true,
   });
@@ -113,7 +111,7 @@ const AppStack = ({
       <Stack.Screen
         name="Attendancelist"
         component={Attendancelist}
-        options={detailHeaderOptions('Attendance List')}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="AttendanceFilter"
@@ -123,7 +121,7 @@ const AppStack = ({
       <Stack.Screen
         name="LeaveList"
         component={LeaveList}
-        options={detailHeaderOptions('Leave Requests')}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen
@@ -177,7 +175,7 @@ const AppStack = ({
         name="ProjectReminder"
         component={projectReminder}
         options={{
-          headerShown: true,
+          headerShown: false,
           title: 'Reminders',
           headerBackTitle: '',
           headerBackVisible: true,
@@ -187,7 +185,7 @@ const AppStack = ({
         name="AddProjectReminder"
         component={addProjectReminder}
         options={{
-          headerShown: true,
+          headerShown: false,
           title: 'Add Reminder',
           headerBackTitle: '',
           headerBackVisible: true,
@@ -197,7 +195,7 @@ const AppStack = ({
         name="AddProjectRemainingScreen"
         component={AddProjectRemainingScreen}
         options={{
-          headerShown: true,
+          headerShown: false,
           title: 'Add Project Remaining',
           headerBackTitle: '',
           headerBackVisible: true,
@@ -207,7 +205,7 @@ const AppStack = ({
         name="ProjectRemainingScreen"
         component={ProjectRemainingScreen}
         options={{
-          headerShown: true,
+          headerShown: false,
           title: 'Project Remaining',
           headerBackTitle: '',
           headerBackVisible: true,
@@ -216,17 +214,17 @@ const AppStack = ({
       <Stack.Screen
         name="ServiceVisitList"
         component={ServiceVisitList}
-        options={detailHeaderOptions('Service Visits')}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="AddServiceVisit"
         component={AddServiceVisit}
-        options={detailHeaderOptions('New Service Visit')}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="CalculateSalary"
         component={CalculateSalary}
-        options={detailHeaderOptions('Salary Calculation')}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
