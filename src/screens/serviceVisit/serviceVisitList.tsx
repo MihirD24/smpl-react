@@ -16,7 +16,6 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 import AppIcon from '../../components/appIcon';
-import { ProTopBar, PRO } from '../../components/modern/ProScreen';
 import AddButton from '../../components/button/addButton';
 import CustomInput from '../../components/formComponent/customInput';
 import ToastUtil from '../../utils/toastAndroid';
@@ -31,12 +30,12 @@ const ServiceVisitList = ({ navigation }: any) => {
   const { userInfo } = useAuth();
 
   const theme = {
-    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
-    cardBg: isDarkMode ? '#1F2937' : '#FFFFFF',
-    border: isDarkMode ? '#334155' : '#E2E8F0',
+    screenBg: isDarkMode ? '#08121E' : '#F4F7FB',
+    cardBg: isDarkMode ? '#102236' : '#FFFFFF',
+    border: isDarkMode ? '#263F59' : '#DCE5F0',
     text: isDarkMode ? '#F9FAFB' : '#1E293B',
     subText: isDarkMode ? '#94A3B8' : '#64748B',
-    primary: '#3B82F6',
+    primary: '#2563EB',
     success: '#10B981',
     warning: '#F59E0B',
     danger: '#EF4444',
@@ -198,7 +197,7 @@ const ServiceVisitList = ({ navigation }: any) => {
             <View style={styles.cardHeader}>
               <View style={styles.badgeContainer}>
                 <View style={[styles.badge, { backgroundColor: item.sales_party_name ? '#EFF6FF' : '#ECFDF5' }]}>
-                  <Text style={[styles.badgeText, { color: item.sales_party_name ? '#3B82F6' : '#10B981' }]}>
+                  <Text style={[styles.badgeText, { color: item.sales_party_name ? '#2563EB' : '#10B981' }]}>
                     {displayCategory}
                   </Text>
                 </View>
@@ -321,7 +320,6 @@ const ServiceVisitList = ({ navigation }: any) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.screenBg }]}>
-      <ProTopBar title="Service Visits" subtitle="Field activity" actionIcon="Plus" onAction={() => navigation.navigate('AddServiceVisit')} />
       {/* Filters & Actions Header */}
       <View style={styles.headerContainer}>
         {/* Search Bar */}
@@ -541,7 +539,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingHorizontal: moderateScale(16),
-    paddingTop: verticalScale(12),
+    paddingTop: verticalScale(8),
     paddingBottom: verticalScale(4),
   },
   filterRow: {
@@ -582,7 +580,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: moderateScale(16),
-    paddingBottom: verticalScale(100),
+    paddingBottom: verticalScale(125),
   },
   card: {
     borderWidth: 1,
@@ -658,7 +656,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#DCE5F0',
     marginVertical: verticalScale(10),
   },
   cardFooter: {
@@ -836,11 +834,5 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(14),
     fontWeight: '700',
   },
-
-  headerContainer:{paddingHorizontal:14,paddingTop:2,paddingBottom:8}, filterRow:{flexDirection:'row',gap:8,marginTop:8,marginBottom:4}, filterTab:{flex:1,paddingVertical:10,alignItems:'center',borderRadius:12,borderWidth:1},
-  listContent:{paddingHorizontal:14,paddingTop:6,paddingBottom:120}, card:{borderWidth:1,borderRadius:20,padding:15,marginBottom:12,backgroundColor:'#fff',borderColor:'#E7ECF3',shadowColor:'#142238',shadowOffset:{width:0,height:6},shadowOpacity:.04,shadowRadius:16,elevation:2},
-  badge:{paddingHorizontal:9,paddingVertical:5,borderRadius:999}, badgeText:{fontSize:10,fontWeight:'800'}, amountText:{fontSize:19,fontWeight:'900'}, detailText:{fontSize:13,fontWeight:'600'}, divider:{height:1,backgroundColor:'#E9EDF3',marginVertical:12}, svrButton:{flexDirection:'row',alignItems:'center',borderWidth:1,paddingHorizontal:10,paddingVertical:6,borderRadius:10},
-
-  emptyContainer:{flex:1,alignItems:'center',justifyContent:'center',paddingTop:100},
 });
 

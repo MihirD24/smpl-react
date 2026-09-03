@@ -37,7 +37,7 @@ import FilterBottomSheet, {
 import ActiveFilterChips, {
   ActiveChip,
 } from '../../../components/filterBottomSheet/activeFilterChips';
-import AppScreen from '../../../components/ui/AppScreen';
+import ScreenWrapper from '../../../components/screenWrapper';
 import NetInfoComponent from '../../../components/netinfoComponent';
 const ATTENDANCE_STATUS_OPTIONS: StatusOption[] = [
   { label: 'Present', color: '#10B981' },
@@ -289,7 +289,12 @@ const AdminAttendancelist: React.FC<
   ];
 
   return (
-    <AppScreen padding={false} safeTop={false}>
+    <ScreenWrapper
+      withHeader
+      statusBarTranslucent
+      statusBarStyle={isDark ? 'light-content' : 'dark-content'}
+      backgroundColor={theme.pageBg}
+    >
         <NetInfoComponent onReconnect={handleCheckAttandance} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View style={[styles.root, { backgroundColor: theme.pageBg }]}>
@@ -434,7 +439,7 @@ const AdminAttendancelist: React.FC<
           onReset={resetFilters}
         />
       </GestureHandlerRootView>
-    </AppScreen>
+    </ScreenWrapper>
   );
 };
 

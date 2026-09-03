@@ -19,8 +19,6 @@ import { getAttendance, getCount } from '../../services';
 import { AppStackScreenProps } from '../../navigation/navigationTypes';
 import { AttendanceItem } from '../../types/adminAttendance';
 import AppIcon from '../../components/appIcon';
-import AppScreen from '../../components/ui/AppScreen';
-import { ProTopBar, ProPill, PRO } from '../../components/modern/ProScreen';
 import ScreenWrapper from '../../components/screenWrapper';
 import AttendanceCard, { fmtMins } from '../attandance/attendanceCard';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
@@ -213,7 +211,7 @@ const StatCard: React.FC<StatCardProps> = ({
         styles.summaryMetric,
         {
           borderColor: isDarkMode ? '#2E2E2E' : '#E5E7EB',
-          backgroundColor: isDarkMode ? '#111827' : '#F9FAFB',
+          backgroundColor: isDarkMode ? '#08121E' : '#F9FAFB',
         },
       ]}
     >
@@ -272,9 +270,9 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
   const theme = getCardTheme(isDarkMode);
 
   // Screen-level tokens not in shared theme
-  const screenBg = isDarkMode ? '#111827' : '#F3F4F6';
-  const sectionBg = isDarkMode ? '#1F2937' : '#FFFFFF';
-  const blueText = isDarkMode ? '#93C5FD' : '#3B82F6';
+  const screenBg = isDarkMode ? '#08121E' : '#F3F4F6';
+  const sectionBg = isDarkMode ? '#102236' : '#FFFFFF';
+  const blueText = isDarkMode ? '#93C5FD' : '#2563EB';
 
   useEffect(() => {
     const iv = setInterval(() => {
@@ -384,8 +382,12 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
   };
 
   return (
-    <AppScreen safeTop={false} padding={false}>
-      <ProTopBar title="Attendance" subtitle="Monthly overview" onAction={()=>{}} />
+    <ScreenWrapper
+      withHeader
+      statusBarTranslucent
+      statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
+      backgroundColor={isDarkMode ? '#08121E' : '#F7F8FA'}
+    >
       <NetInfoComponent onReconnect={handleRefresh} />
       <>
         {!isReady ? (
@@ -436,7 +438,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 value={attandanceCount?.total_present || 0}
                 subtext="This month"
                 accentColor="#10B981"
-                valueColor={isDarkMode ? '#F9FAFB' : '#111827'}
+                valueColor={isDarkMode ? '#F9FAFB' : '#08121E'}
                 subtextColor="#10B981"
                 isDarkMode={isDarkMode}
               />
@@ -690,7 +692,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                       style={[
                         styles.completedTimeItem,
                         {
-                          backgroundColor: isDarkMode ? '#111827' : '#F9FAFB',
+                          backgroundColor: isDarkMode ? '#08121E' : '#F9FAFB',
                           borderColor: isDarkMode ? '#2E2E2E' : '#E5E7EB',
                         },
                       ]}
@@ -746,7 +748,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                   <Text
                     style={{
                       fontSize: moderateScale(13),
-                      color: '#3B82F6',
+                      color: '#2563EB',
                       fontWeight: '600',
                     }}
                   >
@@ -911,7 +913,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
           </View>
         </Modal>
       </>
-    </AppScreen>
+    </ScreenWrapper>
   );
 };
 
@@ -921,8 +923,8 @@ export default Attendancelist;
 const styles = StyleSheet.create({
   dateSelector: {
     paddingHorizontal: scale(16),
-    paddingTop: verticalScale(6),
-    paddingBottom: verticalScale(10),
+    paddingTop: verticalScale(18),
+    paddingBottom: verticalScale(14),
     borderBottomWidth: 1,
   },
   statsGrid: {
@@ -1129,7 +1131,7 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(22),
   },
   okButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#2563EB',
     paddingVertical: verticalScale(13),
     paddingHorizontal: moderateScale(28),
     borderRadius: moderateScale(11),
@@ -1141,8 +1143,4 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
   },
-
-  dateSelector:{paddingHorizontal:14,paddingTop:2,paddingBottom:10,borderBottomWidth:0,backgroundColor:'#F6F8FC'},
-  summaryPanel:{marginHorizontal:14,marginTop:6,borderWidth:0,borderRadius:20,padding:7,backgroundColor:'#fff',flexDirection:'row',flexWrap:'wrap',gap:7,shadowColor:'#142238',shadowOffset:{width:0,height:6},shadowOpacity:.05,shadowRadius:16,elevation:2},
-  summaryMetric:{width:'31.8%',minHeight:72,borderWidth:0,borderRadius:15,paddingHorizontal:10,paddingVertical:9,backgroundColor:'#F8FAFC'},
 });

@@ -560,83 +560,149 @@ const StaffSalary = () => {
   // ── UI ────────────────────────────────────────────────────────────────────
   return (
     <ScreenWrapper
-      withHeader={false}
+      withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#0E1420' : '#F5F7FB'}
+      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
-      <NetInfoComponent onReconnect={fetchSalary as any} />
+        <NetInfoComponent onReconnect={fetchSalary} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View style={[styles.screen, isDarkMode && styles.screenDark]}>
-          <View style={styles.salaryHero}>
-            <View style={styles.salaryBrandRow}>
-              <View style={styles.salaryIcon}><AppIcon name="WalletCards" size={moderateScale(20)} color="#2563EB" /></View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.salaryEyebrow}>PAYROLL</Text>
-                <Text style={styles.salaryTitle}>Staff salary</Text>
-                <Text style={styles.salarySub}>{MONTHS[selectedMonth].abbr} {selectedYear} · {filteredData.length} employees</Text>
-              </View>
-              <TouchableOpacity onPress={openFilterSheet} style={styles.salaryFilterBtn}>
-                <AppIcon name="SlidersHorizontal" size={moderateScale(18)} color="#0F172A" />
-                {totalActiveFilters > 0 ? <View style={styles.filterDot}><Text style={styles.filterDotText}>{totalActiveFilters}</Text></View> : null}
-              </TouchableOpacity>
+          {/* Search + filter button */}
+          <View
+            style={[
+              commonFilterStyles.searchRow,
+              { paddingHorizontal: 15, paddingTop: 10 },
+            ]}
+          >
+            <View style={commonFilterStyles.searchWrapper}>
+              <SearchBarComponent onChangeText={searchFilter} value={search} />
             </View>
-            <View style={styles.salaryTotals}>
-              <View style={styles.totalBlock}>
-                <Text style={styles.totalLabel}>RUN TOTAL</Text>
-                <Text style={styles.totalAmount}>{formatCurrency(filteredData.reduce((acc, e) => acc + e.amount, 0))}</Text>
-              </View>
-              <View style={styles.totalDivider} />
-              <View style={styles.totalBlock}>
-                <Text style={styles.totalLabel}>STATUS</Text>
-                <Text style={styles.totalStatus}>{filteredData.filter(e => e.status === 'PAID').length} paid</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.searchRow}>
-            <View style={{ flex: 1 }}><SearchBarComponent onChangeText={searchFilter} value={search} /></View>
-            <TouchableOpacity onPress={openFilterSheet} style={[styles.filterButton, hasActiveFilters && styles.filterButtonActive]}>
-              <AppIcon name="ListFilter" size={moderateScale(18)} color={hasActiveFilters ? '#FFF' : '#2563EB'} />
+            <TouchableOpacity
+              style={[
+                commonFilterStyles.filterIconBtn,
+                hasActiveFilters && commonFilterStyles.filterIconBtnActive,
+                { borderColor: '#BFDBFE' },
+              ]}
+              onPress={openFilterSheet}
+              activeOpacity={0.8}
+            >
+              <AppIcon
+                name="ListFilter"
+                size={modScaleLocal(20)}
+                color={hasActiveFilters ? '#FFFFFF' : '#3B82F6'}
+              />
+              {totalActiveFilters > 0 && (
+                <View style={commonFilterStyles.filterBadge}>
+                  <Text style={commonFilterStyles.filterBadgeText}>
+                    {totalActiveFilters}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
 
+          {/* Active filter chips */}
           <ActiveFilterChips
             chips={[
-              ...(monthYearLabel ? [{ key: 'month', label: monthYearLabel, onRemove: removeMonthYearFilter }] : []),
-              ...(selectedDeveloperName ? [{ key: 'developer', label: selectedDeveloperName, onRemove: removeDeveloperFilter }] : []),
-              ...selectedStatuses.map(status => { const meta = ALL_STATUS_META.find(s => s.value === status); return { key: status, label: meta?.label || status, color: meta?.color, onRemove: () => removeStatusFilter(status) }; }),
+              ...(monthYearLabel
+                ? [
+                    {
+                      key: 'month',
+                      label: monthYearLabel,
+                      onRemove: removeMonthYearFilter,
+                    },
+                  ]
+                : []),
+
+              ...(selectedDeveloperName
+                ? [
+                    {
+                      key: 'developer',
+                      label: selectedDeveloperName,
+                      onRemove: removeDeveloperFilter,
+                    },
+                  ]
+                : []),
+
+              ...selectedStatuses.map(status => {
+                const meta = ALL_STATUS_META.find(s => s.value === status);
+                return {
+                  key: status,
+                  label: meta?.label || status,
+                  color: meta?.color,
+                  onRemove: () => removeStatusFilter(status),
+                };
+              }),
             ]}
             onClearAll={resetFilters}
           />
-
-          <View style={styles.listMeta}>
-            <View>
-              <Text style={[styles.listMetaTitle, isDarkMode && styles.textDark]}>Payroll records</Text>
-              <Text style={[styles.listMetaSub, isDarkMode && styles.textMutedDark]}>{filteredData.length} of {masterData.length} employees</Text>
-            </View>
-            <View style={styles.paidChip}><View style={styles.paidDot} /><Text style={styles.paidChipText}>Live data</Text></View>
+          {/* Summary bar */}
+          <View
+            style={[styles.summaryBar, isDarkMode && styles.summaryBarDark]}
+          >
+            <Text
+              style={[
+                styles.summaryBarText,
+                isDarkMode && styles.textMutedDark,
+              ]}
+            >
+              {filteredData.length} of {masterData.length} employees
+            </Text>
+            <Text
+              style={[styles.summaryBarAmount, isDarkMode && styles.textDark]}
+            >
+              Total:{' '}
+              {formatCurrency(
+                filteredData.reduce((acc, e) => acc + e.amount, 0),
+              )}
+            </Text>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          {/* Employee list */}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
             {loading ? (
-              <View style={styles.loaderContainer}><ActivityIndicator size="large" color="#2563EB" /></View>
+              <View style={styles.loaderContainer}>
+                <ActivityIndicator size="large" color="#2563EB" />
+              </View>
             ) : filteredData.length === 0 ? (
               <View style={styles.noDataContainer}>
-                <View style={styles.emptyIcon}><AppIcon name="WalletCards" color="#94A3B8" size={28} /></View>
-                <Text style={[styles.noDataText, isDarkMode && styles.textDark]}>No payroll records</Text>
-                <Text style={commonFilterStyles.noDataSub}>{search ? 'No employees match your search.' : 'Try a different month or filter.'}</Text>
+                <AppIcon name="Inbox" color="#CBD5E1" size={64} />
+                <Text
+                  style={[styles.noDataText, isDarkMode && styles.textDark]}
+                >
+                  No Salary Found
+                </Text>
+                <Text style={commonFilterStyles.noDataSub}>
+                  {search
+                    ? 'No results match your search.'
+                    : 'Try adjusting your filters.'}
+                </Text>
               </View>
             ) : (
               <View style={styles.employeeList}>
-                {filteredData.map((item, index) => <EmployeeRow key={`${item.id}-${index}`} item={item} isDarkMode={isDarkMode} />)}
+                {filteredData.map((item, index) => (
+                  <EmployeeRow
+                    key={`${item.id}-${index}`}
+                    item={item}
+                    isDarkMode={isDarkMode}
+                  />
+                ))}
               </View>
             )}
           </ScrollView>
         </View>
+
+        {/* ── Filter Bottom Sheet ── */}
         <FilterBottomSheet
           ref={filterSheetRef}
-          statusOptions={PAYMENT_STATUSES.map(s => ({ label: s.value, color: s.color }))}
+          statusOptions={PAYMENT_STATUSES.map(s => ({
+            label: s.value,
+            color: s.color,
+          }))}
           selectedStatuses={pendingStatuses}
           onToggleStatus={togglePendingStatus}
           chipSections={chipSections}
@@ -648,64 +714,133 @@ const StaffSalary = () => {
   );
 };
 
+export default StaffSalary;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F5F7FB' },
-  screenDark: { backgroundColor: '#0E1420' },
-  salaryHero: { backgroundColor: '#FFFFFF', paddingHorizontal: moderateScale(18), paddingTop: verticalScale(7), paddingBottom: verticalScale(16), borderBottomLeftRadius: moderateScale(22), borderBottomRightRadius: moderateScale(22) },
-  salaryBrandRow: { flexDirection: 'row', alignItems: 'center', gap: moderateScale(11) },
-  salaryIcon: { width: moderateScale(44), height: moderateScale(44), borderRadius: moderateScale(14), backgroundColor: '#EAF1FF', alignItems: 'center', justifyContent: 'center' },
-  salaryEyebrow: { fontSize: moderateScale(7.5), fontWeight: '900', letterSpacing: 1.5, color: '#64748B' },
-  salaryTitle: { fontSize: moderateScale(21), fontWeight: '800', color: '#0F172A', letterSpacing: -0.5, marginTop: 2 },
-  salarySub: { fontSize: moderateScale(9), color: '#64748B', marginTop: 2 },
-  salaryFilterBtn: { width: moderateScale(40), height: moderateScale(40), borderRadius: moderateScale(13), backgroundColor: '#F7F9FC', borderWidth: 1, borderColor: '#E5EAF2', alignItems: 'center', justifyContent: 'center' },
-  filterDot: { position: 'absolute', top: -3, right: -3, width: 16, height: 16, borderRadius: 8, backgroundColor: '#2563EB', alignItems: 'center', justifyContent: 'center' },
-  filterDotText: { color: '#FFF', fontSize: 8, fontWeight: '800' },
-  salaryTotals: { flexDirection: 'row', alignItems: 'center', marginTop: verticalScale(15), paddingTop: verticalScale(13), borderTopWidth: 1, borderTopColor: '#EEF2F7' },
-  totalBlock: { flex: 1 },
-  totalDivider: { width: 1, height: 32, backgroundColor: '#E7ECF3', marginHorizontal: moderateScale(13) },
-  totalLabel: { fontSize: moderateScale(7.5), color: '#94A3B8', fontWeight: '900', letterSpacing: 1.2 },
-  totalAmount: { fontSize: moderateScale(16), fontWeight: '900', color: '#0F172A', marginTop: 3 },
-  totalStatus: { fontSize: moderateScale(13), fontWeight: '800', color: '#059669', marginTop: 3 },
-  searchRow: { flexDirection: 'row', alignItems: 'center', gap: moderateScale(8), paddingHorizontal: moderateScale(16), paddingTop: verticalScale(12) },
-  filterButton: { width: moderateScale(43), height: moderateScale(43), borderRadius: moderateScale(14), backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE5F2', alignItems: 'center', justifyContent: 'center' },
-  filterButtonActive: { backgroundColor: '#2563EB', borderColor: '#2563EB' },
-  listMeta: { paddingHorizontal: moderateScale(18), paddingTop: verticalScale(14), paddingBottom: verticalScale(8), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  listMetaTitle: { fontSize: moderateScale(15), fontWeight: '800', color: '#0F172A' },
-  listMetaSub: { fontSize: moderateScale(8.5), color: '#64748B', marginTop: 2 },
-  paidChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(9), paddingVertical: verticalScale(6), borderRadius: 99, backgroundColor: '#ECFDF5' },
-  paidDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981', marginRight: 5 },
-  paidChipText: { fontSize: 8, fontWeight: '800', color: '#047857' },
-  scrollContent: { paddingHorizontal: moderateScale(16), paddingBottom: verticalScale(100) },
+  screen: { flex: 1, backgroundColor: '#F4F5FA' },
+  screenDark: { backgroundColor: '#12121E' },
+  scrollContent: {
+    paddingHorizontal: scale(14),
+    paddingTop: verticalScale(8),
+    paddingBottom: verticalScale(60),
+  },
   loaderContainer: { alignItems: 'center', paddingTop: verticalScale(80) },
-  employeeList: { gap: verticalScale(10) },
-  employeeCard: { backgroundColor: '#FFF', borderRadius: moderateScale(18), overflow: 'hidden', borderWidth: 1, borderColor: '#E7ECF3', shadowColor: '#0F172A', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.035, shadowRadius: 14, elevation: 1 },
-  employeeCardDark: { backgroundColor: '#171E2B', borderColor: '#273143' },
-  employeeRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(13), paddingVertical: moderateScale(13), gap: moderateScale(10) },
-  employeeInfo: { flex: 1, gap: 2 },
-  employeeName: { fontSize: moderateScale(13), fontWeight: '800', color: '#0F172A' },
-  employeeRight: { alignItems: 'flex-end', gap: 4 },
-  employeeAmount: { fontSize: moderateScale(14), fontWeight: '900', color: '#0F172A' },
-  statusPill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99, borderWidth: 0 },
-  statusDotSmall: { width: 5, height: 5, borderRadius: 3 },
-  statusPillText: { fontSize: 8.5, fontWeight: '800' },
-  expandedPanel: { backgroundColor: '#F8FAFC', paddingHorizontal: moderateScale(13), paddingVertical: moderateScale(13), gap: verticalScale(10), borderTopWidth: 1, borderTopColor: '#EEF2F7' },
-  expandedPanelDark: { backgroundColor: '#121925', borderTopColor: '#273143' },
-  infoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: verticalScale(10) },
-  infoCell: { width: '47%', gap: 3 },
-  infoCellLabel: { fontSize: 8, color: '#94A3B8', letterSpacing: 0.6, fontWeight: '800' },
-  infoCellValue: { fontSize: 11.5, fontWeight: '800', color: '#0F172A' },
-  additionalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9, borderWidth: 1, borderColor: '#EEF2F7' },
-  additionalRowDark: { backgroundColor: '#171E2B', borderColor: '#273143' },
-  additionalLabel: { fontSize: 11.5, color: '#64748B' },
-  additionalValue: { fontSize: 13, fontWeight: '800', color: '#0F172A' },
-  noDataContainer: { alignItems: 'center', paddingTop: verticalScale(115), paddingHorizontal: moderateScale(34) },
-  emptyIcon: { width: 58, height: 58, borderRadius: 20, backgroundColor: '#EEF3FA', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  noDataText: { fontSize: moderateScale(17), fontWeight: '800', color: '#1E293B', marginBottom: 6 },
+  summaryBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: scale(14),
+    paddingVertical: verticalScale(8),
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF',
+  },
+  summaryBarDark: { backgroundColor: '#1E1E2E', borderBottomColor: '#2A2A3E' },
+  summaryBarText: { fontSize: moderateScale(12), color: '#64748B' },
+  summaryBarAmount: {
+    fontSize: moderateScale(13),
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  employeeList: { gap: verticalScale(8) },
+  employeeCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: moderateScale(14),
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  employeeCardDark: {
+    backgroundColor: '#1E1E2E',
+    borderWidth: 1,
+    borderColor: '#2A2A3E',
+  },
+  employeeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: moderateScale(14),
+    paddingVertical: moderateScale(12),
+    gap: scale(10),
+  },
+  employeeInfo: { flex: 1, gap: verticalScale(2) },
+  employeeName: {
+    fontSize: moderateScale(15),
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  employeeRight: { alignItems: 'flex-end', gap: verticalScale(4) },
+  employeeAmount: {
+    fontSize: moderateScale(14),
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: scale(8),
+    paddingVertical: scale(3),
+    borderRadius: scale(20),
+    borderWidth: 1,
+  },
+  statusDotSmall: { width: scale(5), height: scale(5), borderRadius: scale(3) },
+  statusPillText: { fontSize: moderateScale(10), fontWeight: '700' },
+  expandedPanel: {
+    backgroundColor: '#F8F9FC',
+    paddingHorizontal: moderateScale(14),
+    paddingVertical: moderateScale(14),
+    gap: verticalScale(12),
+    borderTopWidth: 1,
+    borderTopColor: '#EEF0F5',
+  },
+  expandedPanelDark: { backgroundColor: '#161625', borderTopColor: '#2A2A3E' },
+  infoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: verticalScale(12) },
+  infoCell: { width: '47%', gap: verticalScale(3) },
+  infoCellLabel: {
+    fontSize: moderateScale(9),
+    color: '#9CA3AF',
+    letterSpacing: 0.6,
+    fontWeight: '600',
+  },
+  infoCellValue: {
+    fontSize: moderateScale(12),
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  additionalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: moderateScale(10),
+    paddingHorizontal: scale(14),
+    paddingVertical: verticalScale(10),
+    borderWidth: 1,
+    borderColor: '#EEF0F5',
+  },
+  additionalRowDark: { backgroundColor: '#1E1E2E', borderColor: '#2A2A3E' },
+  additionalLabel: { fontSize: moderateScale(13), color: '#6B7280' },
+  additionalValue: {
+    fontSize: moderateScale(15),
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  noDataContainer: {
+    alignItems: 'center',
+    paddingTop: verticalScale(160),
+    paddingHorizontal: scale(40),
+  },
+  noDataText: {
+    fontSize: moderateScale(18),
+    fontWeight: '600',
+    color: '#1E293B',
+    marginTop: scale(16),
+    marginBottom: scale(8),
+  },
   textDark: { color: '#F0F0F0' },
   textMutedDark: { color: '#9CA3AF' },
 });
-
-
-export default StaffSalary;

@@ -16,7 +16,6 @@ import {
   getStaffAttendanceData,
   getDashboardCount,
 } from '../../../services/adminDashboardServices';
-import { ProTopBar, PRO } from '../../../components/modern/ProScreen';
 import NetInfoComponent from '../../../components/netinfoComponent';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -584,9 +583,7 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
   };
 
   return (
-    <>
-      <ProTopBar title="Admin Dashboard" subtitle={moment().format('dddd, DD MMMM YYYY')} />
-      <GestureHandlerRootView
+    <GestureHandlerRootView
       style={[styles.container, { backgroundColor: colors.pageBg }]}
     >
       <NetInfoComponent onReconnect={onRefresh} />
@@ -865,7 +862,6 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
         </View>
       </ScrollView>
     </GestureHandlerRootView>
-    </>
   );
 };
 
@@ -1268,11 +1264,6 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(14),
     fontWeight: '700',
   },
-
-  // product-level admin styling
-  container:{backgroundColor:'#F6F8FC'},
-  scrollContent:{paddingHorizontal:14,paddingTop:8,paddingBottom:120},
-  statCard:{borderRadius:20,borderWidth:1,shadowOpacity:.04,shadowRadius:16,elevation:2},
 });
 
 export default AdminDashboard;

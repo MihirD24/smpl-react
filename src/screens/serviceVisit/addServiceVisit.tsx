@@ -22,7 +22,6 @@ import CustomInput from '../../components/formComponent/customInput';
 import CustomButton from '../../components/button/customButton';
 import CalendarPickerModal from '../../components/formComponent/calendarpickermodal';
 import CustomRadioGroup from '../../components/formComponent/customRadioGroup';
-import { ProTopBar } from '../../components/modern/ProScreen';
 import FormLabel from '../../components/formComponent/formLabel';
 import AppIcon from '../../components/appIcon';
 import ToastUtil from '../../utils/toastAndroid';
@@ -447,8 +446,6 @@ const AddServiceVisit = ({ navigation }: any) => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.screenBg }}>
-      <ProTopBar title="New Service Visit" subtitle="Create field activity" onBack={() => navigation.goBack()} />
     <KeyboardAvoidingView
       style={[formStyles.keyboardContainer, { backgroundColor: theme.background }]}
       behavior="padding"
@@ -981,7 +978,6 @@ const AddServiceVisit = ({ navigation }: any) => {
 
 
     </KeyboardAvoidingView>
-    </View>
   );
 };
 

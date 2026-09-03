@@ -16,7 +16,6 @@ import AppIcon from '../../components/appIcon';
 import { moderateScale, verticalScale, scale } from 'react-native-size-matters';
 import moment from 'moment';
 import NetInfoComponent from '../../components/netinfoComponent';
-import AppScreen from '../../components/ui/AppScreen';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -223,7 +222,12 @@ const PerformanceReport: React.FC = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <AppScreen padding={false}>
+    <View style={{ flex: 1, backgroundColor: t.bg }}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={t.headerBg}
+      />
+
       <NetInfoComponent onReconnect={fetchReport} />
       <ScrollView
         style={{ flex: 1 }}
@@ -553,7 +557,7 @@ const PerformanceReport: React.FC = () => {
           JATAYU{'\n'}Technologies
         </Text>
       </ScrollView>
-    </AppScreen>
+    </View>
   );
 };
 

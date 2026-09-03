@@ -456,6 +456,4 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(12),
     fontWeight: '600',
   },
-
-  // polished card geometry
 });

@@ -12,7 +12,7 @@ import { getDevelopersList, calculateSalary, Developer } from '../../services/sa
 import ToastUtil from '../../utils/toastAndroid';
 import moment from 'moment';
 import { formatDate } from '../../utils/dateUtils';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { moderateScale } from 'react-native-size-matters';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AppIcon from '../../components/appIcon';
 
@@ -69,19 +69,11 @@ const CalculateSalary = () => {
 
   return (
     <ScreenWrapper
-      withHeader={false}
+      withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
-      <View style={[styles.payrollHeader, { backgroundColor: isDarkMode ? '#111827' : '#0F2B5B' }]}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.payrollKicker}>PAYROLL</Text>
-          <Text style={styles.payrollTitle}>Salary calculator</Text>
-          <Text style={styles.payrollSub}>Generate a clear payroll estimate before processing.</Text>
-        </View>
-        <View style={styles.payrollIcon}><AppIcon name="Wallet" size={moderateScale(21)} color="#2563EB" /></View>
-      </View>
       <ScrollView
         style={[formStyles.container, { backgroundColor: theme.background }]}
         contentContainerStyle={formStyles.scrollContent}
@@ -145,8 +137,7 @@ const CalculateSalary = () => {
           <ActivityIndicator size="large" color="#3B82F6" style={{ marginTop: 20 }} />
         ) : calcResult ? (
           <View style={[styles.resultCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <View style={styles.resultHeadingRow}><View><Text style={[styles.resultEyebrow, { color: theme.subText }]}>PAYROLL RESULT</Text><Text style={[styles.resultTitle, { color: theme.label }]}>Calculation summary</Text></View><AppIcon name="CircleCheck" size={moderateScale(20)} color="#10B981" /></View>
-            <View style={[styles.netHero, { backgroundColor: isDarkMode ? '#052E16' : '#ECFDF5' }]}><Text style={[styles.netLabel, { color: isDarkMode ? '#86EFAC' : '#059669' }]}>ESTIMATED NET PAY</Text><Text style={[styles.netValue, { color: isDarkMode ? '#DCFCE7' : '#047857' }]}>₹{calcResult.net_amount}</Text></View>
+            <Text style={[styles.resultTitle, { color: theme.label }]}>Calculation Summary</Text>
             <View style={styles.resultRow}>
               <Text style={{ color: theme.subText }}>Salary</Text>
               <Text style={[styles.resultValue, { color: theme.label }]}>₹{calcResult.salary}</Text>
@@ -167,7 +158,10 @@ const CalculateSalary = () => {
               <Text style={{ color: theme.subText }}>Deduction</Text>
               <Text style={[styles.resultValue, { color: '#EF4444' }]}>₹{calcResult.deduction_amount}</Text>
             </View>
-            <View style={[styles.resultRow, styles.totalRow, { borderTopColor: theme.border }]}><Text style={styles.totalText}>Net Amount</Text><Text style={[styles.totalValue, { color: '#10B981' }]}>₹{calcResult.net_amount}</Text></View>
+            <View style={[styles.resultRow, styles.totalRow, { borderTopColor: theme.border }]}>
+              <Text style={styles.totalText}>Net Amount</Text>
+              <Text style={[styles.totalValue, { color: '#10B981' }]}>₹{calcResult.net_amount}</Text>
+            </View>
           </View>
         ) : null}
       </ScrollView>
@@ -186,23 +180,43 @@ const CalculateSalary = () => {
 };
 
 const styles = StyleSheet.create({
-  payrollHeader: { marginHorizontal: 0, marginTop: 0, marginBottom: verticalScale(8), paddingHorizontal: moderateScale(19), paddingVertical: verticalScale(15), borderRadius: 0, flexDirection: 'row', alignItems: 'center', overflow: 'hidden' },
-  payrollKicker: { color: '#A9C6FF', fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1.6, marginBottom: verticalScale(5) },
-  payrollTitle: { color: '#FFFFFF', fontSize: moderateScale(23), fontWeight: '800', letterSpacing: -0.5 },
-  payrollSub: { color: '#CAD4E2', fontSize: moderateScale(10.5), lineHeight: moderateScale(16), marginTop: verticalScale(5), maxWidth: moderateScale(280) },
-  payrollIcon: { width: moderateScale(48), height: moderateScale(48), borderRadius: moderateScale(16), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  resultCard: { marginTop: verticalScale(18), padding: moderateScale(17), borderRadius: moderateScale(19), borderWidth: 1, shadowColor: '#0F172A', shadowOpacity: 0.06, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 2 },
-  resultHeadingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: verticalScale(12) },
-  resultEyebrow: { fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1.25 },
-  resultTitle: { fontSize: moderateScale(18), fontWeight: '800', marginTop: verticalScale(2), letterSpacing: -0.2 },
-  netHero: { paddingHorizontal: moderateScale(16), paddingVertical: verticalScale(16), borderRadius: moderateScale(17), marginBottom: verticalScale(11) },
-  netLabel: { fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1.2 },
-  netValue: { fontSize: moderateScale(30), fontWeight: '800', marginTop: verticalScale(3), letterSpacing: -0.8 },
-  resultRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: verticalScale(9) },
-  resultValue: { fontWeight: '700' },
-  totalRow: { marginTop: verticalScale(8), paddingTop: verticalScale(12), borderTopWidth: 1 },
-  totalText: { fontSize: moderateScale(14), fontWeight: '800', color: '#334155' },
-  totalValue: { fontSize: moderateScale(17), fontWeight: '800' },
+  resultCard: {
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  resultTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  resultRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+  },
+  resultValue: {
+    fontWeight: '600',
+  },
+  totalRow: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+  },
+  totalText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#374151',
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });
 
 export default CalculateSalary;

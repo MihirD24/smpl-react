@@ -1,17 +1,9 @@
 import React from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  StatusBar,
-  KeyboardAvoidingView,
-  Platform,
-  ViewStyle,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { useAppTheme } from '../constant/theme';
 
-interface ScreenWrapperProps {
+interface Props {
   children: React.ReactNode;
   scrollable?: boolean;
   padding?: boolean | number;
@@ -27,108 +19,29 @@ interface ScreenWrapperProps {
   withHeader?: boolean;
 }
 
-const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
-  children,
-  scrollable = false,
-  padding = false,
-  safeTop = true,
-  safeBottom = true,
-  backgroundColor ,
-  safeAreaTopColor,
-  safeAreaBottomColor,
-  statusBarTranslucent = false,
-  statusBarBackgroundColor ,
-  statusBarStyle ,
-  keyboardAvoiding = false,
-  withHeader = false,
+const ScreenWrapper: React.FC<Props> = ({
+  children, scrollable=false, padding=false, safeTop=true, safeBottom=true,
+  backgroundColor, safeAreaTopColor, safeAreaBottomColor,
+  statusBarStyle, statusBarBackgroundColor, statusBarTranslucent=true,
+  keyboardAvoiding=false,
 }) => {
-  const insets = useSafeAreaInsets();
-
-  const contentStyle: ViewStyle = {
-    // flex: 1,
-    paddingHorizontal:
-      typeof padding === 'boolean'
-        ? padding
-          ? moderateScale(16)
-          : 0
-        : padding,
-    paddingVertical:
-      typeof padding === 'boolean' ? (padding ? verticalScale(7) : 0) : padding,
-  };
-
-  const content = scrollable ? (
-    <ScrollView
-      contentContainerStyle={[styles.inner, contentStyle]}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-    >
+  const insets=useSafeAreaInsets();
+  const {theme}=useAppTheme();
+  const bg=backgroundColor ?? theme.background;
+  const horizontal=typeof padding==='number'?padding:padding?16:0;
+  const body=scrollable ? (
+    <ScrollView contentContainerStyle={[styles.scroll,{paddingHorizontal:horizontal}]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       {children}
     </ScrollView>
-  ) : (
-    <View style={[styles.inner, contentStyle]}>{children}</View>
-  );
-
+  ) : <View style={[styles.inner,{paddingHorizontal:horizontal}]}>{children}</View>;
   return (
-    <>
-      <StatusBar
-        translucent={
-          typeof statusBarTranslucent === 'boolean'
-            ? statusBarTranslucent
-            : !withHeader
-        }
-        barStyle={statusBarStyle}
-        backgroundColor={
-          statusBarBackgroundColor ??
-          (Platform.OS === 'android' && withHeader
-            ? safeAreaTopColor ?? backgroundColor
-            : 'transparent')
-        }
-      />
-
-      <View style={{ flex: 1, backgroundColor }}>
-        {/* Top Safe Area (conditionally rendered) */}
-        {!withHeader && safeTop && (
-          <View
-            style={{
-              height: insets.top,
-              backgroundColor: safeAreaTopColor ?? backgroundColor,
-            }}
-          />
-        )}
-
-        {/* Main Content */}
-        {keyboardAvoiding ? (
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          >
-            {content}
-          </KeyboardAvoidingView>
-        ) : (
-          content
-        )}
-
-        {/* Bottom Safe Area (conditionally rendered) */}
-        {safeBottom && (
-          <View
-            style={{
-              height: Platform.OS === 'ios' ? insets.bottom : 0,
-              backgroundColor: safeAreaBottomColor ?? backgroundColor,
-            }}
-          />
-        )}
-      </View>
-    </>
+    <View style={[styles.root,{backgroundColor:bg}]}>
+      <StatusBar translucent={statusBarTranslucent} backgroundColor={statusBarBackgroundColor ?? 'transparent'} barStyle={statusBarStyle ?? 'dark-content'} />
+      {safeTop && <View style={{height:insets.top,backgroundColor:safeAreaTopColor ?? bg}} />}
+      {keyboardAvoiding ? <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS==='ios'?'padding':undefined}>{body}</KeyboardAvoidingView> : body}
+      {safeBottom && Platform.OS==='ios' && <View style={{height:insets.bottom,backgroundColor:safeAreaBottomColor ?? bg}} />}
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  inner: {
-    flexGrow: 1,
-  },
-});
-
+const styles=StyleSheet.create({root:{flex:1},flex:{flex:1},inner:{flex:1},scroll:{flexGrow:1,paddingBottom:24}});
 export default ScreenWrapper;

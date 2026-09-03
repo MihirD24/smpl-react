@@ -70,11 +70,11 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   const isDarkMode = useColorScheme() === 'dark';
 
   const theme = {
-    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
+    screenBg: isDarkMode ? '#08121E' : '#F4F7FB',
     text: isDarkMode ? '#F9FAFB' : '#1E293B',
     muted: isDarkMode ? '#94A3B8' : '#64748B',
     softBg: isDarkMode ? '#0F172A' : '#F8FAFC',
-    border: isDarkMode ? '#334155' : '#E2E8F0',
+    border: isDarkMode ? '#263F59' : '#DCE5F0',
   };
 
 
@@ -262,10 +262,10 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <ScreenWrapper
-      withHeader={false}
+      withHeader
       statusBarTranslucent
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
+      backgroundColor={isDarkMode ? '#08121E' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={handleLeaveData} />
       <GestureHandlerRootView style={{ flex: 1 }}>
@@ -275,25 +275,6 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             { backgroundColor: theme.screenBg, paddingHorizontal: 0 },
           ]}
         >
-          <View style={styles.leaveHeader}>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.leaveKicker, { color: theme.muted }]}>TIME OFF</Text>
-              <Text style={[styles.leaveTitle, { color: theme.text }]}>Leave requests</Text>
-              <Text style={[styles.leaveSubtitle, { color: theme.muted }]}>Review, search and track your time off</Text>
-            </View>
-            <View style={[styles.leaveCount, { backgroundColor: isDarkMode ? '#172554' : '#EFF6FF' }]}>
-              <Text style={[styles.leaveCountValue, { color: isDarkMode ? '#BFDBFE' : '#2563EB' }]}>{filterJobData.length}</Text>
-              <Text style={[styles.leaveCountLabel, { color: theme.muted }]}>TOTAL</Text>
-            </View>
-          </View>
-          <View style={[styles.statusRail, { backgroundColor: theme.softBg, borderColor: theme.border }]}>
-            {[['Pending', '#F59E0B'], ['Approved', '#10B981'], ['Rejected', '#EF4444']].map(([label,color]) => (
-              <View key={label} style={styles.statusRailItem}>
-                <View style={[styles.statusRailDot, { backgroundColor: color }]} />
-                <View><Text style={[styles.statusRailValue, { color: theme.text }]}>{filterJobData.filter(x => x.status === (label === 'Pending' ? 0 : label === 'Approved' ? 1 : 2)).length}</Text><Text style={[styles.statusRailLabel, { color: theme.muted }]}>{label}</Text></View>
-              </View>
-            ))}
-          </View>
           {/* ── Search + Filter button ── */}
           <View
             style={[
@@ -310,9 +291,9 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                 style={[
                   commonFilterStyles.filterIconBtn,
                   {
-                    borderColor: hasActiveFilters ? '#3B82F6' : theme.border,
+                    borderColor: hasActiveFilters ? '#2563EB' : theme.border,
                     backgroundColor: hasActiveFilters
-                      ? '#3B82F6'
+                      ? '#2563EB'
                       : theme.softBg,
                   },
                 ]}
@@ -322,7 +303,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                 <AppIcon
                   name="ListFilter"
                   size={moderateScale(20)}
-                  color={hasActiveFilters ? '#FFFFFF' : '#3B82F6'}
+                  color={hasActiveFilters ? '#FFFFFF' : '#2563EB'}
                 />
                 {totalActiveFilters > 0 && (
                   <View style={commonFilterStyles.filterBadge}>
@@ -377,7 +358,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                     tintColor="#3B82F6"
-                    colors={['#3B82F6']}
+                    colors={['#2563EB']}
                   />
                 }
               />
@@ -421,22 +402,24 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
 };
 
 const styles = StyleSheet.create({
-  leaveHeader: { paddingHorizontal: moderateScale(18), paddingTop: verticalScale(10), paddingBottom: verticalScale(13), flexDirection: 'row', alignItems: 'center' },
-  leaveKicker: { fontSize: moderateScale(8.5), fontWeight: '800', letterSpacing: 1.7 },
-  leaveTitle: { fontSize: moderateScale(24), fontWeight: '800', letterSpacing: -0.7, marginTop: verticalScale(3) },
-  leaveSubtitle: { fontSize: moderateScale(10.5), marginTop: verticalScale(4), fontWeight: '500' },
-  leaveCount: { width: moderateScale(62), height: moderateScale(62), borderRadius: moderateScale(19), alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#D7E5F8' },
-  leaveCountValue: { fontSize: moderateScale(20), fontWeight: '800', lineHeight: moderateScale(22) },
-  leaveCountLabel: { fontSize: moderateScale(7), fontWeight: '800', letterSpacing: 0.8, marginTop: verticalScale(1) },
-  statusRail: { marginHorizontal: moderateScale(18), marginBottom: verticalScale(10), paddingHorizontal: moderateScale(13), paddingVertical: verticalScale(12), borderRadius: moderateScale(18), borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', shadowColor: '#0F172A', shadowOpacity: 0.035, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 1 },
-  statusRailItem: { flexDirection: 'row', alignItems: 'center', minWidth: moderateScale(78) },
-  statusRailDot: { width: moderateScale(8), height: moderateScale(8), borderRadius: 4, marginRight: moderateScale(7) },
-  statusRailValue: { fontSize: moderateScale(17), fontWeight: '800' },
-  statusRailLabel: { fontSize: moderateScale(8), fontWeight: '700', marginTop: verticalScale(1) },
   content: { flex: 1 },
-  listContent: { paddingHorizontal: moderateScale(15), paddingTop: moderateScale(9), paddingBottom: scale(120) },
-  noDataContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: scale(40), paddingTop: scale(60) },
-  noDataText: { fontSize: moderateScale(16), fontWeight: '800', marginTop: scale(14), marginBottom: scale(7) },
+  listContent: {
+    padding: moderateScale(13),
+    paddingBottom: scale(90),
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: scale(40),
+    paddingTop: scale(60),
+  },
+  noDataText: {
+    fontSize: moderateScale(18),
+    fontWeight: '600',
+    marginTop: scale(16),
+    marginBottom: scale(8),
+  },
 });
 
 export default LeaveList;
