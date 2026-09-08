@@ -1,31 +1,63 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+} from 'react';
+
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
   Animated,
   RefreshControl,
   useColorScheme,
+  useWindowDimensions,
 } from 'react-native';
+
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 import AppIcon from '../../../components/appIcon';
+
 import {
   getStaffAttendanceData,
   getDashboardCount,
 } from '../../../services/adminDashboardServices';
+
 import NetInfoComponent from '../../../components/netinfoComponent';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DESIGN_WIDTH = 375;
+/* =========================================================
+   TYPES
+   ========================================================= */
 
-const scale = (size: number): number => (SCREEN_WIDTH / DESIGN_WIDTH) * size;
-const moderateScale = (size: number, factor: number = 0.5): number =>
-  size + (scale(size) - size) * factor;
+interface AttendanceItem {
+  id: string;
+  employeeId?: string | number;
+  name?: string;
+  avatar?: string;
+  date?: string;
+  inTime?: string;
+  outTime?: string;
+  lateEntry?: number;
+  earlyExit?: number;
+  extraTime?: string | number;
+  status: string[];
+  time: string[];
+}
 
-// ─── Dark Mode Theme Hook ─────────────────────────────────────────────────────
+interface StatCard {
+  id: number;
+  label: string;
+  value: number | string;
+  icon: string;
+  color: 'blue' | 'orange' | 'red' | 'green';
+  screen?: string;
+}
+
+/* =========================================================
+   THEME
+   ========================================================= */
 
 const useTheme = () => {
   const colorScheme = useColorScheme();
@@ -33,86 +65,132 @@ const useTheme = () => {
 
   return {
     isDark,
+
     colors: {
-      // Backgrounds
       pageBg: isDark ? '#0F172A' : '#F8FAFC',
+
       cardBg: isDark ? '#1E293B' : '#FFFFFF',
-      cardBorder: isDark ? '#334155' : '#E2E8F0',
-      subCardBg: isDark ? '#0F172A' : '#F1F5F9',
 
-      // Text
-      textPrimary: isDark ? '#F1F5F9' : '#1E293B',
-      textSecondary: isDark ? '#94A3B8' : '#64748B',
-      textMuted: isDark ? '#64748B' : '#94A3B8',
-      textDeepPrimary: isDark ? '#F8FAFC' : '#0F172A',
+      cardBorder: isDark
+        ? '#334155'
+        : '#E2E8F0',
 
-      // Links / Accent
-      accent: '#3B82F6',
+      subCardBg: isDark
+        ? '#0F172A'
+        : '#F1F5F9',
 
-      // Avatar
-      avatarBg: isDark ? '#1D4ED8' : '#3B82F6',
+      textPrimary: isDark
+        ? '#F1F5F9'
+        : '#1E293B',
 
-      // Timeline
-      timelineLine: isDark ? '#334155' : '#E2E8F0',
+      textSecondary: isDark
+        ? '#94A3B8'
+        : '#64748B',
 
-      // Stat card icon bg
-      statIconBg: isDark ? '#0F172A' : '#F1F5F9',
+      textMuted: isDark
+        ? '#64748B'
+        : '#94A3B8',
 
-      // Emergency buttons
-      stopBtnBg: isDark ? '#1E293B' : '#FFFFFF',
-      stopBtnBorder: '#DC2626',
+      textDeepPrimary: isDark
+        ? '#F8FAFC'
+        : '#0F172A',
 
-      // Modal
-      overlayBg: 'rgba(0,0,0,0.65)',
-      modalBg: isDark ? '#1E293B' : '#FFFFFF',
-      cancelBtnBg: isDark ? '#0F172A' : '#F1F5F9',
-      cancelBtnText: isDark ? '#94A3B8' : '#475569',
+      accent: '#2563EB',
 
-      // Skeleton
-      skeletonBase: isDark ? '#334155' : '#CBD5E1',
-      skeletonDark: isDark ? '#1D4ED8' : '#3B6AC4',
+      avatarBg: '#3B82F6',
 
-      // Financial
-      upcomingCardBg: isDark ? '#0F172A' : '#F1F5F9',
-      pendingCardBg: '#1546A0',
+      statIconBg: isDark
+        ? '#0F172A'
+        : '#F1F5F9',
 
-      // Badge backgrounds (status) — same in both modes, readable
       badgePresent: '#DCFCE7',
       badgeLate: '#FEF3C7',
       badgeEarlyExit: '#FFE4E6',
       badgeLeave: '#DBEAFE',
       badgeWorking: '#DBEAFE',
+
+      warning: '#F59E0B',
     },
   };
 };
 
-// ─── Shimmer Skeleton ─────────────────────────────────────────────────────────
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+const formatMinutes = (
+  value: string,
+): string => {
+  const minutes = parseInt(value, 10);
+
+  if (Number.isNaN(minutes)) {
+    return value;
+  }
+
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  if (hrs > 0 && mins > 0) {
+    return `${hrs}hr ${mins}min`;
+  }
+
+  if (hrs > 0) {
+    return `${hrs}hr`;
+  }
+
+  return `${mins}min`;
+};
+
+const formatPunchTime = (
+  value?: string,
+): string => {
+  if (!value) {
+    return '--';
+  }
+
+  const timeMatch = String(value).match(
+    /\d{1,2}:\d{2}(?::\d{2})?\s?(AM|PM|am|pm)?/,
+  );
+
+  return timeMatch?.[0] ?? value;
+};
+
+const hasPositiveTime = (
+  value: string | number | undefined,
+): boolean => {
+  return Number(value || 0) > 0;
+};
+
+/* =========================================================
+   SKELETON
+   ========================================================= */
 
 const SkeletonBox: React.FC<{
   width?: number | string;
   height?: number;
   borderRadius?: number;
   style?: any;
-  dark?: boolean;
   isDark?: boolean;
 }> = ({
   width = '100%',
-  height = scale(14),
-  borderRadius = scale(6),
+  height = 14,
+  borderRadius = 6,
   style,
-  dark = false,
   isDark = false,
 }) => {
-  const shimmer = useRef(new Animated.Value(0)).current;
+  const shimmer = useRef(
+    new Animated.Value(0),
+  ).current;
 
   useEffect(() => {
-    const loop = Animated.loop(
+    const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(shimmer, {
           toValue: 1,
           duration: 900,
           useNativeDriver: true,
         }),
+
         Animated.timing(shimmer, {
           toValue: 0,
           duration: 900,
@@ -120,8 +198,12 @@ const SkeletonBox: React.FC<{
         }),
       ]),
     );
-    loop.start();
-    return () => loop.stop();
+
+    animation.start();
+
+    return () => {
+      animation.stop();
+    };
   }, [shimmer]);
 
   const opacity = shimmer.interpolate({
@@ -129,16 +211,16 @@ const SkeletonBox: React.FC<{
     outputRange: [0.35, 0.75],
   });
 
-  const bgColor = dark ? '#3B6AC4' : isDark ? '#334155' : '#CBD5E1';
-
   return (
     <Animated.View
       style={[
         {
-          width: width as any,
+          width,
           height,
           borderRadius,
-          backgroundColor: bgColor,
+          backgroundColor: isDark
+            ? '#334155'
+            : '#CBD5E1',
           opacity,
         },
         style,
@@ -147,590 +229,1091 @@ const SkeletonBox: React.FC<{
   );
 };
 
-// ─── No Data ──────────────────────────────────────────────────────────────────
+/* =========================================================
+   NO DATA
+   ========================================================= */
 
 const NoData: React.FC<{
   message?: string;
   icon?: string;
-  darkBg?: boolean;
   isDark?: boolean;
 }> = ({
   message = 'No data available',
   icon = 'Inbox',
-  darkBg = false,
   isDark = false,
 }) => {
-  const iconBg = darkBg ? '#1D3D8A' : isDark ? '#0F172A' : '#F1F5F9';
-  const iconColor = darkBg ? '#3B6AC4' : isDark ? '#475569' : '#CBD5E1';
-  const textColor = darkBg ? '#93C5FD' : isDark ? '#64748B' : '#94A3B8';
-
   return (
-    <View style={noDataStyles.container}>
-      <View style={[noDataStyles.iconWrap, { backgroundColor: iconBg }]}>
-        <AppIcon name={icon as any} size={scale(26)} color={iconColor} />
+    <View style={styles.noDataContainer}>
+      <View
+        style={[
+          styles.noDataIconWrap,
+          {
+            backgroundColor: isDark
+              ? '#0F172A'
+              : '#F1F5F9',
+          },
+        ]}
+      >
+        <AppIcon
+          name={icon as any}
+          size={26}
+          color={
+            isDark
+              ? '#64748B'
+              : '#94A3B8'
+          }
+        />
       </View>
-      <Text style={[noDataStyles.text, { color: textColor }]}>{message}</Text>
+
+      <Text
+        style={[
+          styles.noDataText,
+          {
+            color: isDark
+              ? '#94A3B8'
+              : '#94A3B8',
+          },
+        ]}
+      >
+        {message}
+      </Text>
     </View>
   );
 };
 
-const noDataStyles = StyleSheet.create({
-  container: {
-    paddingVertical: scale(24),
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: scale(8),
-  },
-  iconWrap: {
-    width: scale(50),
-    height: scale(50),
-    borderRadius: scale(25),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: moderateScale(12),
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-});
+/* =========================================================
+   MAIN COMPONENT
+   ========================================================= */
 
-// ─── Skeleton: Stats Cards Row ────────────────────────────────────────────────
+const AdminDashboard: React.FC = ({
+  navigation,
+}: any) => {
+  const {
+    isDark,
+    colors,
+  } = useTheme();
 
-const StatsCardsSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
-  <ScrollView
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    contentContainerStyle={{
-      paddingRight: scale(10),
-      gap: scale(12),
-      paddingBottom: scale(4),
-    }}
-  >
-    {[1, 2, 3, 4].map(i => (
-      <View
-        key={i}
-        style={[
-          {
-            width: scale(135),
-            borderWidth: 1,
-            borderRadius: scale(16),
-            padding: scale(12),
-            gap: scale(6),
-            marginBottom: scale(12),
-            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-            borderColor: isDark ? '#334155' : '#E2E8F0',
-          },
-        ]}
-      >
-        <SkeletonBox
-          width={scale(30)}
-          height={scale(30)}
-          borderRadius={scale(10)}
-          isDark={isDark}
-        />
-        <SkeletonBox
-          width={scale(60)}
-          height={scale(20)}
-          style={{ marginTop: scale(4) }}
-          isDark={isDark}
-        />
-        <SkeletonBox
-          width={scale(90)}
-          height={scale(11)}
-          style={{ marginTop: scale(4) }}
-          isDark={isDark}
-        />
-      </View>
-    ))}
-  </ScrollView>
-);
+  const { width } =
+    useWindowDimensions();
 
-// ─── Skeleton: Attendance Snapshot ───────────────────────────────────────────
+  /**
+   * Responsive breakpoints
+   */
+  const isTablet = width >= 768;
+  const isLargeTablet = width >= 1100;
 
-const AttendanceSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
-  <View
-    style={{
-      backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-      borderWidth: 1,
-      borderColor: isDark ? '#334155' : '#E2E8F0',
-      borderRadius: scale(16),
-      padding: scale(20),
-      marginBottom: scale(16),
-    }}
-  >
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: scale(16),
-      }}
-    >
-      <SkeletonBox width={scale(120)} height={scale(12)} isDark={isDark} />
-      <SkeletonBox width={scale(50)} height={scale(12)} isDark={isDark} />
-    </View>
-    <View
-      style={{
-        flexDirection: 'row',
-        gap: scale(8),
-        marginBottom: scale(12),
-      }}
-    >
-      {[1, 2, 3, 4].map(i => (
-        <View
-          key={i}
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            borderRadius: scale(10),
-            paddingVertical: scale(8),
-            backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
-          }}
-        >
-          <SkeletonBox width={scale(18)} height={scale(16)} isDark={isDark} />
-          <SkeletonBox
-            width={scale(34)}
-            height={scale(9)}
-            style={{ marginTop: scale(4) }}
-            isDark={isDark}
-          />
-        </View>
-      ))}
-    </View>
-    <View>
-      {[1, 2, 3, 4, 5].map(i => (
-        <View
-          key={i}
-          style={{
-            minHeight: scale(38),
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderBottomWidth: 1,
-            borderBottomColor: isDark ? '#334155' : '#E2E8F0',
-            paddingVertical: scale(6),
-            gap: scale(6),
-          }}
-        >
-          <View style={{ flex: 2 }}>
-            <SkeletonBox width="88%" height={scale(12)} isDark={isDark} />
-          </View>
-          <View style={{ flex: 0.52 }}>
-            <SkeletonBox width="80%" height={scale(10)} isDark={isDark} />
-            <SkeletonBox
-              width="92%"
-              height={scale(8)}
-              style={{ marginTop: scale(4) }}
-              isDark={isDark}
-            />
-          </View>
-          <View style={{ flex: 0.52 }}>
-            <SkeletonBox width="80%" height={scale(10)} isDark={isDark} />
-            <SkeletonBox
-              width="92%"
-              height={scale(8)}
-              style={{ marginTop: scale(4) }}
-              isDark={isDark}
-            />
-          </View>
-        </View>
-      ))}
-    </View>
-  </View>
-);
+  const [
+    showAllAttendance,
+    setShowAllAttendance,
+  ] = useState(false);
 
+  const [
+    refreshing,
+    setRefreshing,
+  ] = useState(false);
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+  const [
+    attendanceData,
+    setAttendanceData,
+  ] = useState<AttendanceItem[]>([]);
 
-const AdminDashboard: React.FC = ({ navigation }: any) => {
-  const { isDark, colors } = useTheme();
+  const [
+    statsCards,
+    setStatsCards,
+  ] = useState<StatCard[]>([]);
 
-  const [showAllAttendance, setShowAllAttendance] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [
+    loadingAttendance,
+    setLoadingAttendance,
+  ] = useState(true);
 
-  const [attendanceData, setAttendanceData] = useState([]);
+  const [
+    loadingStats,
+    setLoadingStats,
+  ] = useState(true);
 
-  const [statsCards, setStatsCards] = useState<any>([]);
+  /* =======================================================
+     FETCH ATTENDANCE
+     ======================================================= */
 
-  // Per-section loading
-  const [loadingAttendance, setLoadingAttendance] = useState(true);
-  const [loadingStats, setLoadingStats] = useState(true);
+  const fetchAttendanceData =
+    async () => {
+      setLoadingAttendance(true);
 
-  // ── Helpers
-  const formatMinutes = (value: string) => {
-    const minutes = parseInt(value);
-    if (isNaN(minutes)) return value;
-    const hrs = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hrs > 0 && mins > 0) return `${hrs}hr ${mins}min`;
-    if (hrs > 0) return `${hrs}hr`;
-    return `${mins}min`;
-  };
+      try {
+        const response =
+          await getStaffAttendanceData();
 
-  const hasPositiveTime = (value: any) => Number(value || 0) > 0;
-
-  const formatPunchTime = (value?: string) => {
-    if (!value) return '--';
-    const timeMatch = String(value).match(
-      /\d{1,2}:\d{2}(?::\d{2})?\s?(AM|PM|am|pm)?/,
-    );
-    return timeMatch ? timeMatch[0] : value;
-  };
-
-  // ── Fetch functions
-  const fetchAttendanceData = async () => {
-    setLoadingAttendance(true);
-    try {
-      const response = await getStaffAttendanceData();
-      console.log('Attendance response:', response);
-      if (response?.attendance?.length) {
-        const formattedData = response.attendance.map(
-          (item: any, index: number) => {
-            const status: string[] = [];
-            const time: string[] = [];
-            if (item.status?.toUpperCase() === 'PRESENT') {
-              status.push('PRESENT');
-              time.push(item.in_time || '');
-            }
-            if (item.late_entry > 0) {
-              status.push('LATE');
-              time.push(`${item.late_entry} min`);
-            }
-            if (item.early_exit > 0) {
-              status.push('EARLY EXIT');
-              time.push(`${item.early_exit} min`);
-            }
-            if (item.status?.toUpperCase() === 'ON LEAVE') {
-              status.push('ON LEAVE');
-              time.push('');
-            }
-            return {
-              id: `${item.employee_id}-${index}`,
-              employeeId: item.employee_id,
-              name: item.employee_name,
-              avatar: item.employee_name
-                ?.split(' ')
-                ?.map((n: string) => n[0])
-                ?.join('')
-                ?.toUpperCase(),
-              date: item.date,
-              inTime: item.in_time,
-              outTime: item.out_time,
-              lateEntry: item.late_entry,
-              earlyExit: item.early_exit,
-              extraTime: item.extra_time,
-              status,
-              time,
-            };
-          },
+        console.log(
+          'Attendance response:',
+          response,
         );
-        setAttendanceData(formattedData);
-      } else {
+
+        if (
+          response?.attendance?.length
+        ) {
+          const formattedData: AttendanceItem[] =
+            response.attendance.map(
+              (
+                item: any,
+                index: number,
+              ) => {
+                const status: string[] =
+                  [];
+
+                const time: string[] =
+                  [];
+
+                if (
+                  item.status
+                    ?.toUpperCase() ===
+                  'PRESENT'
+                ) {
+                  status.push(
+                    'PRESENT',
+                  );
+
+                  time.push(
+                    item.in_time || '',
+                  );
+                }
+
+                if (
+                  Number(
+                    item.late_entry,
+                  ) > 0
+                ) {
+                  status.push('LATE');
+
+                  time.push(
+                    `${item.late_entry} min`,
+                  );
+                }
+
+                if (
+                  Number(
+                    item.early_exit,
+                  ) > 0
+                ) {
+                  status.push(
+                    'EARLY EXIT',
+                  );
+
+                  time.push(
+                    `${item.early_exit} min`,
+                  );
+                }
+
+                if (
+                  item.status
+                    ?.toUpperCase() ===
+                  'ON LEAVE'
+                ) {
+                  status.push(
+                    'ON LEAVE',
+                  );
+
+                  time.push('');
+                }
+
+                return {
+                  id: `${item.employee_id}-${index}`,
+
+                  employeeId:
+                    item.employee_id,
+
+                  name:
+                    item.employee_name,
+
+                  avatar:
+                    item.employee_name
+                      ?.split(' ')
+                      ?.map(
+                        (n: string) =>
+                          n[0],
+                      )
+                      ?.join('')
+                      ?.toUpperCase(),
+
+                  date: item.date,
+
+                  inTime:
+                    item.in_time,
+
+                  outTime:
+                    item.out_time,
+
+                  lateEntry:
+                    item.late_entry,
+
+                  earlyExit:
+                    item.early_exit,
+
+                  extraTime:
+                    item.extra_time,
+
+                  status,
+
+                  time,
+                };
+              },
+            );
+
+          setAttendanceData(
+            formattedData,
+          );
+        } else {
+          setAttendanceData([]);
+        }
+      } catch (error) {
+        console.error(
+          'Attendance fetch error:',
+          error,
+        );
+
         setAttendanceData([]);
+      } finally {
+        setLoadingAttendance(
+          false,
+        );
       }
-    } finally {
-      setLoadingAttendance(false);
-    }
-  };
+    };
 
+  /* =======================================================
+     FETCH DASHBOARD STATS
+     ======================================================= */
 
-  const fetchDashboardCount = async () => {
-    setLoadingStats(true);
-    try {
-      const response = await getDashboardCount();
-      console.log("response",response)
-      if (response) {
-        setStatsCards([
-          {
-            id: 1,
-            label: 'Pending Service Visits',
-            value: response?.pendingServiceVisits,
-            icon: 'Users',
-            color: 'blue',
-            bg: '#EFF6FF',
-          },
-          {
-            id: 2,
-            label: 'Departments',
-            value: response?.departmentsCount,
-            icon: 'Users',
-            color: 'blue',
-            bg: '#EFF6FF',
-          },
-          {
-            id: 3,
-            label: 'Designation',
-            value: response?.designationsCount,
-            icon: 'Users',
-            color: 'blue',
-            bg: '#EFF6FF',
-          },
-          {
-            id: 4,
-            label: 'Employees',
-            value: response?.employeesCount,
-            icon: 'Users',
-            color: 'blue',
-            bg: '#EFF6FF',
-          },
-        ]);
+  const fetchDashboardCount =
+    async () => {
+      setLoadingStats(true);
+
+      try {
+        const response =
+          await getDashboardCount();
+
+        console.log(
+          'Dashboard response:',
+          response,
+        );
+
+        if (response) {
+          setStatsCards([
+            {
+              id: 1,
+              label:
+                'Pending Service Visits',
+              value:
+                response?.pendingServiceVisits ??
+                0,
+              icon: 'Users',
+              color: 'blue',
+            },
+
+            {
+              id: 2,
+              label: 'Departments',
+              value:
+                response?.departmentsCount ??
+                0,
+              icon: 'Users',
+              color: 'blue',
+            },
+
+            {
+              id: 3,
+              label: 'Designation',
+              value:
+                response?.designationsCount ??
+                0,
+              icon: 'Users',
+              color: 'blue',
+            },
+
+            {
+              id: 4,
+              label: 'Employees',
+              value:
+                response?.employeesCount ??
+                0,
+              icon: 'Users',
+              color: 'blue',
+            },
+          ]);
+        } else {
+          setStatsCards([]);
+        }
+      } catch (error) {
+        console.error(
+          'Dashboard count error:',
+          error,
+        );
+
+        setStatsCards([]);
+      } finally {
+        setLoadingStats(false);
       }
-    } finally {
-      setLoadingStats(false);
-    }
-  };
+    };
 
-  // ── fetchAllData: plain async — no useCallback wrapping.
-  // useCallback with [] captures stale function references on mount,
-  // causing APIs to silently do nothing on first login navigation.
-  // Instead we use a ref so useEffect and onRefresh always call the
-  // latest version without any dependency array issues.
-  const fetchAllData = async () => {
-    try {
+  /* =======================================================
+     FETCH ALL DATA
+     ======================================================= */
+
+  const fetchAllData =
+    async () => {
       await Promise.all([
         fetchAttendanceData(),
         fetchDashboardCount(),
       ]);
+    };
+
+  /**
+   * Ref is used to avoid stale function
+   * references in effects / refresh.
+   */
+  const fetchAllDataRef =
+    useRef(fetchAllData);
+
+  useEffect(() => {
+    fetchAllDataRef.current =
+      fetchAllData;
+  });
+
+  /**
+   * Initial dashboard load
+   */
+  useEffect(() => {
+    fetchAllDataRef.current();
+  }, []);
+
+  /* =======================================================
+     REFRESH
+     ======================================================= */
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+
+    try {
+      await fetchAllDataRef.current();
     } finally {
+      setRefreshing(false);
     }
   };
 
-  const fetchAllDataRef = useRef(fetchAllData);
-  // Keep ref current on every render so it never holds a stale closure
-  useEffect(() => {
-    fetchAllDataRef.current = fetchAllData;
-  });
+  /* =======================================================
+     CARD COLORS
+     ======================================================= */
 
-  // ── Initial load — runs exactly once on mount
-  useEffect(() => {
-    fetchAllDataRef.current();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ── Pull to Refresh — uses ref so no dependency array needed
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchAllDataRef.current();
-    setRefreshing(false);
-  };
-
-  const statCardIconColor = (color: string) => {
+  const getIconColor = (
+    color: string,
+  ): string => {
     switch (color) {
       case 'blue':
         return '#2563EB';
+
       case 'orange':
         return '#EA580C';
+
       case 'red':
         return '#DC2626';
+
       case 'green':
         return '#16A34A';
+
       default:
         return '#64748B';
     }
   };
 
-  const statCardBorderColor = (color: string) => {
+  const getBorderColor = (
+    color: string,
+  ): string => {
     if (isDark) {
       switch (color) {
         case 'blue':
           return '#1D4ED8';
+
         case 'orange':
           return '#C2410C';
+
         case 'red':
           return '#B91C1C';
+
         case 'green':
           return '#15803D';
+
         default:
           return '#334155';
       }
     }
+
     switch (color) {
       case 'blue':
         return '#BFDBFE';
+
       case 'orange':
         return '#FDE68A';
+
       case 'red':
         return '#FECACA';
+
       case 'green':
         return '#A7F3D0';
+
       default:
         return '#E2E8F0';
     }
   };
 
+  /* =======================================================
+     ATTENDANCE SUMMARY
+     ======================================================= */
+
   const attendanceSummary = {
-    present: attendanceData.filter((item: any) =>
-      item.status.includes('PRESENT'),
-    ).length,
-    late: attendanceData.filter((item: any) => item.status.includes('LATE'))
-      .length,
-    leave: attendanceData.filter((item: any) =>
-      item.status.includes('ON LEAVE'),
-    ).length,
-    earlyExit: attendanceData.filter((item: any) =>
-      item.status.includes('EARLY EXIT'),
-    ).length,
+    present:
+      attendanceData.filter(
+        item =>
+          item.status.includes(
+            'PRESENT',
+          ),
+      ).length,
+
+    late:
+      attendanceData.filter(
+        item =>
+          item.status.includes(
+            'LATE',
+          ),
+      ).length,
+
+    leave:
+      attendanceData.filter(
+        item =>
+          item.status.includes(
+            'ON LEAVE',
+          ),
+      ).length,
+
+    earlyExit:
+      attendanceData.filter(
+        item =>
+          item.status.includes(
+            'EARLY EXIT',
+          ),
+      ).length,
   };
 
-  const visibleAttendance = showAllAttendance
-    ? attendanceData
-    : attendanceData.slice(0, 8);
+  const visibleAttendance =
+    showAllAttendance
+      ? attendanceData
+      : attendanceData.slice(0, 8);
 
-  // Dynamic styles
-  const dynCard = {
-    backgroundColor: colors.cardBg,
-    borderColor: colors.cardBorder,
-  };
+  /* =======================================================
+     RENDER
+     ======================================================= */
 
   return (
     <GestureHandlerRootView
-      style={[styles.container, { backgroundColor: colors.pageBg }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            colors.pageBg,
+        },
+      ]}
     >
-      <NetInfoComponent onReconnect={onRefresh} />
+      <NetInfoComponent
+        onReconnect={onRefresh}
+      />
+
       <ScrollView
         style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isTablet &&
+            styles.scrollContentTablet,
+        ]}
+        showsVerticalScrollIndicator={
+          false
+        }
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
             colors={['#3B82F6']}
             tintColor="#3B82F6"
-            progressBackgroundColor={colors.cardBg}
+            progressBackgroundColor={
+              colors.cardBg
+            }
           />
         }
       >
-        <View style={styles.maxWidth}>
-          {/* ── STATS CARDS ─────────────────────────────────────────────────── */}
+        {/* =================================================
+            MAIN RESPONSIVE CONTAINER
+        ================================================= */}
+
+        <View
+          style={[
+            styles.pageContainer,
+            isTablet &&
+              styles.pageContainerTablet,
+            isLargeTablet &&
+              styles.pageContainerLarge,
+          ]}
+        >
+          {/* =================================================
+              HEADER
+          ================================================= */}
+
+          <View style={styles.pageHeader}>
+            <View>
+              <Text
+                style={[
+                  styles.pageTitle,
+                  {
+                    color:
+                      colors.textPrimary,
+                  },
+                ]}
+              >
+                Admin Dashboard
+              </Text>
+
+              <Text
+                style={[
+                  styles.pageDate,
+                  {
+                    color:
+                      colors.textSecondary,
+                  },
+                ]}
+              >
+                {new Date().toLocaleDateString(
+                  'en-US',
+                  {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  },
+                )}
+              </Text>
+            </View>
+          </View>
+
+          {/* =================================================
+              STATS
+          ================================================= */}
+
           {loadingStats ? (
-            <StatsCardsSkeleton isDark={isDark} />
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.statsRow}
+            <View
+              style={[
+                styles.statsGrid,
+                isTablet &&
+                  styles.statsGridTablet,
+              ]}
             >
-              {statsCards.map((card: any) => (
-                <TouchableOpacity
-                  key={card.id}
-                  style={[
-                    styles.statCardHorizontal,
-                    {
-                      backgroundColor: colors.cardBg,
-                      borderColor: statCardBorderColor(card.color),
-                    },
-                  ]}
-                  activeOpacity={0.7}
-                  onPress={() =>
-                    card.screen && navigation.navigate(card.screen)
-                  }
-                >
-                  {/* Top Row */}
-                  <View style={styles.statCardTopRow}>
+              {[1, 2, 3, 4].map(
+                item => (
+                  <View
+                    key={item}
+                    style={[
+                      styles.statCard,
+                      isTablet &&
+                        styles.statCardTablet,
+                      {
+                        backgroundColor:
+                          colors.cardBg,
+
+                        borderColor:
+                          colors.cardBorder,
+                      },
+                    ]}
+                  >
                     <View
-                      style={[
-                        styles.statCardIconWrap,
-                        { backgroundColor: colors.statIconBg },
-                      ]}
+                      style={
+                        styles.statTopRow
+                      }
                     >
-                      <AppIcon
-                        name={card.icon as any}
-                        size={scale(18)}
-                        color={statCardIconColor(card.color)}
+                      <SkeletonBox
+                        width={
+                          isTablet
+                            ? 48
+                            : 44
+                        }
+                        height={
+                          isTablet
+                            ? 48
+                            : 44
+                        }
+                        borderRadius={14}
+                        isDark={
+                          isDark
+                        }
                       />
+
+                      <SkeletonBox
+                        width={48}
+                        height={26}
+                        borderRadius={6}
+                        isDark={
+                          isDark
+                        }
+                      />
+                    </View>
+
+                    <SkeletonBox
+                      width="76%"
+                      height={14}
+                      borderRadius={5}
+                      isDark={
+                        isDark
+                      }
+                    />
+                  </View>
+                ),
+              )}
+            </View>
+          ) : (
+            <View
+              style={[
+                styles.statsGrid,
+                isTablet &&
+                  styles.statsGridTablet,
+              ]}
+            >
+              {statsCards.map(
+                (card: StatCard) => (
+                  <TouchableOpacity
+                    key={card.id}
+                    style={[
+                      styles.statCard,
+                      isTablet &&
+                        styles.statCardTablet,
+                      {
+                        backgroundColor:
+                          colors.cardBg,
+
+                        borderColor:
+                          getBorderColor(
+                            card.color,
+                          ),
+                      },
+                    ]}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      if (
+                        card.screen
+                      ) {
+                        navigation.navigate(
+                          card.screen,
+                        );
+                      }
+                    }}
+                  >
+                    <View
+                      style={
+                        styles.statTopRow
+                      }
+                    >
+                      <View
+                        style={[
+                          styles.statIconWrap,
+                          {
+                            backgroundColor:
+                              colors.statIconBg,
+                          },
+                        ]}
+                      >
+                        <AppIcon
+                          name={
+                            card.icon as any
+                          }
+                          size={
+                            isTablet
+                              ? 24
+                              : 20
+                          }
+                          color={getIconColor(
+                            card.color,
+                          )}
+                        />
+                      </View>
+
+                      <Text
+                        style={[
+                          styles.statValue,
+                          {
+                            color:
+                              colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        {card.value}
+                      </Text>
                     </View>
 
                     <Text
                       style={[
-                        styles.statCardValue,
-                        { color: colors.textPrimary },
+                        styles.statLabel,
+                        {
+                          color:
+                            colors.textSecondary,
+                        },
+                      ]}
+                      numberOfLines={2}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.8}
+                    >
+                      {card.label}
+                    </Text>
+                  </TouchableOpacity>
+                ),
+              )}
+            </View>
+          )}
+
+          {/* =================================================
+              ATTENDANCE CARD
+          ================================================= */}
+
+          {loadingAttendance ? (
+            <View
+              style={[
+                styles.card,
+                isTablet &&
+                  styles.cardTablet,
+                {
+                  backgroundColor:
+                    colors.cardBg,
+
+                  borderColor:
+                    colors.cardBorder,
+                },
+              ]}
+            >
+              <View
+                style={
+                  styles.cardHeader
+                }
+              >
+                <View>
+                  <SkeletonBox
+                    width={
+                      isTablet
+                        ? 220
+                        : 170
+                    }
+                    height={20}
+                    isDark={
+                      isDark
+                    }
+                  />
+
+                  <SkeletonBox
+                    width={140}
+                    height={12}
+                    style={{
+                      marginTop: 7,
+                    }}
+                    isDark={
+                      isDark
+                    }
+                  />
+                </View>
+
+                <SkeletonBox
+                  width={60}
+                  height={18}
+                  isDark={
+                    isDark
+                  }
+                />
+              </View>
+
+              <View
+                style={[
+                  styles.summaryGrid,
+                  isTablet &&
+                    styles.summaryGridTablet,
+                ]}
+              >
+                {[1, 2, 3, 4].map(
+                  item => (
+                    <View
+                      key={item}
+                      style={[
+                        styles.summaryItem,
+                        isTablet &&
+                          styles.summaryItemTablet,
+                        {
+                          backgroundColor:
+                            colors.subCardBg,
+                        },
                       ]}
                     >
-                      {card.value}
-                    </Text>
-                  </View>
+                      <SkeletonBox
+                        width={28}
+                        height={24}
+                        borderRadius={5}
+                        isDark={
+                          isDark
+                        }
+                      />
 
-                  {/* Label Below */}
-                  <Text
+                      <SkeletonBox
+                        width={48}
+                        height={12}
+                        borderRadius={4}
+                        style={{
+                          marginTop: 8,
+                        }}
+                        isDark={
+                          isDark
+                        }
+                      />
+                    </View>
+                  ),
+                )}
+              </View>
+
+              {[1, 2, 3].map(
+                item => (
+                  <View
+                    key={item}
                     style={[
-                      styles.statCardLabel,
-                      { color: colors.textSecondary },
+                      styles.skeletonRow,
+                      {
+                        borderBottomColor:
+                          colors.cardBorder,
+                      },
                     ]}
                   >
-                    {card.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            )}
+                    <SkeletonBox
+                      width={44}
+                      height={44}
+                      borderRadius={22}
+                      isDark={
+                        isDark
+                      }
+                    />
 
-            {/* ── ATTENDANCE SNAPSHOT ──────────────────────────────────────────── */}
-            {loadingAttendance ? (
-            <AttendanceSkeleton isDark={isDark} />
+                    <View
+                      style={
+                        styles.skeletonName
+                      }
+                    >
+                      <SkeletonBox
+                        width="68%"
+                        height={14}
+                        isDark={
+                          isDark
+                        }
+                      />
+
+                      <SkeletonBox
+                        width="38%"
+                        height={10}
+                        style={{
+                          marginTop: 5,
+                        }}
+                        isDark={
+                          isDark
+                        }
+                      />
+                    </View>
+
+                    <SkeletonBox
+                      width={72}
+                      height={14}
+                      isDark={
+                        isDark
+                      }
+                    />
+
+                    <SkeletonBox
+                      width={72}
+                      height={14}
+                      isDark={
+                        isDark
+                      }
+                    />
+                  </View>
+                ),
+              )}
+            </View>
           ) : (
-            <View style={[styles.card, dynCard]}>
-              <View style={styles.cardHeader}>
-                <Text
-                  style={[styles.sectionTitle, { color: colors.textMuted }]}
+            <View
+              style={[
+                styles.card,
+                isTablet &&
+                  styles.cardTablet,
+                {
+                  backgroundColor:
+                    colors.cardBg,
+                  borderColor:
+                    colors.cardBorder,
+                },
+              ]}
+            >
+              {/* =================================================
+                  CARD HEADER
+              ================================================= */}
+
+              <View
+                style={
+                  styles.cardHeader
+                }
+              >
+                <View
+                  style={
+                    styles.cardHeaderText
+                  }
                 >
-                  Today's Attendance
-                </Text>
-                {attendanceData.length > 8 && (
+                  <Text
+                    style={[
+                      styles.sectionTitle,
+                      {
+                        color:
+                          colors.textPrimary,
+                      },
+                    ]}
+                  >
+                    Today's Attendance
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.sectionSubtitle,
+                      {
+                        color:
+                          colors.textMuted,
+                      },
+                    ]}
+                  >
+                    Attendance overview
+                  </Text>
+                </View>
+
+                {attendanceData.length >
+                  8 && (
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    onPress={() => setShowAllAttendance(prev => !prev)}
+                    onPress={() =>
+                      setShowAllAttendance(
+                        previous =>
+                          !previous,
+                      )
+                    }
+                    style={
+                      styles.viewAllButton
+                    }
                   >
-                    <Text style={[styles.linkText, { color: colors.accent }]}>
-                      {showAllAttendance ? 'Show Less' : 'View All'}
+                    <Text
+                      style={[
+                        styles.viewAllText,
+                        {
+                          color:
+                            colors.accent,
+                        },
+                      ]}
+                    >
+                      {showAllAttendance
+                        ? 'Show Less'
+                        : 'View All'}
                     </Text>
                   </TouchableOpacity>
                 )}
               </View>
 
-              <View style={styles.attendanceSummaryGrid}>
+              {/* =================================================
+                  SUMMARY GRID
+              ================================================= */}
+
+              <View
+                style={[
+                  styles.summaryGrid,
+                  isTablet &&
+                    styles.summaryGridTablet,
+                ]}
+              >
                 {[
                   {
                     label: 'Present',
-                    value: attendanceSummary.present,
-                    valueStyle: styles.textPresent,
-                    bg: isDark ? '#052E1B' : '#F0FDF4',
+                    value:
+                      attendanceSummary.present,
+                    color: '#16A34A',
+                    bg: isDark
+                      ? '#052E1B'
+                      : '#F0FDF4',
                   },
+
                   {
                     label: 'Late',
-                    value: attendanceSummary.late,
-                    valueStyle: styles.textLate,
-                    bg: isDark ? '#3F2E05' : '#FFFBEB',
+                    value:
+                      attendanceSummary.late,
+                    color: '#D97706',
+                    bg: isDark
+                      ? '#3F2E05'
+                      : '#FFFBEB',
                   },
+
                   {
                     label: 'Leave',
-                    value: attendanceSummary.leave,
-                    valueStyle: styles.textLeave,
-                    bg: isDark ? '#082F49' : '#EFF6FF',
+                    value:
+                      attendanceSummary.leave,
+                    color: '#2563EB',
+                    bg: isDark
+                      ? '#082F49'
+                      : '#EFF6FF',
                   },
+
                   {
                     label: 'Early',
-                    value: attendanceSummary.earlyExit,
-                    valueStyle: styles.textEarlyExit,
-                    bg: isDark ? '#4C0519' : '#FFF1F2',
+                    value:
+                      attendanceSummary.earlyExit,
+                    color: '#E11D48',
+                    bg: isDark
+                      ? '#4C0519'
+                      : '#FFF1F2',
                   },
                 ].map(item => (
                   <View
-                    key={item.label}
+                    key={
+                      item.label
+                    }
                     style={[
-                      styles.attendanceSummaryItem,
-                      { backgroundColor: item.bg },
+                      styles.summaryItem,
+                      isTablet &&
+                        styles.summaryItemTablet,
+                      {
+                        backgroundColor:
+                          item.bg,
+                      },
                     ]}
                   >
                     <Text
-                      style={[styles.attendanceSummaryValue, item.valueStyle]}
+                      style={[
+                        styles.summaryValue,
+                        {
+                          color:
+                            item.color,
+                        },
+                      ]}
                     >
                       {item.value}
                     </Text>
+
                     <Text
                       style={[
-                        styles.attendanceSummaryLabel,
-                        { color: colors.textSecondary },
+                        styles.summaryLabel,
+                        {
+                          color:
+                            colors.textSecondary,
+                        },
                       ]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.85}
                     >
                       {item.label}
                     </Text>
@@ -738,115 +1321,317 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
                 ))}
               </View>
 
-              <View style={styles.attendanceSnapshotTable}>
-                {visibleAttendance.length > 0 ? (
-                  visibleAttendance.map((item: any) => {
-                    const isLeave = item.status.includes('ON LEAVE');
-                    const isLate = item.status.includes('LATE');
-                    const isEarlyExit = item.status.includes('EARLY EXIT');
-                    const hasExtraTime = hasPositiveTime(item.extraTime);
-                    const inNote = isLeave
-                      ? 'Leave'
-                      : isLate
-                      ? `Late ${formatMinutes(`${item.lateEntry}`)}`
-                      : 'On time';
-                    const outNote = isLeave
-                      ? '--'
-                      : isEarlyExit
-                      ? `Early ${formatMinutes(`${item.earlyExit}`)}`
-                      : hasExtraTime
-                      ? `Extra ${formatMinutes(`${item.extraTime}`)}`
-                      : item.outTime
-                      ? 'On time'
-                      : '--';
-                    const inNoteStyle = isLeave
-                      ? styles.textLeave
-                      : isLate
-                      ? styles.textLate
-                      : styles.textPresent;
-                    const outNoteStyle = isLeave
-                      ? styles.textLeave
-                      : isEarlyExit
-                      ? styles.textEarlyExit
-                      : hasExtraTime
-                      ? styles.textPresent
-                      : styles.textPresent;
+              {/* =================================================
+                  TABLE HEADER
+              ================================================= */}
 
-                    return (
-                      <View
-                        key={item.id}
-                        style={[
-                          styles.attendanceSnapshotRow,
-                          {
-                            borderBottomColor: colors.cardBorder,
-                          },
-                        ]}
-                      >
-                        <View style={styles.attendancePersonCell}>
+              {visibleAttendance.length >
+                0 && (
+                <View
+                  style={[
+                    styles.tableHeader,
+                    {
+                      borderBottomColor:
+                        colors.cardBorder,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.tableHeaderText,
+                      styles.employeeHeader,
+                      {
+                        color:
+                          colors.textMuted,
+                      },
+                    ]}
+                  >
+                    Employee
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.tableHeaderText,
+                      styles.timeHeader,
+                      {
+                        color:
+                          colors.textMuted,
+                      },
+                    ]}
+                  >
+                    Check In
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.tableHeaderText,
+                      styles.timeHeader,
+                      {
+                        color:
+                          colors.textMuted,
+                      },
+                    ]}
+                  >
+                    Check Out
+                  </Text>
+                </View>
+              )}
+
+              {/* =================================================
+                  ATTENDANCE TABLE
+              ================================================= */}
+
+              <View
+                style={
+                  styles.attendanceTable
+                }
+              >
+                {visibleAttendance.length >
+                0 ? (
+                  visibleAttendance.map(
+                    item => {
+                      const isLeave =
+                        item.status.includes(
+                          'ON LEAVE',
+                        );
+
+                      const isLate =
+                        item.status.includes(
+                          'LATE',
+                        );
+
+                      const isEarlyExit =
+                        item.status.includes(
+                          'EARLY EXIT',
+                        );
+
+                      const hasExtraTime =
+                        hasPositiveTime(
+                          item.extraTime,
+                        );
+
+                      const inNote =
+                        isLeave
+                          ? 'Leave'
+                          : isLate
+                          ? `Late ${formatMinutes(
+                              String(
+                                item.lateEntry ??
+                                  0,
+                              ),
+                            )}`
+                          : 'On time';
+
+                      const outNote =
+                        isLeave
+                          ? '--'
+                          : isEarlyExit
+                          ? `Early ${formatMinutes(
+                              String(
+                                item.earlyExit ??
+                                  0,
+                              ),
+                            )}`
+                          : hasExtraTime
+                          ? `Extra ${formatMinutes(
+                              String(
+                                item.extraTime ??
+                                  0,
+                              ),
+                            )}`
+                          : item.outTime
+                          ? 'On time'
+                          : '--';
+
+                      const inNoteColor =
+                        isLeave
+                          ? '#2563EB'
+                          : isLate
+                          ? '#D97706'
+                          : '#16A34A';
+
+                      const outNoteColor =
+                        isLeave
+                          ? '#2563EB'
+                          : isEarlyExit
+                          ? '#E11D48'
+                          : '#16A34A';
+
+                      return (
+                        <View
+                          key={
+                            item.id
+                          }
+                          style={[
+                            styles.attendanceRow,
+                            isTablet &&
+                              styles.attendanceRowTablet,
+                            {
+                              borderBottomColor:
+                                colors.cardBorder,
+                            },
+                          ]}
+                        >
+                          {/* Employee */}
+
                           <View
                             style={[
-                              styles.attendanceMiniAvatar,
-                              { backgroundColor: colors.avatarBg },
+                              styles.employeeCell,
+                              isTablet &&
+                                styles.employeeCellTablet,
                             ]}
                           >
-                            <Text style={styles.attendanceMiniAvatarText}>
-                              {item.avatar || item.name?.charAt(0)}
-                            </Text>
+                            <View
+                              style={[
+                                styles.avatar,
+                                isTablet &&
+                                  styles.avatarTablet,
+                                {
+                                  backgroundColor:
+                                    colors.avatarBg,
+                                },
+                              ]}
+                            >
+                              <Text
+                                style={
+                                  styles.avatarText
+                                }
+                              >
+                                {item.avatar ||
+                                  item.name?.charAt(
+                                    0,
+                                  ) ||
+                                  '?'}
+                              </Text>
+                            </View>
+
+                            <View
+                              style={
+                                styles.employeeInfo
+                              }
+                            >
+                              <Text
+                                style={[
+                                  styles.employeeName,
+                                  {
+                                    color:
+                                      colors.textPrimary,
+                                  },
+                                ]}
+                                numberOfLines={1}
+                              >
+                                {item.name ||
+                                  'Employee'}
+                              </Text>
+
+                              {item.employeeId !==
+                                undefined &&
+                                item.employeeId !==
+                                  null && (
+                                  <Text
+                                    style={[
+                                      styles.employeeId,
+                                      {
+                                        color:
+                                          colors.textMuted,
+                                      },
+                                    ]}
+                                    numberOfLines={
+                                      1
+                                    }
+                                  >
+                                    ID:{' '}
+                                    {
+                                      item.employeeId
+                                    }
+                                  </Text>
+                                )}
+                            </View>
                           </View>
-                          <View style={styles.attendanceNameBlock}>
+
+                          {/* Check In */}
+
+                          <View
+                            style={
+                              styles.timeCell
+                            }
+                          >
                             <Text
                               style={[
-                                styles.attendanceName,
-                                { color: colors.textPrimary },
+                                styles.timeValue,
+                                {
+                                  color:
+                                    colors.textPrimary,
+                                },
                               ]}
-                              numberOfLines={2}
+                              numberOfLines={
+                                1
+                              }
                             >
-                              {item.name}
+                              {formatPunchTime(
+                                item.inTime,
+                              )}
+                            </Text>
+
+                            <Text
+                              style={[
+                                styles.timeNote,
+                                {
+                                  color:
+                                    inNoteColor,
+                                },
+                              ]}
+                              numberOfLines={
+                                1
+                              }
+                            >
+                              {inNote}
+                            </Text>
+                          </View>
+
+                          {/* Check Out */}
+
+                          <View
+                            style={
+                              styles.timeCell
+                            }
+                          >
+                            <Text
+                              style={[
+                                styles.timeValue,
+                                {
+                                  color:
+                                    colors.textPrimary,
+                                },
+                              ]}
+                              numberOfLines={
+                                1
+                              }
+                            >
+                              {formatPunchTime(
+                                item.outTime,
+                              )}
+                            </Text>
+
+                            <Text
+                              style={[
+                                styles.timeNote,
+                                {
+                                  color:
+                                    outNoteColor,
+                                },
+                              ]}
+                              numberOfLines={
+                                1
+                              }
+                            >
+                              {outNote}
                             </Text>
                           </View>
                         </View>
-
-                        <View style={styles.attendancePunchCell}>
-                          <Text
-                            style={[
-                              styles.attendanceTimeValue,
-                              { color: colors.textPrimary },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {formatPunchTime(item.inTime)}
-                          </Text>
-                          <Text
-                            style={[styles.attendanceSnapshotNote, inNoteStyle]}
-                            numberOfLines={1}
-                          >
-                            {inNote}
-                          </Text>
-                        </View>
-
-                        <View style={styles.attendancePunchCell}>
-                          <Text
-                            style={[
-                              styles.attendanceTimeValue,
-                              { color: colors.textPrimary },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {formatPunchTime(item.outTime)}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.attendanceSnapshotNote,
-                              outNoteStyle,
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {outNote}
-                          </Text>
-                        </View>
-                      </View>
-                    );
-                  })
+                      );
+                    },
+                  )
                 ) : (
                   <NoData
                     message="No attendance records for today"
@@ -857,412 +1642,433 @@ const AdminDashboard: React.FC = ({ navigation }: any) => {
               </View>
             </View>
           )}
-
-        
         </View>
       </ScrollView>
     </GestureHandlerRootView>
   );
 };
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+/* =========================================================
+   STYLES
+   ========================================================= */
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollView: { flex: 1 },
-  maxWidth: {
-    maxWidth: 448,
+  /* =======================================================
+     CONTAINER
+  ======================================================= */
+
+  container: {
+    flex: 1,
+  },
+
+  scrollView: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 32,
+  },
+
+  scrollContentTablet: {
+    paddingBottom: 48,
+  },
+
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
+  pageContainer: {
     width: '100%',
+    maxWidth: 600,
     alignSelf: 'center',
-    paddingHorizontal: scale(16),
-    paddingTop: scale(12),
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
 
-  // Stats
-  statsRow: {
-    paddingRight: scale(10),
-    gap: scale(12),
-    paddingBottom: scale(4),
+  pageContainerTablet: {
+    maxWidth: 1024,
+    paddingHorizontal: 32,
+    paddingTop: 24,
   },
 
-  statCardHorizontal: {
-    width: scale(122),
-    borderWidth: 1,
-    borderRadius: scale(12),
-    padding: scale(10),
-    marginBottom: scale(10),
-    gap: scale(8),
+  pageContainerLarge: {
+    maxWidth: 1200,
+    paddingHorizontal: 40,
+    paddingTop: 28,
   },
 
-  statCardTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  /* =======================================================
+     PAGE HEADER
+  ======================================================= */
+
+  pageHeader: {
+    width: '100%',
+    marginBottom: 20,
   },
 
-  statCardIconWrap: {
-    width: scale(28),
-    height: scale(28),
-    borderRadius: scale(9),
-    justifyContent: 'center',
-    alignItems: 'center',
+  pageTitle: {
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: '800',
+    letterSpacing: -0.5,
   },
 
-  statCardValue: {
-    fontSize: moderateScale(22),
-    fontWeight: '700',
-  },
-
-  statCardLabel: {
-    fontSize: moderateScale(11),
-    lineHeight: moderateScale(16),
-    fontWeight: '500',
-  },
-
-  // Card
-  card: {
-    borderWidth: 1,
-    borderRadius: scale(16),
-    padding: scale(20),
-    marginBottom: scale(16),
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: scale(16),
-  },
-  sectionTitle: {
-    fontSize: moderateScale(11),
-    fontWeight: '700',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  cardTitle: {
-    fontSize: moderateScale(16),
-    fontWeight: '700',
-  },
-  linkText: {
-    fontSize: moderateScale(12),
+  pageDate: {
+    fontSize: 16,
+    lineHeight: 22,
     fontWeight: '600',
+    marginTop: 4,
   },
 
-  // Emergency
-  controlCard: {
+  /* =======================================================
+     STATS GRID
+  ======================================================= */
+
+  statsGrid: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 20,
+  },
+
+  statsGridTablet: {
+    gap: 16,
+    marginBottom: 24,
+  },
+
+  /* =======================================================
+     STAT CARD
+  ======================================================= */
+
+  statCard: {
+    width: '48%',
+    minHeight: 132,
     borderWidth: 1,
-    borderRadius: scale(14),
-    padding: scale(12),
-    marginBottom: scale(16),
-  },
-  controlHeader: {
-    marginBottom: scale(10),
-  },
-  controlTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  controlIconWrap: {
-    width: scale(30),
-    height: scale(30),
-    borderRadius: scale(10),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FEE2E2',
-    marginRight: scale(9),
-  },
-  title: {
-    fontSize: moderateScale(13),
-    fontWeight: '700',
-  },
-  subtitle: {
-    fontSize: moderateScale(10),
-    lineHeight: moderateScale(14),
-    marginTop: scale(1),
-  },
-  buttonRow: { flexDirection: 'row', gap: scale(8) },
-  stopBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: scale(6),
-    paddingVertical: scale(8),
-    borderRadius: scale(8),
-    borderWidth: 1.5,
-  },
-  stopBtnText: {
-    color: '#DC2626',
-    fontSize: moderateScale(9),
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-  punchBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: scale(5),
-    paddingVertical: scale(8),
-    borderRadius: scale(8),
-    backgroundColor: '#1E3A8A',
-  },
-  punchBtnText: {
-    color: '#FFFFFF',
-    fontSize: moderateScale(9),
-    fontWeight: '700',
-    letterSpacing: 0.3,
+    borderRadius: 18,
+    padding: 16,
+    justifyContent: 'space-between',
   },
 
-  // Attendance
-  attendanceSummaryGrid: {
-    flexDirection: 'row',
-    gap: scale(8),
-    marginBottom: scale(12),
+  statCardTablet: {
+    width: '48.7%',
+    minHeight: 148,
+    borderRadius: 20,
+    padding: 20,
   },
-  attendanceSummaryItem: {
-    flex: 1,
-    borderRadius: scale(10),
-    paddingVertical: scale(8),
+
+  statTopRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  statIconWrap: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  attendanceSummaryValue: {
-    fontSize: moderateScale(16),
+
+  statValue: {
+    fontSize: 30,
+    lineHeight: 36,
     fontWeight: '800',
   },
-  attendanceSummaryLabel: {
-    fontSize: moderateScale(9),
+
+  statLabel: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '600',
+    paddingRight: 8,
+  },
+
+  /* =======================================================
+     MAIN CARD
+  ======================================================= */
+
+  card: {
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 20,
+  },
+
+  cardTablet: {
+    borderRadius: 24,
+    padding: 24,
+  },
+
+  cardHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+
+  cardHeaderText: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  sectionTitle: {
+    fontSize: 19,
+    lineHeight: 25,
+    fontWeight: '800',
+  },
+
+  sectionSubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '500',
+    marginTop: 3,
+  },
+
+  viewAllButton: {
+    minHeight: 40,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    marginLeft: 12,
+  },
+
+  viewAllText: {
+    fontSize: 14,
+    lineHeight: 20,
     fontWeight: '700',
-    marginTop: scale(2),
   },
-  attendanceSnapshotTable: {
-    marginTop: scale(2),
+
+  /* =======================================================
+     ATTENDANCE SUMMARY
+  ======================================================= */
+
+  summaryGrid: {
+    width: '100%',
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 24,
   },
-  attendanceSnapshotRow: {
-    minHeight: scale(42),
+
+  summaryGridTablet: {
+    gap: 12,
+  },
+
+  summaryItem: {
+    flex: 1,
+    minHeight: 74,
+    borderRadius: 14,
+    paddingHorizontal: 6,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  summaryItemTablet: {
+    minHeight: 92,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+  },
+
+  summaryValue: {
+    fontSize: 24,
+    lineHeight: 30,
+    fontWeight: '800',
+  },
+
+  summaryLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '700',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+
+  /* =======================================================
+     TABLE HEADER
+  ======================================================= */
+
+  tableHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    marginBottom: 2,
+  },
+
+  tableHeaderText: {
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+
+  employeeHeader: {
+    flex: 2.2,
+    paddingLeft: 56,
+  },
+
+  timeHeader: {
+    flex: 1,
+    textAlign: 'center',
+  },
+
+  /* =======================================================
+     ATTENDANCE TABLE
+  ======================================================= */
+
+  attendanceTable: {
+    width: '100%',
+  },
+
+  attendanceRow: {
+    width: '100%',
+    minHeight: 66,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    paddingVertical: scale(6),
-    gap: scale(6),
+    paddingVertical: 9,
   },
-  attendancePersonCell: {
-    flex: 2,
+
+  attendanceRowTablet: {
+    minHeight: 78,
+    paddingVertical: 12,
+  },
+
+  /* =======================================================
+     EMPLOYEE CELL
+  ======================================================= */
+
+  employeeCell: {
+    flex: 2.2,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    minWidth: 0,
+    paddingRight: 12,
   },
-  attendanceMiniAvatar: {
-    width: scale(22),
-    height: scale(22),
-    borderRadius: scale(11),
-    alignItems: 'center',
+
+  employeeCellTablet: {
+    paddingRight: 20,
+  },
+
+  avatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
-    marginRight: scale(5),
+    alignItems: 'center',
+    marginRight: 10,
   },
-  attendanceMiniAvatarText: {
+
+  avatarTablet: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginRight: 12,
+  },
+
+  avatarText: {
     color: '#FFFFFF',
-    fontSize: moderateScale(7),
+    fontSize: 13,
+    lineHeight: 16,
     fontWeight: '800',
   },
-  attendancePunchCell: {
-    flex: 0.52,
-    minWidth: scale(48),
-  },
-  attendanceSnapshotNote: {
-    fontSize: moderateScale(7.5),
-    fontWeight: '800',
-    marginTop: scale(1),
-  },
-  attendanceNameBlock: {
+
+  employeeInfo: {
     flex: 1,
     minWidth: 0,
   },
-  attendanceTimeValue: {
-    fontSize: moderateScale(11),
-    fontWeight: '700',
-    marginTop: scale(1),
-  },
-  attendanceName: { fontSize: moderateScale(12), fontWeight: '600' },
-  textPresent: { color: '#16A34A' },
-  textLate: { color: '#D97706' },
-  textEarlyExit: { color: '#E11D48' },
-  textLeave: { color: '#2563EB' },
 
-  // Financial
-  upcomingCard: {
-    borderRadius: scale(16),
-    padding: scale(16),
-    marginTop: scale(12),
-  },
-  pendingReceiptsCard: {
-    backgroundColor: '#1546A0',
-    borderRadius: scale(16),
-    padding: scale(16),
-    marginTop: scale(16),
-  },
-  financialHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: scale(12),
-  },
-  financialSectionLabel: {
-    fontSize: moderateScale(10),
+  employeeName: {
+    fontSize: 14,
+    lineHeight: 19,
     fontWeight: '700',
-    letterSpacing: 0.8,
-    marginBottom: scale(12),
-  },
-  financialRowClean: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: scale(14),
-  },
-  financialItemLabel: { fontSize: moderateScale(11) },
-  financialAmount: {
-    fontSize: moderateScale(16),
-    fontWeight: '700',
-    marginTop: scale(2),
-  },
-  financialRight: { alignItems: 'flex-end' },
-  financialDueLabel: {
-    fontSize: moderateScale(9),
-    fontWeight: '600',
-    letterSpacing: 0.4,
-  },
-  financialDueValue: { fontSize: moderateScale(12), fontWeight: '700' },
-  financialDueUrgent: { color: '#EF4444' },
-  financialDueToday: { color: '#F59E0B' },
-  purchaseType: {
-    fontSize: moderateScale(10),
-    marginTop: scale(3),
-    fontWeight: '600',
-  },
-  viewMoreBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: scale(4),
-    paddingVertical: scale(4),
-  },
-  viewMoreText: {
-    fontSize: moderateScale(12),
-    fontWeight: '600',
-    letterSpacing: 0.4,
-  },
-  pendingReceiptsLabel: {
-    fontSize: moderateScale(10),
-    fontWeight: '700',
-    color: '#93C5FD',
-    letterSpacing: 0.8,
-    marginBottom: scale(12),
-  },
-  pendingReceiptItemLabel: { fontSize: moderateScale(11), color: '#93C5FD' },
-  pendingReceiptAmount: {
-    fontSize: moderateScale(15),
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  pendingRight: { alignItems: 'flex-end' },
-  pendingExpectedLabel: {
-    fontSize: moderateScale(9),
-    fontWeight: '600',
-    color: '#93C5FD',
-    letterSpacing: 0.4,
-  },
-  pendingExpectedValue: {
-    fontSize: moderateScale(12),
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  pendingOverdue: { color: '#FCA5A5' },
-  pendingToday: { color: '#FBBF24' },
-  pendingNoDate: { color: '#93C5FD' },
-  saleType: {
-    fontSize: moderateScale(10),
-    color: '#93C5FD',
-    marginTop: scale(3),
-    fontWeight: '600',
-  },
-  viewMoreBtnDark: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: scale(4),
-    paddingVertical: scale(4),
-  },
-  viewMoreTextDark: {
-    color: '#93C5FD',
-    fontSize: moderateScale(12),
-    fontWeight: '600',
-    letterSpacing: 0.4,
   },
 
-  // Modal
-  overlay: {
+  employeeId: {
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+
+  /* =======================================================
+     TIME CELLS
+  ======================================================= */
+
+  timeCell: {
     flex: 1,
+    minWidth: 0,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: scale(24),
+    paddingHorizontal: 6,
   },
-  modalCard: {
-    width: '100%',
-    borderRadius: scale(20),
-    padding: scale(24),
-    alignItems: 'center',
-    gap: scale(10),
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: scale(8) },
-    shadowOpacity: 0.18,
-    shadowRadius: scale(24),
-    elevation: 16,
-  },
-  iconWrap: {
-    width: scale(58),
-    height: scale(58),
-    borderRadius: scale(29),
-    backgroundColor: '#FEE2E2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: scale(4),
-  },
-  modalTitle: {
-    fontSize: moderateScale(18),
+
+  timeValue: {
+    fontSize: 14,
+    lineHeight: 19,
     fontWeight: '700',
     textAlign: 'center',
   },
-  modalDesc: {
-    fontSize: moderateScale(13),
+
+  timeNote: {
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '700',
+    marginTop: 3,
     textAlign: 'center',
-    lineHeight: moderateScale(20),
   },
-  modalBtnRow: {
-    flexDirection: 'row',
-    gap: scale(12),
+
+  /* =======================================================
+     SKELETON
+  ======================================================= */
+
+  skeletonRow: {
     width: '100%',
-    marginTop: scale(8),
-  },
-  cancelBtn: {
-    flex: 1,
-    paddingVertical: scale(12),
-    borderRadius: scale(10),
+    minHeight: 66,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    borderBottomWidth: 1,
+    paddingVertical: 10,
   },
-  cancelBtnText: { fontSize: moderateScale(14), fontWeight: '600' },
-  confirmBtn: {
+
+  skeletonName: {
     flex: 1,
-    paddingVertical: scale(12),
-    borderRadius: scale(10),
-    backgroundColor: '#DC2626',
+    minWidth: 0,
+  },
+
+  /* =======================================================
+     NO DATA
+  ======================================================= */
+
+  noDataContainer: {
+    minHeight: 180,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: scale(44),
+    paddingVertical: 32,
   },
-  confirmBtnDisabled: { opacity: 0.65 },
-  confirmBtnText: {
-    color: '#FFFFFF',
-    fontSize: moderateScale(14),
-    fontWeight: '700',
+
+  noDataIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+
+  noDataText: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 
