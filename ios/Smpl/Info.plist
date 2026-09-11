@@ -23,13 +23,12 @@
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false />
 
-		<!-- Launch Screen -->
 		<key>UILaunchStoryboardName</key>
 		<string>LaunchScreen</string>
 
+		<!-- Camera Permission -->
 		<key>NSCameraUsageDescription</key>
-		<string>This app uses your camera to capture and upload photos for employee profile images
-			and attendance-related verification when you choose to use these features.</string>
+		<string>SMPL uses the camera to take your profile photo and capture a photo for attendance verification when you choose these features.</string>
 
 		<!-- iPhone -->
 		<key>UISupportedInterfaceOrientations</key>
