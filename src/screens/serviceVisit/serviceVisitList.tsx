@@ -22,6 +22,7 @@ import ToastUtil from '../../utils/toastAndroid';
 import { getServiceVisitsList, bulkApproveServiceVisits } from '../../services/serviceVisitServices';
 import { formatDate } from '../../utils/dateUtils';
 import { useAuth } from '../../context/authContext';
+import ModuleIntro from '../../components/moduleIntro';
 
 const ServiceVisitList = ({ navigation }: any) => {
   const isFocused = useIsFocused();
@@ -320,6 +321,7 @@ const ServiceVisitList = ({ navigation }: any) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.screenBg }]}>
+      <ModuleIntro eyebrow="FIELD OPERATIONS / SERVICE" title="Service visits" description="Manage field visits, approvals, machines and service activity." />
       {/* Filters & Actions Header */}
       <View style={styles.headerContainer}>
         {/* Search Bar */}

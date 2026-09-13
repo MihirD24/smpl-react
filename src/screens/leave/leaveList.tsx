@@ -34,6 +34,7 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import commonFilterStyles from '../../assets/style/commonFilter';
 import ScreenWrapper from '../../components/screenWrapper';
 import NetInfoComponent from '../../components/netinfoComponent';
+import ModuleIntro from '../../components/moduleIntro';
 
 // ─── Responsive scaling ──────────────────────────────────────────────────────
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -61,6 +62,20 @@ const LEAVE_TYPE_ITEMS = [
 ].map(t => ({ id: t, name: t }));
 
 // ─── Component ───────────────────────────────────────────────────────────────
+const SummaryCard = ({ label, value, icon, tone, dark }: {
+  label: string; value: number; icon: string; tone: string; dark: boolean;
+}) => (
+  <View style={[styles.summaryCard, { backgroundColor: dark ? '#172033' : '#FFFFFF', borderColor: dark ? '#273449' : '#E2E8F0' }]}>
+    <View style={[styles.summaryIcon, { backgroundColor: `${tone}18` }]}>
+      <AppIcon name={icon} size={moderateScale(16)} color={tone} />
+    </View>
+    <View style={styles.summaryCopy}>
+      <Text style={[styles.summaryValue, { color: dark ? '#F8FAFC' : '#0F172A' }]}>{value}</Text>
+      <Text style={[styles.summaryLabel, { color: dark ? '#94A3B8' : '#64748B' }]}>{label}</Text>
+    </View>
+  </View>
+);
+
 const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   navigation,
 }) => {
@@ -247,6 +262,13 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
     })),
   ];
 
+  const leaveSummary = {
+    total: masterJobData.length,
+    pending: masterJobData.filter(item => item.status === 0).length,
+    approved: masterJobData.filter(item => item.status === 1).length,
+    rejected: masterJobData.filter(item => item.status === 2).length,
+  };
+
   const onRefresh = () => handleLeaveData(loginuserId);
 
   const renderJobInfo = ({ item }: { item: LeaveData }) => (
@@ -268,6 +290,11 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={handleLeaveData} />
+      <ModuleIntro
+        eyebrow="WORKFORCE / LEAVE"
+        title="Leave management"
+        description="Plan time off, track requests and keep approvals organized."
+      />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View
           style={[
@@ -275,6 +302,13 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             { backgroundColor: theme.screenBg, paddingHorizontal: 0 },
           ]}
         >
+          <View style={styles.summaryRow}>
+            <SummaryCard label="Total" value={leaveSummary.total} icon="CalendarDays" tone="#64748B" dark={isDarkMode} />
+            <SummaryCard label="Pending" value={leaveSummary.pending} icon="Clock3" tone="#F59E0B" dark={isDarkMode} />
+            <SummaryCard label="Approved" value={leaveSummary.approved} icon="CircleCheck" tone="#16A34A" dark={isDarkMode} />
+            <SummaryCard label="Rejected" value={leaveSummary.rejected} icon="CircleX" tone="#DC2626" dark={isDarkMode} />
+          </View>
+
           {/* ── Search + Filter button ── */}
           <View
             style={[
@@ -402,6 +436,34 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
 };
 
 const styles = StyleSheet.create({
+  summaryRow: {
+    flexDirection: 'row',
+    paddingHorizontal: moderateScale(14),
+    paddingTop: moderateScale(4),
+    paddingBottom: moderateScale(8),
+    gap: moderateScale(8),
+  },
+  summaryCard: {
+    flex: 1,
+    minHeight: moderateScale(68),
+    borderWidth: 1,
+    borderRadius: moderateScale(14),
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(9),
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  summaryIcon: {
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(9),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: moderateScale(7),
+  },
+  summaryCopy: { flex: 1 },
+  summaryValue: { fontSize: moderateScale(19), fontWeight: '800', lineHeight: moderateScale(21) },
+  summaryLabel: { fontSize: moderateScale(9), fontWeight: '700', marginTop: moderateScale(2) },
   content: { flex: 1 },
   listContent: {
     padding: moderateScale(13),

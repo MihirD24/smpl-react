@@ -8,14 +8,16 @@ import {
   Image,
 } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { Dimensions } from 'react-native';
 
 type Props = {
   title?: string;
   onComplete: () => void;
 };
 
-const BUTTON_WIDTH = scale(320);
-const KNOB_SIZE = scale(50);
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const BUTTON_WIDTH = Math.min(SCREEN_WIDTH - scale(40), scale(390));
+const KNOB_SIZE = scale(54);
 const MAX_SLIDE = BUTTON_WIDTH - KNOB_SIZE;
 const COMPLETE_THRESHOLD = BUTTON_WIDTH * 0.6;
 
@@ -90,14 +92,14 @@ export default function SlideToPunchButton({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: verticalScale(20),
+    marginTop: verticalScale(10),
     alignItems: 'center',
   },
 
   track: {
     width: BUTTON_WIDTH,
-    height: verticalScale(50),
-    backgroundColor: '#2563EB',
+    height: verticalScale(58),
+    backgroundColor: '#F4C400',
     borderRadius: moderateScale(28),
     justifyContent: 'center',
     overflow: 'hidden',
@@ -108,14 +110,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: moderateScale(15),
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#111111',
   },
 
   knob: {
     width: KNOB_SIZE,
     height: KNOB_SIZE,
     borderRadius: KNOB_SIZE / 2,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#111111',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: scale(4),
@@ -125,6 +127,6 @@ const styles = StyleSheet.create({
   icon: {
     width: scale(22),
     height: scale(22),
-    tintColor: '#0056A1',
+    tintColor: '#F4C400',
   },
 });

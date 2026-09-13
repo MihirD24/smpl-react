@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Image,
   TouchableOpacity,
@@ -40,11 +42,12 @@ import CameraScreen from '../../components/cameraScreen';
 import NetInfoComponent from '../../components/netinfoComponent';
 if (!(Geocoder as any).isInitialized) {
   Geocoder.init('AIzaSyBHL-m8PpehMXtvM5sRlEpMWxJJGycmmo4');
+  (Geocoder as any).isInitialized = true;
 }
 
 const getPunchPhotoUri = (photoUri: string) => {
   if (Platform.OS !== 'android') {
-    return photoUri.replace('file://', ''); 
+    return photoUri.replace('file://', '');
   }
 
   if (photoUri.startsWith('file://') || photoUri.startsWith('content://')) {
@@ -505,9 +508,28 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
 };
 
   return (
-    <>
-        <NetInfoComponent onReconnect={handleReconnect} />
+    <SafeAreaView style={[styles.screen, { backgroundColor: isDarkMode ? '#0B0D10' : '#F4F6F8' }]}>
+      <NetInfoComponent onReconnect={handleReconnect} />
 
+      <View style={styles.erpHeader}>
+        <View style={styles.headerTitleWrap}>
+          <View style={styles.yellowRail} />
+          <View>
+            <Text style={styles.erpEyebrow}>WORKFORCE / ATTENDANCE</Text>
+            <Text style={[styles.erpTitle, { color: isDarkMode ? '#FFFFFF' : '#111827' }]}>Punch & Attendance</Text>
+          </View>
+        </View>
+        <View style={styles.liveBadge}>
+          <View style={styles.liveDot} />
+          <Text style={styles.liveText}>LIVE</Text>
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
       {address && punchStatus !== 'AFTER_PUNCH_OUT' && (
         <View style={styles.mapContainer}>
           <MapView
@@ -569,7 +591,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
             <View
               style={[
                 styles.locationContainer,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f5f5f7' },
+                { backgroundColor: isDarkMode ? '#171A1F' : '#F4F5F7' },
               ]}
             >
               <Navigation
@@ -658,7 +680,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
             <View
               style={[
                 styles.locationContainer,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f5f5f7' },
+                { backgroundColor: isDarkMode ? '#171A1F' : '#F4F5F7' },
               ]}
             >
               <Navigation
@@ -719,7 +741,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
           <View
             style={[
               styles.completedCard,
-              { backgroundColor: isDarkMode ? '#bfd6f5' : '#FFFFFF' },
+              { backgroundColor: isDarkMode ? '#171A1F' : '#FFFFFF' },
             ]}
           >
             <Image
@@ -736,7 +758,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
             <View
               style={[
                 styles.timeBox,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f8f4f4' },
+                { backgroundColor: isDarkMode ? '#171A1F' : '#F8F9FA' },
               ]}
             >
               <Text style={styles.locationLabel}>
@@ -750,7 +772,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
             <View
               style={[
                 styles.timeBox,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f8f4f4' },
+                { backgroundColor: isDarkMode ? '#171A1F' : '#F8F9FA' },
               ]}
             >
               <Text style={styles.locationLabel}>
@@ -767,7 +789,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
             <View
               style={[
                 styles.punchOutChip,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f8f4f4' },
+                { backgroundColor: isDarkMode ? '#171A1F' : '#F8F9FA' },
               ]}
             >
               <View style={styles.punchOutChipLeft}>
@@ -816,7 +838,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
             <View
               style={[
                 styles.locationContainer,
-                { backgroundColor: isDarkMode ? '#bfd6f5' : '#f5f5f7' },
+                { backgroundColor: isDarkMode ? '#171A1F' : '#F4F5F7' },
               ]}
             >
               <Navigation
@@ -836,6 +858,8 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
           </View>
         </>
       )}
+      </ScrollView>
+
       {cameraVisible && (
         <Modal
           visible={cameraVisible}
@@ -906,54 +930,127 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
           </View>
         </Modal>
       )}
-    </>
+    </SafeAreaView>
   );
 };
 
 export default Punch;
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  erpHeader: {
+    minHeight: verticalScale(72),
+    paddingHorizontal: moderateScale(18),
+    paddingTop: verticalScale(7),
+    paddingBottom: verticalScale(9),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  erpEyebrow: {
+    fontSize: moderateScale(10),
+    letterSpacing: 1.4,
+    fontWeight: '800',
+    color: '#6B7280',
+    marginBottom: verticalScale(3),
+  },
+  erpTitle: {
+    fontSize: moderateScale(20),
+    fontWeight: '800',
+  },
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: moderateScale(11),
+    paddingVertical: verticalScale(7),
+    borderRadius: moderateScale(18),
+    backgroundColor: '#E8F7EE',
+  },
+  liveDot: {
+    width: scale(7),
+    height: scale(7),
+    borderRadius: scale(4),
+    backgroundColor: '#15803D',
+    marginRight: scale(6),
+  },
+  liveText: {
+    fontSize: moderateScale(10),
+    fontWeight: '800',
+    letterSpacing: 1,
+    color: '#15803D',
+  },
+  scroll: { flex: 1 },
+  scrollContent: {
+    paddingBottom: verticalScale(28),
+  },
+  headerTitleWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  yellowRail: {
+    width: scale(4),
+    height: verticalScale(40),
+    borderRadius: scale(3),
+    backgroundColor: '#F4C400',
+    marginRight: scale(10),
+  },
   sliderWrapper: {
     justifyContent: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    position: 'absolute',
-    bottom: scale(10),
+    paddingHorizontal: moderateScale(18),
+    paddingTop: verticalScale(8),
+    paddingBottom: verticalScale(12),
   },
   mapContainer: {
-    margin: scale(10),
-    width: '100%',
-    height: verticalScale(280),
-    borderRadius: moderateScale(15),
+    marginHorizontal: moderateScale(14),
+    marginTop: verticalScale(10),
+    marginBottom: verticalScale(2),
+    width: '94%',
+    height: verticalScale(165),
+    borderRadius: moderateScale(18),
     overflow: 'hidden',
     alignSelf: 'center',
   },
   bottomCard: {
-    padding: moderateScale(18),
-    borderRadius: moderateScale(12),
+    padding: moderateScale(16),
+    borderRadius: moderateScale(16),
     backgroundColor: '#fff',
-    width: '92%',
+    width: '94%',
     alignSelf: 'center',
-    elevation: 3,
-    position: 'absolute',
-    top: verticalScale(210),
+    borderWidth: 1,
+    borderColor: '#E6E9EE',
+    borderLeftWidth: scale(4),
+    borderLeftColor: '#F4C400',
+    elevation: 2,
+    shadowColor: '#101828',
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    marginTop: verticalScale(8),
   },
   bottomCardOut: {
-    padding: moderateScale(18),
+    padding: moderateScale(16),
     borderRadius: moderateScale(12),
     backgroundColor: '#fff',
-    width: '92%',
+    width: '94%',
     alignSelf: 'center',
     elevation: 3,
     marginTop: verticalScale(20),
   },
   currentTimeLabel: {
-    fontSize: moderateScale(11),
-    fontWeight: '600',
+    fontSize: moderateScale(10),
+    fontWeight: '900',
+    letterSpacing: 1.1,
+    color: '#9A7600',
   },
   bigTime: {
-    fontSize: moderateScale(26),
+    fontSize: moderateScale(30),
     fontWeight: '700',
   },
   subText: {
@@ -964,13 +1061,15 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#E5E5E5',
-    marginVertical: verticalScale(14),
+    marginVertical: verticalScale(10),
   },
   locationContainer: {
     paddingHorizontal: moderateScale(40),
-    paddingVertical: verticalScale(12),
-    borderRadius: moderateScale(7),
-    marginTop: verticalScale(7),
+    paddingVertical: verticalScale(10),
+    borderRadius: moderateScale(10),
+    borderWidth: 1,
+    borderColor: '#E7E9ED',
+    marginTop: verticalScale(5),
   },
   locationLabel: {
     fontSize: moderateScale(11),
@@ -978,19 +1077,19 @@ const styles = StyleSheet.create({
   },
   address: {
     fontSize: moderateScale(13),
-    color: 'black',
+    color: '#111827',
     marginTop: verticalScale(4),
   },
   rowBetween: {
-    marginTop: verticalScale(14),
+    marginTop: verticalScale(9),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   shiftText: {
     fontSize: moderateScale(12),
-    fontWeight: '600',
-    color: '',
+    fontWeight: '700',
+    color: '#111827',
   },
   completedCard: {
     padding: moderateScale(16),
@@ -1035,7 +1134,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: moderateScale(12),
     backgroundColor: '#F8F9FA',
     paddingHorizontal: moderateScale(12),
-    paddingVertical: verticalScale(12),
+    paddingVertical: verticalScale(10),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

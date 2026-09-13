@@ -23,6 +23,7 @@ import ScreenWrapper from '../../components/screenWrapper';
 import AttendanceCard, { fmtMins } from '../attandance/attendanceCard';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
 import NetInfoComponent from '../../components/netinfoComponent';
+import ModuleIntro from '../../components/moduleIntro';
 
 // ─── Scaling ──────────────────────────────────────────────────────────────────
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -389,6 +390,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={handleRefresh} />
+      <ModuleIntro eyebrow="WORKFORCE / ATTENDANCE" title="Attendance" description="Your monthly attendance, working hours, late marks and overtime." />
       <>
         {!isReady ? (
           <ScrollView
@@ -922,10 +924,14 @@ export default Attendancelist;
 // ─── Local-only styles ────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   dateSelector: {
-    paddingHorizontal: scale(16),
-    paddingTop: verticalScale(18),
-    paddingBottom: verticalScale(14),
-    borderBottomWidth: 1,
+    marginHorizontal: scale(16),
+    marginTop: verticalScale(14),
+    paddingHorizontal: scale(14),
+    paddingTop: verticalScale(4),
+    paddingBottom: verticalScale(4),
+    borderBottomWidth: 0,
+    borderWidth: 1,
+    borderRadius: moderateScale(16),
   },
   statsGrid: {
     flexDirection: 'row',
@@ -934,37 +940,37 @@ const styles = StyleSheet.create({
     gap: scale(10),
   },
   summaryPanel: {
-    marginHorizontal: scale(10),
-    marginTop: verticalScale(12),
+    marginHorizontal: scale(16),
+    marginTop: verticalScale(14),
     borderWidth: 1,
-    borderRadius: moderateScale(14),
-    padding: scale(8),
+    borderRadius: moderateScale(18),
+    padding: scale(10),
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: scale(7),
+    gap: scale(9),
   },
   summaryMetric: {
-    width: '31.8%',
-    minHeight: verticalScale(68),
+    width: SCREEN_WIDTH >= 768 ? '31.5%' : '48.2%',
+    minHeight: verticalScale(82),
     position: 'relative',
     overflow: 'hidden',
     borderWidth: 1,
     borderRadius: moderateScale(9),
-    paddingHorizontal: scale(9),
-    paddingVertical: verticalScale(8),
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(11),
   },
   statLabel: {
-    fontSize: moderateScale(8),
-    fontWeight: '700',
-    letterSpacing: 0.2,
+    fontSize: moderateScale(9),
+    fontWeight: '800',
+    letterSpacing: 0.55,
     marginBottom: verticalScale(4),
   },
   statValue: {
-    fontSize: moderateScale(17),
-    fontWeight: '700',
+    fontSize: moderateScale(22),
+    fontWeight: '800',
     marginBottom: verticalScale(2),
   },
-  statSubtext: { fontSize: moderateScale(9.5), fontWeight: '500' },
+  statSubtext: { fontSize: moderateScale(10), fontWeight: '600' },
   // Punch section
   punchSection: { alignItems: 'center', marginTop: verticalScale(20) },
   activePunchSection: {
@@ -1095,6 +1101,7 @@ const styles = StyleSheet.create({
   timeItemValue: { fontSize: moderateScale(16), fontWeight: '600' },
   // Recent activity
   recentSection: {
+    marginHorizontal: scale(16),
     marginTop: verticalScale(24),
     marginBottom: verticalScale(24),
   },

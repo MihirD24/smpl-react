@@ -27,6 +27,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   getDashboardCount,
 } from '../../services/adminDashboardServices';
+import { getCount } from '../../services/attendanceServices';
+import { checkPunch } from '../../services/punchServices';
 import AppIcon, { IconName } from '../../components/appIcon';
 import {
   moderateScale,
@@ -199,6 +201,25 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     employeesCount: 0,
   });
   const [refreshing, setRefreshing] = useState(false);
+  const [attendanceSummary, setAttendanceSummary] = useState({
+    present: 0,
+    absent: 0,
+    halfday: 0,
+    paidleave: 0,
+  });
+  const [todayPunch, setTodayPunch] = useState<{
+    status: 'BEFORE_PUNCH_IN' | 'AFTER_PUNCH_IN' | 'AFTER_PUNCH_OUT' | 'ON_LEAVE';
+    label: string;
+    inTime: string;
+    outTime: string;
+    attendanceStatus: string;
+  }>({
+    status: 'BEFORE_PUNCH_IN',
+    label: 'Punch In',
+    inTime: '',
+    outTime: '',
+    attendanceStatus: '',
+  });
 
 
   // ── Quick Actions Bottom Sheet ────────────────────────────────────────────
@@ -255,6 +276,46 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     }
   };
 
+  const fetchAttendanceSnapshot = async () => {
+    try {
+      const month = moment().format('MM');
+      const year = moment().format('YYYY');
+      const [count, punch] = await Promise.all([
+        getCount(month, year, 'user', null),
+        checkPunch(moment().format('YYYY-MM-DD')),
+      ]);
+
+      setAttendanceSummary({
+        present: Number(count?.total_present ?? 0),
+        absent: Number(count?.total_absent ?? 0),
+        halfday: Number(count?.total_halfday ?? 0),
+        paidleave: Number(count?.total_paidleave ?? 0),
+      });
+
+      if (punch && typeof punch === 'object') {
+        const inTime = punch?.in_time || '';
+        const outTime = punch?.out_time || '';
+        const attendanceStatus = punch?.today_attendance_status || '';
+        const status = attendanceStatus === 'Absent'
+          ? 'ON_LEAVE'
+          : !inTime
+            ? 'BEFORE_PUNCH_IN'
+            : !outTime
+              ? 'AFTER_PUNCH_IN'
+              : 'AFTER_PUNCH_OUT';
+        setTodayPunch({
+          status,
+          label: punch?.show_label || (status === 'AFTER_PUNCH_IN' ? 'Punch Out' : status === 'AFTER_PUNCH_OUT' ? 'Completed' : 'Punch In'),
+          inTime,
+          outTime,
+          attendanceStatus,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch attendance snapshot:', error);
+    }
+  };
+
   const fetchCounts = async () => {
     try {
       const response = await getDashboardCount();
@@ -284,6 +345,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
       await fetchUserDetails();
       await Promise.allSettled([
         fetchCounts(),
+        fetchAttendanceSnapshot(),
       ]);
       setIsLoading(false);
     };
@@ -296,6 +358,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
       setRefreshing(true);
       await Promise.allSettled([
         fetchCounts(),
+        fetchAttendanceSnapshot(),
         fetchUserDetails(),
       ]);
     } catch (error) {
@@ -403,6 +466,55 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                 <Text style={[styles.liveText, { color: BRAND.success }]}>LIVE</Text>
               </View>
             </View>
+
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('Punch')}
+              style={[styles.attendanceHero, { backgroundColor: isDarkMode ? '#17191D' : '#111214', borderColor: isDarkMode ? '#2A2D30' : '#111214' }]}
+            >
+              <View style={styles.attendanceHeroTop}>
+                <View style={styles.attendanceHeroTitleWrap}>
+                  <View style={styles.attendanceHeroIcon}>
+                    <AppIcon name="CalendarCheck" size={19} color={BRAND.black} />
+                  </View>
+                  <View>
+                    <Text style={styles.attendanceHeroEyebrow}>TODAY'S ATTENDANCE</Text>
+                    <Text style={styles.attendanceHeroTitle}>
+                      {todayPunch.status === 'AFTER_PUNCH_OUT' ? 'Attendance completed' : todayPunch.status === 'AFTER_PUNCH_IN' ? 'You are working' : todayPunch.status === 'ON_LEAVE' ? 'Leave / absent' : 'Ready to start'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.attendanceStatusBadge}>
+                  <View style={[styles.attendanceStatusDot, { backgroundColor: todayPunch.status === 'AFTER_PUNCH_IN' ? BRAND.success : todayPunch.status === 'ON_LEAVE' ? '#F59E0B' : BRAND.yellow }]} />
+                  <Text style={styles.attendanceStatusText}>
+                    {todayPunch.status === 'AFTER_PUNCH_IN' ? 'WORKING' : todayPunch.status === 'AFTER_PUNCH_OUT' ? 'DONE' : todayPunch.status === 'ON_LEAVE' ? 'LEAVE' : 'READY'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.attendanceHeroMiddle}>
+                <View>
+                  <Text style={styles.attendanceHeroTimeLabel}>PUNCH IN</Text>
+                  <Text style={styles.attendanceHeroTime}>{todayPunch.inTime || '--:--'}</Text>
+                </View>
+                <View style={styles.attendanceHeroDivider} />
+                <View>
+                  <Text style={styles.attendanceHeroTimeLabel}>PUNCH OUT</Text>
+                  <Text style={styles.attendanceHeroTime}>{todayPunch.outTime || '--:--'}</Text>
+                </View>
+                <View style={styles.attendanceHeroCta}>
+                  <Text style={styles.attendanceHeroCtaText}>{todayPunch.status === 'AFTER_PUNCH_IN' ? 'Punch Out' : todayPunch.status === 'AFTER_PUNCH_OUT' ? 'View' : 'Punch In'}</Text>
+                  <AppIcon name="ArrowUpRight" size={16} color={BRAND.black} />
+                </View>
+              </View>
+
+              <View style={styles.attendanceSummaryRow}>
+                <Text style={styles.attendanceSummaryText}>This month</Text>
+                <Text style={styles.attendanceSummaryValue}>{attendanceSummary.present} Present</Text>
+                <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.absent} Absent</Text>
+                <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.paidleave} Leave</Text>
+              </View>
+            </TouchableOpacity>
 
             <View style={[styles.actionStrip, { backgroundColor: t.card, borderColor: t.border }]}>
               {[
@@ -714,6 +826,38 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1,
   },
+  attendanceHero: {
+    borderRadius: moderateScale(20),
+    borderWidth: 1,
+    padding: moderateScale(16),
+    marginBottom: verticalScale(14),
+    overflow: 'hidden',
+  },
+  attendanceHeroTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  attendanceHeroTitleWrap: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  attendanceHeroIcon: {
+    width: 42, height: 42, borderRadius: 13, backgroundColor: BRAND.yellow,
+    alignItems: 'center', justifyContent: 'center', marginRight: 11,
+  },
+  attendanceHeroEyebrow: { color: '#A1A1AA', fontSize: 9, fontWeight: '800', letterSpacing: 1.1 },
+  attendanceHeroTitle: { color: '#FFFFFF', fontSize: moderateScale(15), fontWeight: '800', marginTop: 2 },
+  attendanceStatusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#25272B', borderRadius: 20, paddingHorizontal: 9, paddingVertical: 6 },
+  attendanceStatusDot: { width: 6, height: 6, borderRadius: 3, marginRight: 5 },
+  attendanceStatusText: { color: '#E4E4E7', fontSize: 8, fontWeight: '900', letterSpacing: 0.8 },
+  attendanceHeroMiddle: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 18 },
+  attendanceHeroTimeLabel: { color: '#71717A', fontSize: 8, fontWeight: '800', letterSpacing: 0.8 },
+  attendanceHeroTime: { color: '#FFFFFF', fontSize: moderateScale(18), fontWeight: '800', marginTop: 2 },
+  attendanceHeroDivider: { width: 1, height: 30, backgroundColor: '#303236', marginHorizontal: 16, marginBottom: 2 },
+  attendanceHeroCta: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', backgroundColor: BRAND.yellow, borderRadius: 12, paddingHorizontal: 11, paddingVertical: 10 },
+  attendanceHeroCtaText: { color: BRAND.black, fontSize: 10, fontWeight: '900', marginRight: 5 },
+  attendanceSummaryRow: { flexDirection: 'row', alignItems: 'center', marginTop: 15, paddingTop: 11, borderTopWidth: 1, borderTopColor: '#2B2D31' },
+  attendanceSummaryText: { color: '#A1A1AA', fontSize: 9, fontWeight: '700', marginRight: 'auto' },
+  attendanceSummaryValue: { color: '#E4E4E7', fontSize: 9, fontWeight: '800', marginLeft: 10 },
+  attendanceSummaryMuted: { color: '#71717A', fontSize: 9, fontWeight: '700', marginLeft: 10 },
   actionStrip: {
     flexDirection: 'row',
     borderRadius: moderateScale(16),
