@@ -39,13 +39,12 @@ import SlideToPunchButton from '../../components/slideToPunchButton';
 import CameraScreen from '../../components/cameraScreen';
 import NetInfoComponent from '../../components/netinfoComponent';
 if (!(Geocoder as any).isInitialized) {
-  Geocoder.init('AIzaSyBuUVyHOxiZyUIvBIvsZg6O_ZiedhxW0FA');
-  (Geocoder as any).isInitialized = true;
+  Geocoder.init('AIzaSyBHL-m8PpehMXtvM5sRlEpMWxJJGycmmo4');
 }
 
 const getPunchPhotoUri = (photoUri: string) => {
   if (Platform.OS !== 'android') {
-    return photoUri.replace('file://', '');
+    return photoUri.replace('file://', ''); 
   }
 
   if (photoUri.startsWith('file://') || photoUri.startsWith('content://')) {
