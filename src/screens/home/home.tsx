@@ -14,6 +14,7 @@ import {
   useColorScheme,
   View,
   Animated,
+  useWindowDimensions,
   RefreshControl,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
@@ -40,6 +41,8 @@ import {
   getReminderTypeList,
 } from '../../services/projectReminderService';
 import NetInfoComponent from '../../components/netinfoComponent';
+import BrandLogo from '../../components/brandLogo';
+import { BRAND, isTabletWidth, contentMaxWidth } from '../../assets/style/brandTheme';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -158,6 +161,8 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const isFocused = useIsFocused();
+  const { width: screenWidth } = useWindowDimensions();
+  const tabletLayout = isTabletWidth(screenWidth);
 
   // ── Live-pulse animation ──────────────────────────────────────────────────
   const [livePulse] = useState(new Animated.Value(1));
@@ -195,6 +200,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
   });
   const [refreshing, setRefreshing] = useState(false);
 
+
   // ── Quick Actions Bottom Sheet ────────────────────────────────────────────
   const quickActionsBottomSheetRef = useRef<BottomSheet>(null);
   const quickActionsSnapPoints = useMemo(() => ['40%'], []);
@@ -226,7 +232,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     text: isDarkMode ? '#F8FAFC' : '#0F172A',
     sub: isDarkMode ? '#94A3B8' : '#64748B',
     border: isDarkMode ? '#2E323E' : '#E2E8F0',
-    primary: '#3B6FD4',
+    primary: BRAND.yellow,
     headerBg: isDarkMode ? '#1E2028' : '#FFFFFF',
     headerBorder: isDarkMode ? '#2E323E' : '#F1F5F9',
     shadow: isDarkMode ? '#000000' : '#0F172A',
@@ -385,6 +391,40 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             />
           }
         >
+          <View style={styles.pageContent}>
+            <View style={styles.sectionIntro}>
+              <View style={styles.introAccent} />
+              <View style={styles.introCopy}>
+                <Text style={[styles.sectionEyebrow, { color: t.sub }]}>WORKFORCE OVERVIEW</Text>
+                <Text style={[styles.sectionTitle, { color: t.text }]}>Today at a glance</Text>
+              </View>
+              <View style={[styles.liveBadge, { backgroundColor: isDarkMode ? '#1E2420' : BRAND.successSoft }]}>
+                <Animated.View style={[styles.liveDot, { opacity: livePulse }]} />
+                <Text style={[styles.liveText, { color: BRAND.success }]}>LIVE</Text>
+              </View>
+            </View>
+
+            <View style={[styles.actionStrip, { backgroundColor: t.card, borderColor: t.border }]}>
+              {[
+                { label: 'Attendance', icon: 'CalendarCheck', route: 'Attendancelist' as const },
+                { label: 'Leave', icon: 'CalendarDays', route: 'LeaveList' as const },
+                { label: 'Salary', icon: 'WalletCards', route: 'Salary' as const },
+                { label: 'Holidays', icon: 'CalendarHeart', route: 'HolidayList' as const },
+              ].map(item => (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.actionItem}
+                  activeOpacity={0.75}
+                  onPress={() => navigation.navigate(item.route)}
+                >
+                  <View style={[styles.actionIcon, { backgroundColor: isDarkMode ? '#2B2D30' : BRAND.yellowSoft }]}>
+                    <AppIcon name={item.icon as any} size={18} color={isDarkMode ? BRAND.yellow : BRAND.black} />
+                  </View>
+                  <Text style={[styles.actionLabel, { color: t.text }]} numberOfLines={1}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
           {/* Counts Grid */}
           <View style={styles.gridContainer}>
             {isLoading ? (
@@ -393,9 +433,9 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                   style={[
                     styles.card,
                     {
+                      width: loginuserRole === 'Employee' ? '100%' : tabletLayout ? '23.5%' : '48.5%',
                       backgroundColor: t.card,
                       borderColor: t.border,
-                      width: loginuserRole === 'Employee' ? '100%' : '48%',
                     },
                   ]}
                 >
@@ -405,17 +445,17 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                 </View>
                 {loginuserRole !== 'Employee' && (
                   <>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                    <View style={[styles.card, { width: tabletLayout ? '23.5%' : '48.5%', backgroundColor: t.card, borderColor: t.border }]}>
                       <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
                       <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
                       <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
                     </View>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                    <View style={[styles.card, { width: tabletLayout ? '23.5%' : '48.5%', backgroundColor: t.card, borderColor: t.border }]}>
                       <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
                       <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
                       <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
                     </View>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                    <View style={[styles.card, { width: tabletLayout ? '23.5%' : '48.5%', backgroundColor: t.card, borderColor: t.border }]}>
                       <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
                       <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
                       <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
@@ -435,7 +475,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       backgroundColor: t.card,
                       borderColor: t.border,
                       shadowColor: t.shadow,
-                      width: loginuserRole === 'Employee' ? '100%' : '48%',
+                      width: loginuserRole === 'Employee' ? '100%' : tabletLayout ? '23.5%' : '48.5%',
                     },
                   ]}
                 >
@@ -460,6 +500,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       style={[
                         styles.card,
                         {
+                          width: tabletLayout ? '23.5%' : '48.5%',
                           backgroundColor: t.card,
                           borderColor: t.border,
                           shadowColor: t.shadow,
@@ -484,6 +525,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       style={[
                         styles.card,
                         {
+                          width: tabletLayout ? '23.5%' : '48.5%',
                           backgroundColor: t.card,
                           borderColor: t.border,
                           shadowColor: t.shadow,
@@ -508,6 +550,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       style={[
                         styles.card,
                         {
+                          width: tabletLayout ? '23.5%' : '48.5%',
                           backgroundColor: t.card,
                           borderColor: t.border,
                           shadowColor: t.shadow,
@@ -532,10 +575,11 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             )}
           </View>
 
-          {/* Branding */}
-          <Text style={[styles.brandName, { color: isDarkMode ? '#2A2D38' : '#EAEDFF' }]}>
-            Shantinath Motors Pvt Ltd
-          </Text>
+          <View style={[styles.enterpriseFooter, { borderTopColor: t.border }]}>
+            <BrandLogo width={isTabletWidth(760) ? 260 : 210} height={34} compact />
+            <Text style={[styles.footerCaption, { color: t.sub }]}>Employee & Workforce Management</Text>
+          </View>
+          </View>
         </ScrollView>
 
         {/* ── Quick Actions Bottom Sheet ── */}
@@ -620,50 +664,98 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: moderateScale(16),
-    paddingTop: verticalScale(18),
-    paddingBottom: verticalScale(100),
+    paddingTop: verticalScale(14),
+    paddingBottom: verticalScale(110),
   },
-  headerContainer: {
+  pageContent: {
+    width: '100%',
+    maxWidth: 1120,
+    alignSelf: 'center',
+  },
+  sectionIntro: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: verticalScale(18),
+    marginBottom: verticalScale(14),
   },
-  welcomeText: {
-    fontSize: moderateScale(22),
+  introAccent: {
+    width: 5,
+    height: 38,
+    borderRadius: 3,
+    backgroundColor: BRAND.yellow,
+    marginRight: 10,
+  },
+  introCopy: { flex: 1 },
+  sectionEyebrow: {
+    fontSize: moderateScale(9),
     fontWeight: '800',
-    letterSpacing: -0.2,
+    letterSpacing: 1.4,
   },
-  dateText: {
-    fontSize: moderateScale(12),
-    fontWeight: '500',
-    marginTop: verticalScale(2),
+  sectionTitle: {
+    fontSize: moderateScale(21),
+    fontWeight: '800',
+    marginTop: 2,
   },
-  quickActionsTrigger: {
-    width: moderateScale(42),
-    height: moderateScale(42),
-    borderRadius: moderateScale(12),
-    justifyContent: 'center',
+  liveBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 16,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: BRAND.success,
+    marginRight: 6,
+  },
+  liveText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  actionStrip: {
+    flexDirection: 'row',
+    borderRadius: moderateScale(16),
     borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    marginBottom: verticalScale(16),
+  },
+  actionItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 70,
+  },
+  actionIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 5,
+  },
+  actionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
   },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginVertical: verticalScale(8),
   },
   card: {
-    width: '48%',
+    width: '48.5%',
     borderRadius: moderateScale(16),
     padding: moderateScale(16),
     borderWidth: 1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.055,
+    shadowRadius: 10,
     elevation: 2,
-    marginBottom: verticalScale(16),
-    minHeight: scale(120),
+    marginBottom: verticalScale(12),
+    minHeight: scale(118),
     justifyContent: 'space-between',
   },
   cardHeader: {
@@ -680,31 +772,31 @@ const styles = StyleSheet.create({
   },
   cardValue: {
     fontSize: moderateScale(24),
-    fontWeight: '800',
+    fontWeight: '900',
     marginTop: verticalScale(12),
   },
   cardLabel: {
-    fontSize: moderateScale(12),
-    fontWeight: '600',
+    fontSize: moderateScale(11),
+    fontWeight: '700',
     marginTop: verticalScale(4),
   },
-  brandName: {
-    fontSize: moderateScale(32),
-    fontWeight: '900',
-    fontStyle: 'italic',
-    lineHeight: moderateScale(38),
-    marginTop: verticalScale(24),
-    marginBottom: verticalScale(8),
-    textAlign: 'right',
+  enterpriseFooter: {
+    marginTop: 8,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    alignItems: 'center',
   },
-
-  // ── Bottom Sheet ──────────────────────────────────────────────────────────
+  footerCaption: {
+    fontSize: 10,
+    fontWeight: '500',
+    marginTop: 5,
+  },
   bottomSheetBackground: {
     borderTopLeftRadius: moderateScale(24),
     borderTopRightRadius: moderateScale(24),
   },
   bottomSheetIndicator: {
-    backgroundColor: '#E0E4EF',
+    backgroundColor: '#BFC4C9',
     width: 40,
   },
   bottomSheetContent: {
@@ -718,25 +810,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: verticalScale(16),
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F3FF',
+    borderBottomColor: BRAND.border,
     marginBottom: verticalScale(16),
   },
   quickActionsTitle: {
     fontSize: moderateScale(14),
     fontWeight: '800',
-    letterSpacing: 0.2,
   },
   closeBtn: {
-    width: moderateScale(28),
-    height: moderateScale(28),
-    borderRadius: moderateScale(16),
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(15),
     justifyContent: 'center',
     alignItems: 'center',
   },
-  quickActionsContainer: {
-    gap: 10,
-    paddingBottom: verticalScale(14),
-  },
+  quickActionsContainer: { gap: 10, paddingBottom: verticalScale(14) },
   quickActionItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -746,9 +834,9 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(14),
   },
   quickActionIconWrap: {
-    width: moderateScale(32),
-    height: moderateScale(32),
-    borderRadius: moderateScale(12),
+    width: moderateScale(34),
+    height: moderateScale(34),
+    borderRadius: moderateScale(11),
     justifyContent: 'center',
     alignItems: 'center',
   },

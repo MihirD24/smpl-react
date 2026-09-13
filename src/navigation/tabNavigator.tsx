@@ -15,6 +15,8 @@ import ProfilePage from '../screens/profile/profile';
 import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import { AuthContext } from '../context/authContext';
 import AppIcon from '../components/appIcon';
+import BrandLogo from '../components/brandLogo';
+import { BRAND } from '../assets/style/brandTheme';
 
 const Tab = createBottomTabNavigator();
 
@@ -46,7 +48,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ navigation }) => {
     border: isDarkMode ? '#2A2D38' : '#F0F3FF',
     text: isDarkMode ? '#F0F0F0' : '#1A1D2E',
     sub: '#9098B1',
-    primary: '#3B6FD4',
+    primary: BRAND.yellow,
   };
 
   return (
@@ -59,29 +61,25 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ navigation }) => {
         },
       ]}
     >
-      {/* Left: Welcome text */}
-      <View style={styles.headerLeft}>
-        <Text style={[styles.headerGreeting, { color: t.sub }]}>
-          Welcome Back,
-        </Text>
-        <Text style={[styles.headerName, { color: t.text }]} numberOfLines={1}>
-          {userName || 'User'}
-        </Text>
-        <Text style={[styles.headerSub, { color: t.sub }]}>
-          Here is your progress for today.
-        </Text>
+      <View style={styles.headerBrand}>
+        <View style={styles.headerLogoWrap}>
+          <BrandLogo width={86} height={31} compact />
+        </View>
+        <View style={styles.headerLeft}>
+          <Text style={[styles.headerGreeting, { color: t.sub }]}>WELCOME BACK</Text>
+          <Text style={[styles.headerName, { color: t.text }]} numberOfLines={1}>
+            {userName || 'Employee'}
+          </Text>
+        </View>
       </View>
 
-      {/* Right: Notification bell */}
       <TouchableOpacity
         onPress={() => navigation.navigate('NotificationScreen')}
-        style={[
-          styles.notifBtn,
-          { backgroundColor: isDarkMode ? '#2A2D38' : '#EEF2FF' },
-        ]}
+        style={[styles.notifBtn, { backgroundColor: isDarkMode ? '#2A2D38' : '#FFF8D9' }]}
         activeOpacity={0.75}
       >
-        <AppIcon name="Bell" color={t.primary} size={20} />
+        <AppIcon name="Bell" color={isDarkMode ? BRAND.yellow : BRAND.black} size={20} />
+        <View style={styles.notifDot} />
       </TouchableOpacity>
     </View>
   );
@@ -92,7 +90,7 @@ export default function TabNavigator() {
   const { userInfo } = useContext(AuthContext);
   const isDarkMode = useColorScheme() === 'dark';
   const tabTheme = {
-    active: '#3B82F6',
+    active: BRAND.black,
     inactive: isDarkMode ? '#94A3B8' : '#94A3B8',
     background: isDarkMode ? '#111827' : '#FFFFFF',
     border: isDarkMode ? '#334155' : '#E5E7EB',
@@ -125,9 +123,9 @@ export default function TabNavigator() {
             backgroundColor: tabTheme.background,
             borderTopColor: tabTheme.border,
             borderTopWidth: 1,
-            paddingBottom: 16,
-            height: 70,
-            paddingTop: 10,
+            paddingBottom: 10,
+            height: 68,
+            paddingTop: 8,
           },
         }}
       >
@@ -211,36 +209,51 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 52, // account for status bar
-    paddingBottom: 14,
+    minHeight: 78,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderBottomWidth: 1,
+  },
+  headerBrand: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  headerLogoWrap: {
+    width: 92,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
   },
   headerLeft: {
     flex: 1,
-    marginRight: 12,
   },
   headerGreeting: {
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-    marginBottom: 1,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.3,
   },
   headerName: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: '800',
-    letterSpacing: 0.1,
-  },
-  headerSub: {
-    fontSize: 12,
-    fontWeight: '500',
     marginTop: 2,
   },
   notifBtn: {
     width: 42,
     height: 42,
-    borderRadius: 14,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  notifDot: {
+    position: 'absolute',
+    top: 9,
+    right: 10,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D92D20',
   },
 });
