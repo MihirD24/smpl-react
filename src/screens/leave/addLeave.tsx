@@ -31,6 +31,7 @@ import { formatDate } from '../../utils/dateUtils';
 import ScreenWrapper from '../../components/screenWrapper';
 import moment from 'moment';
 import NetInfoComponent from '../../components/netinfoComponent';
+import { BRAND } from '../../assets/style/brandTheme';
 const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
   navigation,
 }) => {
@@ -505,9 +506,22 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
             </View>
             {/* ── Submit ─────────────────────────────────────────────────── */}
             <CustomButton
-              label="Submit Request"
+              label="SUBMIT LEAVE REQUEST"
               onPress={handleAddLeave}
               disabled={disableBtn}
+              textColor={disableBtn ? '#6B7280' : '#111111'}
+              style={{
+                width: '100%',
+                backgroundColor: disableBtn ? '#E5E7EB' : BRAND.yellow,
+                borderRadius: moderateScale(14),
+                minHeight: moderateScale(54),
+                marginTop: moderateScale(6),
+                shadowColor: '#000',
+                shadowOpacity: 0.10,
+                shadowRadius: 10,
+                shadowOffset: { width: 0, height: 4 },
+                elevation: 3,
+              }}
             />
           </View>
           {/* ── Calendar Pickers ───────────────────────────────────────────── */}

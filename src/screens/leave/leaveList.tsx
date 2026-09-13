@@ -35,6 +35,7 @@ import commonFilterStyles from '../../assets/style/commonFilter';
 import ScreenWrapper from '../../components/screenWrapper';
 import NetInfoComponent from '../../components/netinfoComponent';
 import ModuleIntro from '../../components/moduleIntro';
+import { BRAND } from '../../assets/style/brandTheme';
 
 // ─── Responsive scaling ──────────────────────────────────────────────────────
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -302,6 +303,10 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             { backgroundColor: theme.screenBg, paddingHorizontal: 0 },
           ]}
         >
+          <View style={styles.sectionLabelRow}>
+            <View style={styles.sectionBar} />
+            <Text style={[styles.sectionLabel, { color: theme.muted }]}>LEAVE OVERVIEW</Text>
+          </View>
           <View style={styles.summaryRow}>
             <SummaryCard label="Total" value={leaveSummary.total} icon="CalendarDays" tone="#64748B" dark={isDarkMode} />
             <SummaryCard label="Pending" value={leaveSummary.pending} icon="Clock3" tone="#F59E0B" dark={isDarkMode} />
@@ -358,16 +363,29 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             {!loading && filterJobData.length === 0 && (
               <View style={styles.noDataContainer}>
                 <AppIcon name="Inbox" color="#CBD5E1" size={64} />
+                <View style={[styles.emptyIconWrap, { backgroundColor: isDarkMode ? '#2A2410' : '#FFF8D8' }]}>
+                  <AppIcon name="CalendarDays" color={'#B88900'} size={34} />
+                </View>
                 <Text style={[styles.noDataText, { color: theme.text }]}>
-                  No Leave Requests
+                  No leave requests yet
                 </Text>
                 <Text
                   style={[commonFilterStyles.noDataSub, { color: theme.muted }]}
                 >
                   {search
-                    ? 'No results found for your search'
-                    : 'All caught up! No pending requests.'}
+                    ? 'Try another employee, leave type or reason.'
+                    : 'Your approved, pending and rejected leave requests will appear here.'}
                 </Text>
+                {loginType === 'Employee' && !search && !hasActiveFilters && (
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => navigation.navigate('AddLeave', { enquiryID: '', customerID: '', customerName: '' })}
+                    style={[styles.emptyAction, { backgroundColor: BRAND.yellow }]}
+                  >
+                    <AppIcon name="Plus" size={moderateScale(17)} color="#111111" />
+                    <Text style={styles.emptyActionText}>Apply for Leave</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
 
@@ -403,6 +421,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
         {/* ── FAB (employee only) ── */}
         {loginType === 'Employee' && (
           <AddButton
+            style={styles.yellowFab}
             onPress={() =>
               navigation.navigate('AddLeave', {
                 enquiryID: '',
@@ -476,6 +495,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(40),
     paddingTop: scale(60),
   },
+  sectionLabelRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(14), paddingTop: moderateScale(2), paddingBottom: moderateScale(6) },
+  sectionBar: { width: moderateScale(4), height: moderateScale(16), borderRadius: 3, backgroundColor: BRAND.yellow, marginRight: moderateScale(8) },
+  sectionLabel: { fontSize: moderateScale(10), fontWeight: '900', letterSpacing: 1.4 },
+  emptyIconWrap: { width: moderateScale(70), height: moderateScale(70), borderRadius: moderateScale(22), alignItems: 'center', justifyContent: 'center', marginBottom: moderateScale(4) },
+  emptyAction: { marginTop: moderateScale(18), minHeight: moderateScale(46), paddingHorizontal: moderateScale(20), borderRadius: moderateScale(13), flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: moderateScale(7) },
+  emptyActionText: { color: '#111111', fontSize: moderateScale(13), fontWeight: '900' },
+  yellowFab: { backgroundColor: BRAND.yellow },
   noDataText: {
     fontSize: moderateScale(18),
     fontWeight: '600',
