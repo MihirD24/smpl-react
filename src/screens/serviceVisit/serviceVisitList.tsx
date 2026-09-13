@@ -321,7 +321,34 @@ const ServiceVisitList = ({ navigation }: any) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.screenBg }]}>
-      <ModuleIntro eyebrow="FIELD OPERATIONS / SERVICE" title="Service visits" description="Manage field visits, approvals, machines and service activity." />
+      <ModuleIntro
+        eyebrow="FIELD OPERATIONS / SERVICE"
+        title="Service visits"
+        description="Track customer visits, machine service, travel and approvals."
+      />
+
+      {/* Compact ERP summary */}
+      <View style={styles.summaryCard}>
+        <View style={styles.summaryItem}>
+          <Text style={[styles.summaryValue, { color: theme.text }]}>{visits.length}</Text>
+          <Text style={[styles.summaryLabel, { color: theme.subText }]}>Total visits</Text>
+        </View>
+        <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
+        <View style={styles.summaryItem}>
+          <Text style={[styles.summaryValue, { color: theme.warning }]}>
+            {visits.filter((v: any) => v.status === 0).length}
+          </Text>
+          <Text style={[styles.summaryLabel, { color: theme.subText }]}>Pending</Text>
+        </View>
+        <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
+        <View style={styles.summaryItem}>
+          <Text style={[styles.summaryValue, { color: theme.success }]}>
+            {visits.filter((v: any) => v.status === 1).length}
+          </Text>
+          <Text style={[styles.summaryLabel, { color: theme.subText }]}>Approved</Text>
+        </View>
+      </View>
+
       {/* Filters & Actions Header */}
       <View style={styles.headerContainer}>
         {/* Search Bar */}
@@ -342,8 +369,8 @@ const ServiceVisitList = ({ navigation }: any) => {
                 style={[
                   styles.filterTab,
                   isSelected && {
-                    backgroundColor: theme.primary,
-                    borderColor: theme.primary,
+                    backgroundColor: '#FACC15',
+                    borderColor: '#FACC15',
                   },
                   { borderColor: theme.border },
                 ]}
@@ -356,7 +383,7 @@ const ServiceVisitList = ({ navigation }: any) => {
                 <Text
                   style={[
                     styles.filterTabText,
-                    isSelected ? { color: '#FFF', fontWeight: '700' } : { color: theme.subText },
+                    isSelected ? { color: '#111827', fontWeight: '800' } : { color: theme.subText },
                   ]}
                 >
                   {filter}
@@ -407,16 +434,40 @@ const ServiceVisitList = ({ navigation }: any) => {
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={[theme.primary]} />
           }
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <AppIcon name="ClipboardList" size={48} color={theme.subText} />
-              <Text style={[styles.emptyText, { color: theme.text }]}>No service visits found.</Text>
+            <View style={[styles.emptyContainer, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+              <View style={[styles.emptyIconWrap, { backgroundColor: isDarkMode ? '#2A2412' : '#FFF8D6' }]}>
+                <AppIcon name="MapPin" size={28} color="#EAB308" />
+              </View>
+              <Text style={[styles.emptyTitle, { color: theme.text }]}>
+                {searchQuery ? 'No matching visits' : 'No service visits yet'}
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: theme.subText }]}>
+                {searchQuery
+                  ? 'Try another employee, customer, machine or location.'
+                  : 'Create your first field visit to start tracking service activity.'}
+              </Text>
+              {!searchQuery && (
+                <TouchableOpacity
+                  style={styles.emptyCta}
+                  onPress={() => navigation.navigate('AddServiceVisit')}
+                  activeOpacity={0.85}
+                >
+                  <AppIcon name="Plus" size={18} color="#111827" />
+                  <Text style={styles.emptyCtaText}>Create visit</Text>
+                </TouchableOpacity>
+              )}
             </View>
           }
         />
       )}
 
       {/* Floating Add Button */}
-      <AddButton onPress={() => navigation.navigate('AddServiceVisit')} />
+      <AddButton
+        onPress={() => navigation.navigate('AddServiceVisit')}
+        color="#111827"
+        size={25}
+        style={styles.addButton}
+      />
 
       {/* Sticky Bottom Action Bar for Admin Bulk Approval */}
       {isAdmin && selectedVisitIds.length > 0 && (
@@ -536,6 +587,44 @@ const ServiceVisitList = ({ navigation }: any) => {
 export default ServiceVisitList;
 
 const styles = StyleSheet.create({
+  summaryCard: {
+    marginHorizontal: moderateScale(16),
+    marginTop: verticalScale(4),
+    marginBottom: verticalScale(8),
+    minHeight: verticalScale(66),
+    borderRadius: moderateScale(16),
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: moderateScale(8),
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryValue: {
+    fontSize: moderateScale(19),
+    fontWeight: '900',
+  },
+  summaryLabel: {
+    fontSize: moderateScale(9.5),
+    fontWeight: '700',
+    marginTop: verticalScale(2),
+    letterSpacing: 0.2,
+  },
+  summaryDivider: {
+    width: 1,
+    height: verticalScale(34),
+  },
+
   container: {
     flex: 1,
   },
@@ -702,12 +791,53 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: verticalScale(100),
-    gap: verticalScale(12),
+    marginHorizontal: moderateScale(16),
+    marginTop: verticalScale(28),
+    paddingHorizontal: moderateScale(22),
+    paddingVertical: verticalScale(30),
+    borderRadius: moderateScale(20),
+    borderWidth: 1,
+    minHeight: verticalScale(230),
   },
-  emptyText: {
-    fontSize: moderateScale(15),
-    fontWeight: '600',
+  emptyIconWrap: {
+    width: moderateScale(58),
+    height: moderateScale(58),
+    borderRadius: moderateScale(18),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: verticalScale(12),
+  },
+  emptyTitle: {
+    fontSize: moderateScale(17),
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: moderateScale(11),
+    lineHeight: verticalScale(17),
+    textAlign: 'center',
+    marginTop: verticalScale(6),
+    maxWidth: moderateScale(290),
+  },
+  emptyCta: {
+    marginTop: verticalScale(16),
+    minHeight: verticalScale(42),
+    paddingHorizontal: moderateScale(18),
+    borderRadius: moderateScale(12),
+    backgroundColor: '#FACC15',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: moderateScale(7),
+  },
+  emptyCtaText: {
+    color: '#111827',
+    fontSize: moderateScale(12),
+    fontWeight: '900',
+  },
+  addButton: {
+    backgroundColor: '#FACC15',
+    shadowColor: '#111827',
   },
   actionBar: {
     position: 'absolute',

@@ -16,6 +16,7 @@ interface CustomButtonProps {
   onPress: (event: GestureResponderEvent) => void;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<import('react-native').TextStyle>;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -23,6 +24,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   onPress,
   disabled = false,
   style,
+  textStyle,
 }) => {
   const MainStyles = MainStyle();
   const colorScheme = useColorScheme();
@@ -42,7 +44,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         styles.submitButton,
       ]}
     >
-      <Text style={MainStyles.ButtonText}>{label}</Text>
+      <Text style={[MainStyles.ButtonText, textStyle]}>{label}</Text>
     </TouchableOpacity>
   );
 };
@@ -52,7 +54,7 @@ export default CustomButton;
 const styles =  StyleSheet.create({
   submitButton: {
     width: '95%',
-    backgroundColor: '#3B82F6', 
+    backgroundColor: '#FACC15', 
     paddingVertical: 15,
   },
 });

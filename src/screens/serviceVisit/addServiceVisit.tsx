@@ -455,7 +455,7 @@ const AddServiceVisit = ({ navigation }: any) => {
 
       {loading && (
         <View style={styles.overlayLoading}>
-          <ActivityIndicator size="large" color="#3B82F6" />
+          <ActivityIndicator size="large" color="#FACC15" />
         </View>
       )}
 
@@ -469,7 +469,7 @@ const AddServiceVisit = ({ navigation }: any) => {
           
           {/* Group 1: General Details */}
           <View style={styles.sectionHeader}>
-            <AppIcon name="FileText" size={18} color="#3B82F6" />
+            <AppIcon name="FileText" size={18} color="#FACC15" />
             <Text style={[styles.sectionTitle, { color: theme.label }]}>General Details</Text>
           </View>
 
@@ -506,14 +506,26 @@ const AddServiceVisit = ({ navigation }: any) => {
 
             <View style={formStyles.dateFieldHalf}>
               <FormLabel label="Company Vehicle" color={theme.label} />
-              <CustomRadioGroup
-                options={[
+              <View style={[styles.segmentedControl, { backgroundColor: isDarkMode ? '#20252B' : '#F1F3F6' }]}>
+                {[
                   { label: 'Yes', value: 'yes' },
                   { label: 'No', value: 'no' },
-                ]}
-                value={companyVehicle}
-                onChange={(val) => setCompanyVehicle(val as 'yes' | 'no')}
-              />
+                ].map((option) => {
+                  const active = companyVehicle === option.value;
+                  return (
+                    <TouchableOpacity
+                      key={option.value}
+                      style={[styles.segment, active && styles.segmentActive]}
+                      onPress={() => setCompanyVehicle(option.value as 'yes' | 'no')}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[styles.segmentText, { color: active ? '#111827' : theme.subText }]}>
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
           </View>
 
@@ -864,20 +876,35 @@ const AddServiceVisit = ({ navigation }: any) => {
 
             <View style={formStyles.half}>
               <FormLabel label="Night Stay" color={theme.label} />
-              <CustomRadioGroup
-                options={[
+              <View style={[styles.segmentedControl, styles.nightSegment, { backgroundColor: isDarkMode ? '#20252B' : '#F1F3F6' }]}>
+                {[
                   { label: 'None', value: 'None' },
                   { label: 'Late', value: 'Late night' },
                   { label: 'Full', value: 'Full night' },
-                ]}
-                value={nightStay}
-                onChange={(val) => setNightStay(val as 'None' | 'Late night' | 'Full night')}
-              />
+                ].map((option) => {
+                  const active = nightStay === option.value;
+                  return (
+                    <TouchableOpacity
+                      key={option.value}
+                      style={[styles.segment, active && styles.segmentActive]}
+                      onPress={() => setNightStay(option.value as 'None' | 'Late night' | 'Full night')}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[styles.segmentText, { color: active ? '#111827' : theme.subText }]}>
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
           </View>
 
           {/* Financial calculations displays */}
-          <View style={styles.financialCard}>
+          <View style={[
+            styles.financialCard,
+            { backgroundColor: isDarkMode ? '#172554' : '#F5F9FF', borderColor: isDarkMode ? '#263D72' : '#D9E8FF' },
+          ]}>
             <View style={styles.financialRow}>
               <Text style={styles.financialLabel}>Travel Allowance (TA):</Text>
               <Text style={styles.financialValue}>₹{taAmount.toFixed(2)}</Text>
@@ -925,9 +952,11 @@ const AddServiceVisit = ({ navigation }: any) => {
 
           <View style={formStyles.submitWrapper}>
             <CustomButton
-              label="SUBMIT FORM"
+              label="SUBMIT VISIT"
               onPress={handleFormSubmit}
               disabled={loading}
+              style={styles.serviceVisitSubmitButton}
+              textStyle={styles.serviceVisitSubmitText}
             />
           </View>
 
@@ -984,6 +1013,24 @@ const AddServiceVisit = ({ navigation }: any) => {
 export default AddServiceVisit;
 
 const styles = StyleSheet.create({
+  serviceVisitSubmitButton: {
+    width: '95%',
+    backgroundColor: '#FACC15',
+    borderRadius: moderateScale(14),
+    paddingVertical: verticalScale(14),
+    marginVertical: verticalScale(15),
+    shadowColor: '#111827',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.14,
+    shadowRadius: 7,
+    elevation: 4,
+  },
+  serviceVisitSubmitText: {
+    color: '#111827',
+    fontSize: moderateScale(16),
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
   overlayLoading: {
     position: 'absolute',
     left: 0,
@@ -998,12 +1045,57 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: moderateScale(8),
-    marginTop: verticalScale(10),
-    marginBottom: verticalScale(16),
+    gap: moderateScale(9),
+    marginTop: verticalScale(18),
+    marginBottom: verticalScale(14),
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
-    paddingBottom: verticalScale(6),
+    paddingBottom: verticalScale(9),
+  },
+  sectionIcon: {
+    width: moderateScale(34),
+    height: moderateScale(34),
+    borderRadius: moderateScale(11),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionKicker: {
+    fontSize: moderateScale(9),
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: verticalScale(1),
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    width: '100%',
+    minHeight: verticalScale(48),
+    padding: moderateScale(4),
+    borderRadius: moderateScale(13),
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    gap: moderateScale(3),
+  },
+  nightSegment: {
+    minHeight: verticalScale(48),
+  },
+  segment: {
+    flex: 1,
+    borderRadius: moderateScale(10),
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: moderateScale(5),
+  },
+  segmentActive: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  segmentText: {
+    fontSize: moderateScale(11.5),
+    fontWeight: '800',
   },
   sectionTitle: {
     fontSize: moderateScale(15),
@@ -1038,12 +1130,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   financialCard: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#DBEAFE',
+    backgroundColor: '#F5F9FF',
+    borderColor: '#D9E8FF',
     borderWidth: 1,
-    borderRadius: moderateScale(12),
-    padding: moderateScale(14),
-    marginVertical: verticalScale(12),
+    borderRadius: moderateScale(16),
+    padding: moderateScale(16),
+    marginVertical: verticalScale(14),
   },
   financialRow: {
     flexDirection: 'row',
@@ -1052,14 +1144,14 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(4),
   },
   financialLabel: {
-    fontSize: moderateScale(13),
-    color: '#1E40AF',
-    fontWeight: '500',
+    fontSize: moderateScale(12),
+    color: '#FACC15',
+    fontWeight: '700',
   },
   financialValue: {
     fontSize: moderateScale(14),
-    color: '#1E3A8A',
-    fontWeight: '700',
+    color: '#FACC15',
+    fontWeight: '800',
   },
   divider: {
     height: 1,
@@ -1072,7 +1164,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontSize: moderateScale(16),
-    color: '#3B82F6',
+    color: '#FACC15',
   },
   modalOverlay: {
     flex: 1,
