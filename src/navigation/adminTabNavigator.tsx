@@ -13,6 +13,7 @@ import AdminDashboard from '../screens/attandance/admin/adminDashboard';
 import AppIcon from '../components/appIcon';
 import staffSalary from '../screens/accounts/staffSalary';
 import moment from 'moment';
+import AdminEmployees from '../screens/attandance/admin/adminEmployees';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 
 const Tab = createBottomTabNavigator();
@@ -20,7 +21,7 @@ const Tab = createBottomTabNavigator();
 export default function AdminTabNavigator() {
   const isDarkMode = useColorScheme() === 'dark';
   const tabTheme = {
-    active: isDarkMode ? '#F8FAFC' : '#000000',
+    active: isDarkMode ? '#F9C900' : '#111111',
     inactive: isDarkMode ? '#94A3B8' : '#999999',
     background: isDarkMode ? '#111827' : '#FFFFFF',
     border: isDarkMode ? '#334155' : '#E5E7EB',
@@ -54,16 +55,18 @@ export default function AdminTabNavigator() {
             backgroundColor: tabTheme.background,
             borderTopColor: tabTheme.border,
             borderTopWidth: 1,
-            paddingBottom: 16,
-            height: 70,
-            paddingTop: 10,
+            paddingBottom: 10,
+            height: 68,
+            paddingTop: 7,
           },
+          tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
         }}
       >
         <Tab.Screen
           name="Admin Dashboard"
           component={AdminDashboard}
           options={{
+            headerShown: false,
             tabBarLabel: 'Dashboard',
             headerTitleAlign: 'left',
             tabBarIcon: ({ color, size }) => (
@@ -88,6 +91,18 @@ export default function AdminTabNavigator() {
                 </View>
               </>
             ),
+          }}
+        />
+
+        <Tab.Screen
+          name="Admin Employees"
+          component={AdminEmployees}
+          options={{
+            tabBarLabel: 'Employees',
+            tabBarIcon: ({ color, size }) => (
+              <AppIcon name="Users" color={color} size={size} />
+            ),
+            headerTitle: 'Employees',
           }}
         />
 

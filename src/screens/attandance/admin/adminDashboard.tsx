@@ -15,6 +15,7 @@ import {
   useColorScheme,
   useWindowDimensions,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -51,7 +52,7 @@ interface StatCard {
   label: string;
   value: number | string;
   icon: string;
-  color: 'blue' | 'orange' | 'red' | 'green';
+  color: 'yellow' | 'orange' | 'red' | 'green';
   screen?: string;
 }
 
@@ -95,9 +96,9 @@ const useTheme = () => {
         ? '#F8FAFC'
         : '#0F172A',
 
-      accent: '#2563EB',
+      accent: '#F9C900',
 
-      avatarBg: '#3B82F6',
+      avatarBg: '#F9C900',
 
       statIconBg: isDark
         ? '#0F172A'
@@ -295,6 +296,7 @@ const AdminDashboard: React.FC = ({
 
   const { width } =
     useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   /**
    * Responsive breakpoints
@@ -505,8 +507,8 @@ const AdminDashboard: React.FC = ({
               value:
                 response?.pendingServiceVisits ??
                 0,
-              icon: 'Users',
-              color: 'blue',
+              icon: 'MapPin',
+              color: 'yellow',
             },
 
             {
@@ -515,8 +517,8 @@ const AdminDashboard: React.FC = ({
               value:
                 response?.departmentsCount ??
                 0,
-              icon: 'Users',
-              color: 'blue',
+              icon: 'Building2',
+              color: 'yellow',
             },
 
             {
@@ -525,8 +527,8 @@ const AdminDashboard: React.FC = ({
               value:
                 response?.designationsCount ??
                 0,
-              icon: 'Users',
-              color: 'blue',
+              icon: 'Briefcase',
+              color: 'yellow',
             },
 
             {
@@ -536,7 +538,8 @@ const AdminDashboard: React.FC = ({
                 response?.employeesCount ??
                 0,
               icon: 'Users',
-              color: 'blue',
+              color: 'yellow',
+              screen: 'Admin Employees',
             },
           ]);
         } else {
@@ -607,8 +610,8 @@ const AdminDashboard: React.FC = ({
     color: string,
   ): string => {
     switch (color) {
-      case 'blue':
-        return '#2563EB';
+      case 'yellow':
+        return '#111111';
 
       case 'orange':
         return '#EA580C';
@@ -629,8 +632,8 @@ const AdminDashboard: React.FC = ({
   ): string => {
     if (isDark) {
       switch (color) {
-        case 'blue':
-          return '#1D4ED8';
+        case 'yellow':
+          return '#F9C900';
 
         case 'orange':
           return '#C2410C';
@@ -647,8 +650,8 @@ const AdminDashboard: React.FC = ({
     }
 
     switch (color) {
-      case 'blue':
-        return '#BFDBFE';
+      case 'yellow':
+        return '#F9C900';
 
       case 'orange':
         return '#FDE68A';
@@ -739,8 +742,8 @@ const AdminDashboard: React.FC = ({
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#3B82F6']}
-            tintColor="#3B82F6"
+            colors={['#F9C900']}
+            tintColor="#F9C900"
             progressBackgroundColor={
               colors.cardBg
             }
@@ -758,6 +761,9 @@ const AdminDashboard: React.FC = ({
               styles.pageContainerTablet,
             isLargeTablet &&
               styles.pageContainerLarge,
+            {
+              paddingTop: Math.max(16, insets.top + 8),
+            },
           ]}
         >
           {/* =================================================
@@ -765,26 +771,28 @@ const AdminDashboard: React.FC = ({
           ================================================= */}
 
           <View style={styles.pageHeader}>
-            <View>
+            <View style={styles.pageHeaderAccent} />
+            <View style={styles.pageHeaderContent}>
+              <Text
+                style={[
+                  styles.eyebrow,
+                  { color: colors.textMuted },
+                ]}
+              >
+                SHANTINATH MOTORS • ADMIN
+              </Text>
               <Text
                 style={[
                   styles.pageTitle,
-                  {
-                    color:
-                      colors.textPrimary,
-                  },
+                  { color: colors.textPrimary },
                 ]}
               >
-                Admin Dashboard
+                Workforce Control Center
               </Text>
-
               <Text
                 style={[
                   styles.pageDate,
-                  {
-                    color:
-                      colors.textSecondary,
-                  },
+                  { color: colors.textSecondary },
                 ]}
               >
                 {new Date().toLocaleDateString(
@@ -1261,10 +1269,10 @@ const AdminDashboard: React.FC = ({
                     label: 'Leave',
                     value:
                       attendanceSummary.leave,
-                    color: '#2563EB',
+                    color: isDark ? '#F9C900' : '#8A6A00',
                     bg: isDark
-                      ? '#082F49'
-                      : '#EFF6FF',
+                      ? '#332B00'
+                      : '#FFF8D6',
                   },
 
                   {
@@ -1704,14 +1712,35 @@ const styles = StyleSheet.create({
 
   pageHeader: {
     width: '100%',
-    marginBottom: 20,
+    flexDirection: 'row',
+    marginBottom: 18,
+  },
+
+  pageHeaderAccent: {
+    width: 5,
+    borderRadius: 3,
+    backgroundColor: '#F9C900',
+    marginRight: 12,
+  },
+
+  pageHeaderContent: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  eyebrow: {
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '800',
+    letterSpacing: 1.1,
+    marginBottom: 2,
   },
 
   pageTitle: {
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 25,
+    lineHeight: 31,
     fontWeight: '800',
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
   },
 
   pageDate: {
@@ -1744,18 +1773,22 @@ const styles = StyleSheet.create({
 
   statCard: {
     width: '48%',
-    minHeight: 132,
+    minHeight: 118,
     borderWidth: 1,
     borderRadius: 18,
-    padding: 16,
+    padding: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#F9C900',
     justifyContent: 'space-between',
   },
 
   statCardTablet: {
     width: '48.7%',
-    minHeight: 148,
+    minHeight: 136,
     borderRadius: 20,
-    padding: 20,
+    padding: 18,
+    borderLeftWidth: 5,
+    borderLeftColor: '#F9C900',
   },
 
   statTopRow: {

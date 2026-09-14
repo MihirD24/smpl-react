@@ -110,10 +110,10 @@ export default function AdminAttendanceCard({ attendanceData, navigation }) {
   if (isPresent) {
     chips.push(
       lateMins === 0
-        ? { label: 'ON TIME', color: '#16803C', bg: '#E8F6ED' }
+        ? { label: 'ON TIME', color: '#10B981', bg: '#D1FAE5' }
         : {
             label: `LATE ${fmtMins(lateMins)}`,
-            color: '#8A6500',
+            color: '#F59E0B',
             bg: '#FEF3C7',
           },
     );
@@ -130,9 +130,9 @@ export default function AdminAttendanceCard({ attendanceData, navigation }) {
         bg: '#FFEDD5',
       });
   } else if (isAbsent) {
-    chips.push({ label: 'ABSENT', color: '#B91C1C', bg: '#FDECEC' });
+    chips.push({ label: 'ABSENT', color: '#EF4444', bg: '#FEE2E2' });
   } else if (isHalfDay) {
-    chips.push({ label: 'HALF DAY', color: '#8A6500', bg: '#FFF7CC' });
+    chips.push({ label: 'HALF DAY', color: '#F59E0B', bg: '#FEF3C7' });
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -366,9 +366,9 @@ export default function AdminAttendanceCard({ attendanceData, navigation }) {
 
 const styles = StyleSheet.create({
   cardOverride: {
-    padding: moderateScale(17),
+    padding: moderateScale(16),
     marginBottom: verticalScale(12),
-    borderRadius: moderateScale(16),
+    borderRadius: scale(12),
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -379,8 +379,8 @@ const styles = StyleSheet.create({
       android: { elevation: 2 },
     }),
   },
-  cardLeave: { borderLeftWidth: scale(3), borderLeftColor: '#F9C900' },
-  cardAbsent: { borderLeftWidth: scale(3), borderLeftColor: '#111111' },
+  cardLeave: { borderLeftWidth: scale(3), borderLeftColor: '#EF4444' },
+  cardAbsent: { borderLeftWidth: scale(3), borderLeftColor: '#94A3B8' },
 
   // ── Top row ──────────────────────────────────────────────────────────────
   topRow: {
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   },
   leaveSubtitle: {
     fontSize: moderateScale(12),
-    color: '#B91C1C',
+    color: '#EF4444',
     fontWeight: '500',
   },
   absentSubtitle: {
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   leaveTag: {
     fontSize: moderateScale(11),
     fontWeight: '800',
-    color: '#B91C1C',
+    color: '#EF4444',
     letterSpacing: 0.6,
   },
 
@@ -478,8 +478,8 @@ const styles = StyleSheet.create({
     borderRadius: scale(6),
   },
   absentStatusBadge: { backgroundColor: '#FEE2E2' },
-  leaveBadge: { backgroundColor: '#FFF7CC' },
-  halfDayBadge: { backgroundColor: '#FFF0D9' },
+  leaveBadge: { backgroundColor: '#DBEAFE' },
+  halfDayBadge: { backgroundColor: '#FED7AA' },
   statusText: {
     fontSize: moderateScale(13),
     fontWeight: '500',
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     height: 120,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF7CC',
+    backgroundColor: '#DBEAFE',
   },
   locationText: {
     fontSize: moderateScale(10),
