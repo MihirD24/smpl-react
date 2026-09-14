@@ -44,7 +44,7 @@ const ATTENDANCE_STATUS_OPTIONS: StatusOption[] = [
   { label: 'Absent', color: '#EF4444' },
   { label: 'Half Day', color: '#F59E0B' },
   { label: 'Late', color: '#EAB308' },
-  { label: 'On Leave', color: '#3B82F6' },
+  { label: 'On Leave', color: '#111111' },
 ];
 const STAFF_LIST_ITEMS = [
   { id: 'Mihir Vora', name: 'Mihir Vora' },
@@ -55,7 +55,8 @@ const STAFF_LIST_ITEMS = [
 // ─── Theme helper ─────────────────────────────────────────────────────────────
 const getTheme = (isDark: boolean) => ({
   // Page backgrounds
-  pageBg: isDark ? '#0F172A' : '#F8FAFC',
+  pageBg: isDark ? '#0F172A' : '#F5F6F7',
+  brandYellow: '#F9C900',
   // Top card
   cardBg: isDark ? '#1E293B' : '#FFFFFF',
   cardBorder: isDark ? '#334155' : 'transparent',
@@ -113,7 +114,7 @@ const AdminAttendancelist: React.FC<
           style={styles.headerBtn}
           onPress={() => filterSheetRef.current?.expand()}
         >
-          <AppIcon name="ListFilter" size={scale(18)} color="#3B82F6" />
+          <AppIcon name="ListFilter" size={scale(18)} color="#111111" />
         </TouchableOpacity>
       ),
     });
@@ -279,7 +280,7 @@ const AdminAttendancelist: React.FC<
     {
       label: 'OVER TIME',
       value: attandanceCount?.total_over_time_count || 0,
-      color: '#2563EB',
+      color: '#111111',
     },
     {
       label: 'EARLY EXIT',
@@ -300,6 +301,17 @@ const AdminAttendancelist: React.FC<
         <View style={[styles.root, { backgroundColor: theme.pageBg }]}>
           {/* ── Top section ── */}
           <View style={[styles.topSection, { backgroundColor: theme.pageBg }]}>
+            <View style={styles.adminBand}>
+              <View style={styles.adminBandAccent} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.adminBandEyebrow}>ADMIN CONTROL CENTER</Text>
+                <Text style={styles.adminBandTitle}>Attendance Management</Text>
+              </View>
+              <View style={styles.datePill}>
+                <AppIcon name="CalendarDays" size={16} color="#111111" />
+                <Text style={styles.datePillText}>{selectedDate.format('DD MMM')}</Text>
+              </View>
+            </View>
             {/* Date + Stats card */}
             <View
               style={[
@@ -321,7 +333,7 @@ const AdminAttendancelist: React.FC<
                     handleDateSelected(moment(selectedDate).subtract(1, 'day'))
                   }
                 >
-                  <AppIcon name="ChevronLeft" size={22} color="#3B82F6" />
+                  <AppIcon name="ChevronLeft" size={22} color="#111111" />
                 </TouchableOpacity>
 
                 <View style={styles.dateCenter}>
@@ -340,7 +352,7 @@ const AdminAttendancelist: React.FC<
                     handleDateSelected(moment(selectedDate).add(1, 'day'))
                   }
                 >
-                  <AppIcon name="ChevronRight" size={22} color="#3B82F6" />
+                  <AppIcon name="ChevronRight" size={22} color="#111111" />
                 </TouchableOpacity>
               </View>
 
@@ -445,6 +457,50 @@ const AdminAttendancelist: React.FC<
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
+  adminBand: {
+    minHeight: verticalScale(72),
+    backgroundColor: '#F9C900',
+    borderRadius: moderateScale(18),
+    marginBottom: verticalScale(12),
+    paddingHorizontal: moderateScale(14),
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  adminBandAccent: {
+    width: scale(5),
+    height: '65%',
+    backgroundColor: '#111111',
+    borderRadius: scale(3),
+    marginRight: moderateScale(12),
+  },
+  adminBandEyebrow: {
+    fontSize: moderateScale(9),
+    fontWeight: '800',
+    letterSpacing: 1.1,
+    color: '#111111',
+    opacity: 0.7,
+  },
+  adminBandTitle: {
+    marginTop: verticalScale(3),
+    fontSize: moderateScale(18),
+    fontWeight: '800',
+    color: '#111111',
+  },
+  datePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scale(5),
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(8),
+    borderRadius: scale(10),
+  },
+  datePillText: {
+    fontSize: moderateScale(11),
+    fontWeight: '800',
+    color: '#111111',
+  },
   root: {
     flex: 1,
   },
