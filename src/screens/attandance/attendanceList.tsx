@@ -273,7 +273,8 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
   // Screen-level tokens not in shared theme
   const screenBg = isDarkMode ? '#111827' : '#F3F4F6';
   const sectionBg = isDarkMode ? '#1F2937' : '#FFFFFF';
-  const blueText = isDarkMode ? '#93C5FD' : '#3B82F6';
+  const brandText = isDarkMode ? '#FDE68A' : '#111827';
+  const brandYellow = '#FACC15';
 
   useEffect(() => {
     const iv = setInterval(() => {
@@ -566,7 +567,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                   <AppIcon
                     name="Clock"
                     size={moderateScale(22)}
-                    color="#3B82F6"
+                    color={brandYellow}
                     style={cardStyles.contentBlockIcon}
                   />
                   <View style={{ marginLeft: scale(11), flex: 1 }}>
@@ -581,7 +582,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                       HOURS WORKED TODAY
                     </Text>
                     <Text
-                      style={[styles.hoursWorkedValue, { color: blueText }]}
+                      style={[styles.hoursWorkedValue, { color: brandText }]}
                     >
                       {calculateWorkedHours()}
                     </Text>
@@ -750,8 +751,8 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                   <Text
                     style={{
                       fontSize: moderateScale(13),
-                      color: '#3B82F6',
-                      fontWeight: '600',
+                      color: isDarkMode ? '#FDE68A' : '#111827',
+                      fontWeight: '700',
                     }}
                   >
                     View Calendar →
@@ -945,6 +946,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: moderateScale(18),
     padding: scale(10),
+    borderTopWidth: 3,
+    borderTopColor: '#FACC15',
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: scale(9),
@@ -1138,7 +1141,7 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(22),
   },
   okButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#FACC15',
     paddingVertical: verticalScale(13),
     paddingHorizontal: moderateScale(28),
     borderRadius: moderateScale(11),
@@ -1147,7 +1150,7 @@ const styles = StyleSheet.create({
   },
   okButtonText: {
     fontSize: moderateScale(15),
-    color: '#FFFFFF',
-    fontWeight: '700',
+    color: '#111827',
+    fontWeight: '800',
   },
 });
