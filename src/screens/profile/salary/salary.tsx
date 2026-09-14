@@ -29,6 +29,7 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 import { Platform, Alert } from 'react-native';
 import ToastUtil from '../../../utils/toastAndroid';
 import NetInfoComponent from '../../../components/netinfoComponent';
+import ModuleIntro from '../../../components/moduleIntro';
 
 const dummySalaryData: SalaryRecord[] = [
   {
@@ -572,6 +573,7 @@ const Salary = () => {
       statusBarStyle={isDarkMode ? 'light-content' : 'dark-content'}
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
+      <ModuleIntro eyebrow="PAYROLL / SALARY" title="Salary" description="Review monthly earnings, deductions, payment status and salary slips." />
       <NetInfoComponent onReconnect={fetchSalary} />
       <View style={[styles.screen, isDarkMode && styles.screenDark]}>
         <FlatList

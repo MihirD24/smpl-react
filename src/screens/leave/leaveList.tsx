@@ -34,6 +34,8 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import commonFilterStyles from '../../assets/style/commonFilter';
 import ScreenWrapper from '../../components/screenWrapper';
 import NetInfoComponent from '../../components/netinfoComponent';
+import ModuleIntro from '../../components/moduleIntro';
+import { BRAND } from '../../assets/style/brandTheme';
 
 // ─── Responsive scaling ──────────────────────────────────────────────────────
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -61,6 +63,20 @@ const LEAVE_TYPE_ITEMS = [
 ].map(t => ({ id: t, name: t }));
 
 // ─── Component ───────────────────────────────────────────────────────────────
+const SummaryCard = ({ label, value, icon, tone, dark }: {
+  label: string; value: number; icon: string; tone: string; dark: boolean;
+}) => (
+  <View style={[styles.summaryCard, { backgroundColor: dark ? '#172033' : '#FFFFFF', borderColor: dark ? '#273449' : '#E2E8F0' }]}>
+    <View style={[styles.summaryIcon, { backgroundColor: `${tone}18` }]}>
+      <AppIcon name={icon} size={moderateScale(16)} color={tone} />
+    </View>
+    <View style={styles.summaryCopy}>
+      <Text style={[styles.summaryValue, { color: dark ? '#F8FAFC' : '#0F172A' }]}>{value}</Text>
+      <Text style={[styles.summaryLabel, { color: dark ? '#94A3B8' : '#64748B' }]}>{label}</Text>
+    </View>
+  </View>
+);
+
 const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   navigation,
 }) => {
@@ -68,6 +84,8 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   const { userInfo } = useContext(AuthContext);
   const MainStyles = MainStyle();
   const isDarkMode = useColorScheme() === 'dark';
+  const { width } = Dimensions.get('window');
+  const isTablet = width >= 768;
 
   const theme = {
     screenBg: isDarkMode ? '#111827' : '#F6FAFF',
@@ -247,6 +265,13 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
     })),
   ];
 
+  const leaveSummary = {
+    total: masterJobData.length,
+    pending: masterJobData.filter(item => item.status === 0).length,
+    approved: masterJobData.filter(item => item.status === 1).length,
+    rejected: masterJobData.filter(item => item.status === 2).length,
+  };
+
   const onRefresh = () => handleLeaveData(loginuserId);
 
   const renderJobInfo = ({ item }: { item: LeaveData }) => (
@@ -268,13 +293,30 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={handleLeaveData} />
+      <ModuleIntro
+        eyebrow="WORKFORCE / LEAVE"
+        title="Leave management"
+        description="Plan time off, track requests and keep approvals organized."
+      />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View
           style={[
             MainStyles.mainContainer,
             { backgroundColor: theme.screenBg, paddingHorizontal: 0 },
+            isTablet && { alignSelf: 'center', width: '100%', maxWidth: 980 },
           ]}
         >
+          <View style={styles.sectionLabelRow}>
+            <View style={styles.sectionBar} />
+            <Text style={[styles.sectionLabel, { color: theme.muted }]}>LEAVE OVERVIEW</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <SummaryCard label="Total" value={leaveSummary.total} icon="CalendarDays" tone={BRAND.black} dark={isDarkMode} />
+            <SummaryCard label="Pending" value={leaveSummary.pending} icon="Clock3" tone={BRAND.yellow} dark={isDarkMode} />
+            <SummaryCard label="Approved" value={leaveSummary.approved} icon="CircleCheck" tone="#16A34A" dark={isDarkMode} />
+            <SummaryCard label="Rejected" value={leaveSummary.rejected} icon="CircleX" tone="#DC2626" dark={isDarkMode} />
+          </View>
+
           {/* ── Search + Filter button ── */}
           <View
             style={[
@@ -291,9 +333,9 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                 style={[
                   commonFilterStyles.filterIconBtn,
                   {
-                    borderColor: hasActiveFilters ? '#3B82F6' : theme.border,
+                    borderColor: hasActiveFilters ? BRAND.yellow : theme.border,
                     backgroundColor: hasActiveFilters
-                      ? '#3B82F6'
+                      ? BRAND.yellow
                       : theme.softBg,
                   },
                 ]}
@@ -303,7 +345,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                 <AppIcon
                   name="ListFilter"
                   size={moderateScale(20)}
-                  color={hasActiveFilters ? '#FFFFFF' : '#3B82F6'}
+                  color={hasActiveFilters ? '#111111' : BRAND.black}
                 />
                 {totalActiveFilters > 0 && (
                   <View style={commonFilterStyles.filterBadge}>
@@ -324,16 +366,29 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             {!loading && filterJobData.length === 0 && (
               <View style={styles.noDataContainer}>
                 <AppIcon name="Inbox" color="#CBD5E1" size={64} />
+                <View style={[styles.emptyIconWrap, { backgroundColor: isDarkMode ? '#2A2410' : '#FFF8D8' }]}>
+                  <AppIcon name="CalendarDays" color={'#B88900'} size={34} />
+                </View>
                 <Text style={[styles.noDataText, { color: theme.text }]}>
-                  No Leave Requests
+                  No leave requests yet
                 </Text>
                 <Text
                   style={[commonFilterStyles.noDataSub, { color: theme.muted }]}
                 >
                   {search
-                    ? 'No results found for your search'
-                    : 'All caught up! No pending requests.'}
+                    ? 'Try another employee, leave type or reason.'
+                    : 'Your approved, pending and rejected leave requests will appear here.'}
                 </Text>
+                {loginType === 'Employee' && !search && !hasActiveFilters && (
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => navigation.navigate('AddLeave', { enquiryID: '', customerID: '', customerName: '' })}
+                    style={[styles.emptyAction, { backgroundColor: BRAND.yellow }]}
+                  >
+                    <AppIcon name="Plus" size={moderateScale(17)} color="#111111" />
+                    <Text style={styles.emptyActionText}>Apply for Leave</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
 
@@ -357,8 +412,8 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                   <RefreshControl
                     refreshing={refreshing}
                     onRefresh={onRefresh}
-                    tintColor="#3B82F6"
-                    colors={['#3B82F6']}
+                    tintColor={BRAND.yellow}
+                    colors={[BRAND.yellow]}
                   />
                 }
               />
@@ -369,6 +424,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
         {/* ── FAB (employee only) ── */}
         {loginType === 'Employee' && (
           <AddButton
+            style={styles.yellowFab}
             onPress={() =>
               navigation.navigate('AddLeave', {
                 enquiryID: '',
@@ -402,6 +458,34 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
 };
 
 const styles = StyleSheet.create({
+  summaryRow: {
+    flexDirection: 'row',
+    paddingHorizontal: moderateScale(14),
+    paddingTop: moderateScale(4),
+    paddingBottom: moderateScale(8),
+    gap: moderateScale(8),
+  },
+  summaryCard: {
+    flex: 1,
+    minHeight: moderateScale(68),
+    borderWidth: 1,
+    borderRadius: moderateScale(14),
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(9),
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  summaryIcon: {
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(9),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: moderateScale(7),
+  },
+  summaryCopy: { flex: 1 },
+  summaryValue: { fontSize: moderateScale(19), fontWeight: '800', lineHeight: moderateScale(21) },
+  summaryLabel: { fontSize: moderateScale(9), fontWeight: '700', marginTop: moderateScale(2) },
   content: { flex: 1 },
   listContent: {
     padding: moderateScale(13),
@@ -414,6 +498,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(40),
     paddingTop: scale(60),
   },
+  sectionLabelRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(14), paddingTop: moderateScale(2), paddingBottom: moderateScale(6) },
+  sectionBar: { width: moderateScale(4), height: moderateScale(16), borderRadius: 3, backgroundColor: BRAND.yellow, marginRight: moderateScale(8) },
+  sectionLabel: { fontSize: moderateScale(10), fontWeight: '900', letterSpacing: 1.4 },
+  emptyIconWrap: { width: moderateScale(70), height: moderateScale(70), borderRadius: moderateScale(22), alignItems: 'center', justifyContent: 'center', marginBottom: moderateScale(4) },
+  emptyAction: { marginTop: moderateScale(18), minHeight: moderateScale(46), paddingHorizontal: moderateScale(20), borderRadius: moderateScale(13), flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: moderateScale(7) },
+  emptyActionText: { color: '#111111', fontSize: moderateScale(13), fontWeight: '900' },
+  yellowFab: { backgroundColor: BRAND.yellow },
   noDataText: {
     fontSize: moderateScale(18),
     fontWeight: '600',

@@ -26,6 +26,7 @@ import ProjectRemainingScreen from '../screens/profile/projectRemain/projectRema
 import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import AddServiceVisit from '../screens/serviceVisit/addServiceVisit';
 import CalculateSalary from '../screens/accounts/calculateSalary';
+import ERPScreenHeader from '../components/erpScreenHeader';
 
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -47,12 +48,11 @@ const AppStack = ({
   const detailHeaderOptions = (title: string) => ({
     headerShown: true,
     title,
+    header: ({ navigation, back }: any) => (
+      <ERPScreenHeader title={title} navigation={navigation} canGoBack={!!back} />
+    ),
     headerStyle,
     headerTintColor,
-    headerTitleStyle: {
-      color: headerTintColor,
-      fontWeight: '600' as const,
-    },
     headerBackTitle: '',
     headerBackVisible: true,
   });

@@ -21,6 +21,7 @@ import {
   verticalScale,
 } from 'react-native-size-matters';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles';
+import { BRAND } from '../../assets/style/brandTheme';
 
 type LeaveRequestCardProps = {
   leaveData: LeaveData;
@@ -52,7 +53,7 @@ const getLeaveTypeColor = (leaveType: string): string => {
   if (type.includes('vacation')) return '#10B981';
   if (type.includes('personal')) return '#8B5CF6';
   if (type.includes('urgent')) return '#DC2626';
-  return '#3B82F6';
+  return '#B88900';
 };
 
 export default function LeaveRequestCard({
@@ -115,7 +116,7 @@ export default function LeaveRequestCard({
     if (leaveData.status === 1) {
       return (
         <View style={[cardStyles.badge, styles.statusApproved]}>
-          <AppIcon name="CheckCircle2" color="#10B981" size={14} />
+          <AppIcon name="CheckCircle2" color={BRAND.success} size={14} />
           <Text style={[cardStyles.badgeText, styles.statusTextApproved]}>
             Approved
           </Text>
@@ -126,7 +127,7 @@ export default function LeaveRequestCard({
     if (leaveData.status === 2) {
       return (
         <View style={[cardStyles.badge, styles.statusRejected]}>
-          <AppIcon name="XCircle" color="#EF4444" size={14} />
+          <AppIcon name="XCircle" color={BRAND.danger} size={14} />
           <Text style={[cardStyles.badgeText, styles.statusTextRejected]}>
             Rejected
           </Text>
@@ -137,7 +138,7 @@ export default function LeaveRequestCard({
     if (leaveData.status === 0 && role !== 'Employee') {
       return (
         <View style={[cardStyles.badge, styles.statusPending]}>
-          <AppIcon name="Clock" color="#F59E0B" size={14} />
+          <AppIcon name="Clock" color="#B88900" size={14} />
           <Text style={[cardStyles.badgeText, styles.statusTextPending]}>
             Pending
           </Text>
@@ -261,7 +262,7 @@ export default function LeaveRequestCard({
           <View style={styles.actionButtons}>
             <TouchableOpacity
               onPress={() => handleLeaveApproval(1)}
-              style={styles.approveButton}
+              style={[styles.approveButton, { backgroundColor: BRAND.yellow }]}
               activeOpacity={0.8}
             >
               <Text style={styles.approveButtonText}>Approve</Text>
@@ -295,7 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: scale(16),
     ...Platform.select({
       ios: {
-        shadowColor: '#3B82F6',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 7,
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
     marginRight: scale(12),
   },
   avatarText: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: moderateScale(13),
     fontWeight: '600',
   },
@@ -433,14 +434,14 @@ const styles = StyleSheet.create({
   },
   approveButton: {
     flex: 1,
-    backgroundColor: '#3B82F6',
+    backgroundColor: BRAND.yellow,
     paddingVertical: scale(12),
     borderRadius: scale(10),
     alignItems: 'center',
     justifyContent: 'center',
   },
   approveButtonText: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: moderateScale(12),
     fontWeight: '600',
   },

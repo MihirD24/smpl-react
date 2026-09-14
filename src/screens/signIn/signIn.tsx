@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import {
   Text,
   View,
-  Image,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
@@ -11,21 +10,20 @@ import {
   StatusBar,
   ScrollView,
   useColorScheme,
+  useWindowDimensions,
 } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import { AuthContext } from '../../context/authContext';
 import { AuthStackScreenProps } from '../../navigation/navigationTypes';
 import MainStyle from '../../assets/style/maincss';
 import {
-  moderateScale,
-  moderateVerticalScale,
-  scale,
-  verticalScale,
 } from 'react-native-size-matters';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import ToastUtil from '../../utils/toastAndroid';
+import BrandLogo from '../../components/brandLogo';
+import { BRAND, isTabletWidth, contentMaxWidth } from '../../assets/style/brandTheme';
 
 const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   const { login } = useContext(AuthContext) as {
@@ -38,6 +36,8 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   const [secure, setSecure] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const isDarkMode = useColorScheme() === 'dark';
+  const { width } = useWindowDimensions();
+  const tablet = isTabletWidth(width);
   const mainStyles = MainStyle();
   const theme = {
     screenBg: isDarkMode ? '#111827' : '#F6FAFF',
@@ -93,254 +93,356 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.screenBg }}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.screenBg }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
-        style={{ flex: 1 }}
+        style={styles.flex}
       >
         <StatusBar
-          backgroundColor={'transparent'}
-          translucent
+          backgroundColor={theme.screenBg}
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         />
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { minHeight: tablet ? '100%' : undefined },
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          <View style={styles.wrapper}>
-            {/* Logo */}
-            <View
-              style={[
-                styles.logoContainer,
-                { backgroundColor: theme.logoCard },
-              ]}
-            >
-              <Image
-                source={require('../../assets/images/login_logo.jpeg')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-            </View>
+          <View
+            style={[
+              styles.page,
+              { maxWidth: contentMaxWidth(width) },
+              tablet && styles.pageTablet,
+            ]}
+          >
+            {tablet && (
+              <View style={[styles.brandPanel, { backgroundColor: BRAND.black }]}>
+                <View style={styles.yellowAccent} />
+                <BrandLogo width="92%" height={Math.min(width * 0.12, 100)} />
+                <Text style={styles.brandPanelTitle}>WORKFORCE</Text>
+                <Text style={styles.brandPanelSubtitle}>
+                  Secure employee access to attendance, leave, salary and field operations.
+                </Text>
+                <View style={styles.brandPill}>
+                  <View style={styles.brandPillDot} />
+                  <Text style={styles.brandPillText}>ENTERPRISE HRMS</Text>
+                </View>
+              </View>
+            )}
 
-            {/* Title */}
-            <Text style={styles.title}>
-              <Text style={[styles.titleBold, { color: theme.title }]}>
-                Shantinath Motors Pvt Ltd{' '}
-              </Text>
-            </Text>
-            <Text style={[styles.subtitle, { color: theme.subtitle }]}>
-              Workforce App
-            </Text>
+            <View style={[styles.formColumn, tablet && styles.formColumnTablet]}>
+              {!tablet && (
+                <View style={styles.mobileLogoWrap}>
+                  <BrandLogo width="100%" height={64} />
+                </View>
+              )}
 
-            {/* Card */}
-            <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder, borderWidth: 1 }]}>
-              <Text style={[styles.label, { color: theme.label }]}>
-                MOBILE NUMBER
+              <Text style={[styles.eyebrow, { color: BRAND.slate }]}>EMPLOYEE PORTAL</Text>
+              <Text style={[styles.title, { color: theme.title }]}>Welcome back</Text>
+              <Text style={[styles.subtitle, { color: theme.subtitle }]}>
+                Sign in to continue to Shantinath JCB HRMS
               </Text>
-              <TextInput
-                placeholder="mobile number"
+
+              <View
                 style={[
-                  styles.input,
-                  { backgroundColor: theme.inputBg, color: theme.inputText, borderColor: theme.inputBorder, borderWidth: 1 },
+                  styles.card,
+                  {
+                    backgroundColor: theme.card,
+                    borderColor: theme.cardBorder,
+                  },
                 ]}
-                placeholderTextColor={theme.placeholder}
-                value={mobileNo}
-                onChangeText={setMobileNo}
-                keyboardType="numeric"
-                maxLength={10}
-              />
+              >
+                <Text style={[styles.label, { color: theme.label }]}>MOBILE NUMBER</Text>
+                <View style={styles.inputShell}>
+                  <Text style={[styles.prefix, { color: theme.placeholder }]}>+91</Text>
+                  <TextInput
+                    placeholder="Enter mobile number"
+                    style={[styles.input, { color: theme.inputText }]}
+                    placeholderTextColor={theme.placeholder}
+                    value={mobileNo}
+                    onChangeText={setMobileNo}
+                    keyboardType="number-pad"
+                    maxLength={10}
+                    returnKeyType="next"
+                  />
+                </View>
 
-              <Text style={[styles.label, { color: theme.label }]}>
-                PASSWORD
-              </Text>
-              <View style={styles.passwordWrapper}>
-                <TextInput
-                  placeholder="••••••••"
-                  style={[
-                    styles.passwordInput,
-                    { backgroundColor: theme.inputBg, color: theme.inputText, borderColor: theme.inputBorder, borderWidth: 1 },
-                  ]}
-                  placeholderTextColor={theme.placeholder}
-                  secureTextEntry={secure}
-                  value={password ?? ''}
-                  onChangeText={setPassword}
-                />
+                <Text style={[styles.label, { color: theme.label }]}>PASSWORD</Text>
+                <View style={styles.passwordWrapper}>
+                  <TextInput
+                    placeholder="Enter password"
+                    style={[styles.passwordInput, { color: theme.inputText }]}
+                    placeholderTextColor={theme.placeholder}
+                    secureTextEntry={secure}
+                    value={password ?? ''}
+                    onChangeText={setPassword}
+                    returnKeyType="done"
+                    onSubmitEditing={handleLogin}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setSecure(!secure)}
+                    style={styles.eyeButton}
+                    activeOpacity={0.7}
+                  >
+                    {secure ? (
+                      <Eye size={20} color={theme.placeholder} />
+                    ) : (
+                      <EyeOff size={20} color={theme.placeholder} />
+                    )}
+                  </TouchableOpacity>
+                </View>
 
                 <TouchableOpacity
-                  onPress={() => setSecure(!secure)}
-                  style={styles.eyeButton}
-                  activeOpacity={0.7}
+                  style={[styles.signInButton, { backgroundColor: BRAND.yellow }]}
+                  onPress={handleLogin}
+                  disabled={loading}
+                  activeOpacity={0.82}
                 >
-                  {secure ? (
-                    <Eye size={20} color={theme.placeholder} />
-                  ) : (
-                    <EyeOff size={20} color={theme.placeholder} />
-                  )}
+                  <Text style={styles.signInText}>Sign In</Text>
+                  <Text style={styles.signInArrow}>→</Text>
                 </TouchableOpacity>
+
+                <View style={styles.secureRow}>
+                  <View style={styles.secureDot} />
+                  <Text style={[styles.secureText, { color: theme.subtitle }]}>
+                    Secure company login
+                  </Text>
+                </View>
               </View>
 
-              <TouchableOpacity
-                style={[styles.signInButton, { backgroundColor: theme.button }]}
-                onPress={handleLogin}
-                disabled={loading}
-              >
-                <Text style={styles.signInText}>Sign In</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* <TouchableOpacity>
-              <Text style={[styles.forgot, { color: theme.forgot }]}>
-                Forgot Password?
+              <Text style={[styles.version, { color: theme.version }]}>
+                VERSION {VersionCheck.getCurrentVersion()} • SHANTINATH MOTORS PVT. LTD.
               </Text>
-            </TouchableOpacity> */}
-
-            <Text style={[styles.version, { color: theme.version }]}>
-              VERSION {VersionCheck.getCurrentVersion()} • ENTERPRISE EDITION
-            </Text>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
       {loading && (
         <View style={mainStyles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#2563EB" />
+          <ActivityIndicator size="large" color={BRAND.yellow} />
         </View>
       )}
     </SafeAreaView>
   );
+
 };
 
 export default SignIn;
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1 },
+  flex: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 28,
   },
-  wrapper: {
+  page: {
+    width: '100%',
+    alignSelf: 'center',
+  },
+  pageTablet: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    minHeight: 560,
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  brandPanel: {
+    flex: 1,
+    minHeight: 560,
+    padding: 34,
+    justifyContent: 'center',
+  },
+  yellowAccent: {
+    width: 54,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: BRAND.yellow,
+    marginBottom: 28,
+  },
+  brandPanelTitle: {
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: '900',
+    letterSpacing: 2,
+    marginTop: 34,
+  },
+  brandPanelSubtitle: {
+    color: '#C7CBD0',
+    fontSize: 14,
+    lineHeight: 22,
+    marginTop: 12,
+    maxWidth: 360,
+  },
+  brandPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: 28,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 20,
+    backgroundColor: '#262626',
+  },
+  brandPillDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: BRAND.yellow,
+    marginRight: 8,
+  },
+  brandPillText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
+  formColumn: {
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: verticalScale(30),
-    paddingBottom: verticalScale(30),
   },
-  logoContainer: {
-    width: moderateScale(96),
-    height: moderateVerticalScale(96),
-    borderRadius: moderateScale(24),
+  formColumnTablet: {
+    flex: 1,
+    width: undefined,
     backgroundColor: '#FFFFFF',
+    paddingHorizontal: 44,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: verticalScale(20),
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
   },
-  logo: {
-    width: moderateScale(76),
-    height: moderateVerticalScale(76),
+  mobileLogoWrap: {
+    width: '92%',
+    marginBottom: 24,
+  },
+  eyebrow: {
+    width: '90%',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.8,
+    marginBottom: 8,
   },
   title: {
-    fontSize: moderateScale(22),
-    letterSpacing: 0.5,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 4,
-  },
-  titleBold: {
+    width: '90%',
+    fontSize: 30,
     fontWeight: '800',
-    color: '#0F172A',
-  },
-  titleLight: {
-    fontWeight: '400',
-    color: '#0F172A',
+    letterSpacing: -0.7,
   },
   subtitle: {
-    fontSize: scale(13),
-    color: '#64748B',
-    marginBottom: verticalScale(28),
-    fontWeight: '500',
-    letterSpacing: 0.5,
+    width: '90%',
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 6,
+    marginBottom: 22,
   },
   card: {
     width: '90%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
-    shadowColor: '#0F172A',
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    shadowColor: BRAND.shadow,
     shadowOpacity: 0.06,
-    shadowRadius: 24,
-    elevation: 4,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 3,
   },
   label: {
-    fontSize: 11,
-    color: '#64748B',
-    marginBottom: 8,
-    marginTop: 14,
-    fontWeight: '600',
-    letterSpacing: 1.2,
+    fontSize: 10,
+    marginBottom: 7,
+    marginTop: 3,
+    fontWeight: '800',
+    letterSpacing: 1.1,
+  },
+  inputShell: {
+    height: 54,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F6F7F8',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BRAND.border,
+  },
+  prefix: {
+    fontSize: 14,
+    fontWeight: '700',
+    paddingLeft: 14,
+    paddingRight: 8,
   },
   input: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    height: 52,
+    flex: 1,
+    height: 54,
+    paddingHorizontal: 8,
     fontSize: 15,
-    color: '#0F172A',
   },
   passwordWrapper: {
-    position: 'relative',
+    height: 54,
     justifyContent: 'center',
+    backgroundColor: '#F6F7F8',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BRAND.border,
   },
   passwordInput: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 14,
-    paddingHorizontal: 16,
+    height: 54,
+    paddingHorizontal: 14,
     paddingRight: 48,
-    height: 52,
     fontSize: 15,
-    color: '#0F172A',
   },
   eyeButton: {
     position: 'absolute',
-    right: 16,
-    height: '100%',
-    justifyContent: 'center',
-  },
-  signInButton: {
-    marginTop: 24,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: '#2563EB',
+    right: 12,
+    width: 34,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#2563EB',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+  },
+  signInButton: {
+    marginTop: 20,
+    height: 54,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   signInText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.5,
+    color: BRAND.black,
+    fontSize: 15,
+    fontWeight: '900',
+    letterSpacing: 0.4,
   },
-  forgot: {
-    color: '#2563EB',
-    marginVertical: 14,
-    fontSize: scale(13),
-    fontWeight: '600',
+  signInArrow: {
+    color: BRAND.black,
+    fontSize: 21,
+    fontWeight: '800',
+    marginLeft: 10,
+    marginTop: -2,
+  },
+  secureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 15,
+  },
+  secureDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: BRAND.success,
+    marginRight: 7,
+  },
+  secureText: {
+    fontSize: 11,
+    fontWeight: '500',
   },
   version: {
-    marginTop: verticalScale(30),
-    fontSize: scale(10),
-    color: '#94A3B8',
-    letterSpacing: 1.5,
-    fontWeight: '500',
+    width: '90%',
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 9,
+    letterSpacing: 0.8,
+    fontWeight: '600',
   },
 });

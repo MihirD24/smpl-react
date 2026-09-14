@@ -14,6 +14,7 @@ import {
   useColorScheme,
   View,
   Animated,
+  useWindowDimensions,
   RefreshControl,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
@@ -26,6 +27,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   getDashboardCount,
 } from '../../services/adminDashboardServices';
+import { getCount } from '../../services/attendanceServices';
+import { checkPunch } from '../../services/punchServices';
 import AppIcon, { IconName } from '../../components/appIcon';
 import {
   moderateScale,
@@ -40,6 +43,8 @@ import {
   getReminderTypeList,
 } from '../../services/projectReminderService';
 import NetInfoComponent from '../../components/netinfoComponent';
+import BrandLogo from '../../components/brandLogo';
+import { BRAND, isTabletWidth, contentMaxWidth } from '../../assets/style/brandTheme';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -158,6 +163,8 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const isFocused = useIsFocused();
+  const { width: screenWidth } = useWindowDimensions();
+  const tabletLayout = isTabletWidth(screenWidth);
 
   // ── Live-pulse animation ──────────────────────────────────────────────────
   const [livePulse] = useState(new Animated.Value(1));
@@ -194,6 +201,26 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     employeesCount: 0,
   });
   const [refreshing, setRefreshing] = useState(false);
+  const [attendanceSummary, setAttendanceSummary] = useState({
+    present: 0,
+    absent: 0,
+    halfday: 0,
+    paidleave: 0,
+  });
+  const [todayPunch, setTodayPunch] = useState<{
+    status: 'BEFORE_PUNCH_IN' | 'AFTER_PUNCH_IN' | 'AFTER_PUNCH_OUT' | 'ON_LEAVE';
+    label: string;
+    inTime: string;
+    outTime: string;
+    attendanceStatus: string;
+  }>({
+    status: 'BEFORE_PUNCH_IN',
+    label: 'Punch In',
+    inTime: '',
+    outTime: '',
+    attendanceStatus: '',
+  });
+
 
   // ── Quick Actions Bottom Sheet ────────────────────────────────────────────
   const quickActionsBottomSheetRef = useRef<BottomSheet>(null);
@@ -226,7 +253,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     text: isDarkMode ? '#F8FAFC' : '#0F172A',
     sub: isDarkMode ? '#94A3B8' : '#64748B',
     border: isDarkMode ? '#2E323E' : '#E2E8F0',
-    primary: '#3B6FD4',
+    primary: BRAND.yellow,
     headerBg: isDarkMode ? '#1E2028' : '#FFFFFF',
     headerBorder: isDarkMode ? '#2E323E' : '#F1F5F9',
     shadow: isDarkMode ? '#000000' : '#0F172A',
@@ -246,6 +273,46 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
       const p = JSON.parse(userInfo);
       setLoginuserRole(p.role || '');
       setLoginuserName(p.name || '');
+    }
+  };
+
+  const fetchAttendanceSnapshot = async () => {
+    try {
+      const month = moment().format('MM');
+      const year = moment().format('YYYY');
+      const [count, punch] = await Promise.all([
+        getCount(month, year, 'user', null),
+        checkPunch(moment().format('YYYY-MM-DD')),
+      ]);
+
+      setAttendanceSummary({
+        present: Number(count?.total_present ?? 0),
+        absent: Number(count?.total_absent ?? 0),
+        halfday: Number(count?.total_halfday ?? 0),
+        paidleave: Number(count?.total_paidleave ?? 0),
+      });
+
+      if (punch && typeof punch === 'object') {
+        const inTime = punch?.in_time || '';
+        const outTime = punch?.out_time || '';
+        const attendanceStatus = punch?.today_attendance_status || '';
+        const status = attendanceStatus === 'Absent'
+          ? 'ON_LEAVE'
+          : !inTime
+            ? 'BEFORE_PUNCH_IN'
+            : !outTime
+              ? 'AFTER_PUNCH_IN'
+              : 'AFTER_PUNCH_OUT';
+        setTodayPunch({
+          status,
+          label: punch?.show_label || (status === 'AFTER_PUNCH_IN' ? 'Punch Out' : status === 'AFTER_PUNCH_OUT' ? 'Completed' : 'Punch In'),
+          inTime,
+          outTime,
+          attendanceStatus,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch attendance snapshot:', error);
     }
   };
 
@@ -278,6 +345,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
       await fetchUserDetails();
       await Promise.allSettled([
         fetchCounts(),
+        fetchAttendanceSnapshot(),
       ]);
       setIsLoading(false);
     };
@@ -290,6 +358,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
       setRefreshing(true);
       await Promise.allSettled([
         fetchCounts(),
+        fetchAttendanceSnapshot(),
         fetchUserDetails(),
       ]);
     } catch (error) {
@@ -385,6 +454,89 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             />
           }
         >
+          <View style={styles.pageContent}>
+            <View style={styles.sectionIntro}>
+              <View style={styles.introAccent} />
+              <View style={styles.introCopy}>
+                <Text style={[styles.sectionEyebrow, { color: t.sub }]}>WORKFORCE OVERVIEW</Text>
+                <Text style={[styles.sectionTitle, { color: t.text }]}>Today at a glance</Text>
+              </View>
+              <View style={[styles.liveBadge, { backgroundColor: isDarkMode ? '#1E2420' : BRAND.successSoft }]}>
+                <Animated.View style={[styles.liveDot, { opacity: livePulse }]} />
+                <Text style={[styles.liveText, { color: BRAND.success }]}>LIVE</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('Punch')}
+              style={[styles.attendanceHero, { backgroundColor: isDarkMode ? '#17191D' : '#111214', borderColor: isDarkMode ? '#2A2D30' : '#111214' }]}
+            >
+              <View style={styles.attendanceHeroTop}>
+                <View style={styles.attendanceHeroTitleWrap}>
+                  <View style={styles.attendanceHeroIcon}>
+                    <AppIcon name="CalendarCheck" size={19} color={BRAND.black} />
+                  </View>
+                  <View>
+                    <Text style={styles.attendanceHeroEyebrow}>TODAY'S ATTENDANCE</Text>
+                    <Text style={styles.attendanceHeroTitle}>
+                      {todayPunch.status === 'AFTER_PUNCH_OUT' ? 'Attendance completed' : todayPunch.status === 'AFTER_PUNCH_IN' ? 'You are working' : todayPunch.status === 'ON_LEAVE' ? 'Leave / absent' : 'Ready to start'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.attendanceStatusBadge}>
+                  <View style={[styles.attendanceStatusDot, { backgroundColor: todayPunch.status === 'AFTER_PUNCH_IN' ? BRAND.success : todayPunch.status === 'ON_LEAVE' ? '#F59E0B' : BRAND.yellow }]} />
+                  <Text style={styles.attendanceStatusText}>
+                    {todayPunch.status === 'AFTER_PUNCH_IN' ? 'WORKING' : todayPunch.status === 'AFTER_PUNCH_OUT' ? 'DONE' : todayPunch.status === 'ON_LEAVE' ? 'LEAVE' : 'READY'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.attendanceHeroMiddle}>
+                <View>
+                  <Text style={styles.attendanceHeroTimeLabel}>PUNCH IN</Text>
+                  <Text style={styles.attendanceHeroTime}>{todayPunch.inTime || '--:--'}</Text>
+                </View>
+                <View style={styles.attendanceHeroDivider} />
+                <View>
+                  <Text style={styles.attendanceHeroTimeLabel}>PUNCH OUT</Text>
+                  <Text style={styles.attendanceHeroTime}>{todayPunch.outTime || '--:--'}</Text>
+                </View>
+                <View style={styles.attendanceHeroCta}>
+                  <Text style={styles.attendanceHeroCtaText}>{todayPunch.status === 'AFTER_PUNCH_IN' ? 'Punch Out' : todayPunch.status === 'AFTER_PUNCH_OUT' ? 'View' : 'Punch In'}</Text>
+                  <AppIcon name="ArrowUpRight" size={16} color={BRAND.black} />
+                </View>
+              </View>
+
+              <View style={styles.attendanceSummaryRow}>
+                <Text style={styles.attendanceSummaryText}>This month</Text>
+                <Text style={styles.attendanceSummaryValue}>{attendanceSummary.present} Present</Text>
+                <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.absent} Absent</Text>
+                <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.paidleave} Leave</Text>
+              </View>
+            </TouchableOpacity>
+
+            <View style={[styles.actionStrip, { backgroundColor: t.card, borderColor: t.border }]}>
+              {[
+                { label: 'Attendance', icon: 'CalendarCheck', route: 'Attendancelist' as const },
+                { label: 'Leave', icon: 'CalendarDays', route: 'LeaveList' as const },
+                { label: 'Salary', icon: 'WalletCards', route: 'Salary' as const },
+                { label: 'Holidays', icon: 'CalendarHeart', route: 'HolidayList' as const },
+              ].map(item => (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.actionItem}
+                  activeOpacity={0.75}
+                  onPress={() => navigation.navigate(item.route)}
+                >
+                  <View style={[styles.actionIcon, { backgroundColor: isDarkMode ? '#2B2D30' : BRAND.yellowSoft }]}>
+                    <AppIcon name={item.icon as any} size={18} color={isDarkMode ? BRAND.yellow : BRAND.black} />
+                  </View>
+                  <Text style={[styles.actionLabel, { color: t.text }]} numberOfLines={1}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
           {/* Counts Grid */}
           <View style={styles.gridContainer}>
             {isLoading ? (
@@ -393,9 +545,9 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                   style={[
                     styles.card,
                     {
+                      width: loginuserRole === 'Employee' ? '100%' : tabletLayout ? '23.5%' : '48.5%',
                       backgroundColor: t.card,
                       borderColor: t.border,
-                      width: loginuserRole === 'Employee' ? '100%' : '48%',
                     },
                   ]}
                 >
@@ -405,17 +557,17 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                 </View>
                 {loginuserRole !== 'Employee' && (
                   <>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                    <View style={[styles.card, { width: tabletLayout ? '23.5%' : '48.5%', backgroundColor: t.card, borderColor: t.border }]}>
                       <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
                       <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
                       <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
                     </View>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                    <View style={[styles.card, { width: tabletLayout ? '23.5%' : '48.5%', backgroundColor: t.card, borderColor: t.border }]}>
                       <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
                       <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
                       <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
                     </View>
-                    <View style={[styles.card, { backgroundColor: t.card, borderColor: t.border }]}>
+                    <View style={[styles.card, { width: tabletLayout ? '23.5%' : '48.5%', backgroundColor: t.card, borderColor: t.border }]}>
                       <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
                       <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
                       <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
@@ -435,7 +587,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       backgroundColor: t.card,
                       borderColor: t.border,
                       shadowColor: t.shadow,
-                      width: loginuserRole === 'Employee' ? '100%' : '48%',
+                      width: loginuserRole === 'Employee' ? '100%' : tabletLayout ? '23.5%' : '48.5%',
                     },
                   ]}
                 >
@@ -460,6 +612,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       style={[
                         styles.card,
                         {
+                          width: tabletLayout ? '23.5%' : '48.5%',
                           backgroundColor: t.card,
                           borderColor: t.border,
                           shadowColor: t.shadow,
@@ -484,6 +637,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       style={[
                         styles.card,
                         {
+                          width: tabletLayout ? '23.5%' : '48.5%',
                           backgroundColor: t.card,
                           borderColor: t.border,
                           shadowColor: t.shadow,
@@ -508,6 +662,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                       style={[
                         styles.card,
                         {
+                          width: tabletLayout ? '23.5%' : '48.5%',
                           backgroundColor: t.card,
                           borderColor: t.border,
                           shadowColor: t.shadow,
@@ -532,10 +687,11 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
             )}
           </View>
 
-          {/* Branding */}
-          <Text style={[styles.brandName, { color: isDarkMode ? '#2A2D38' : '#EAEDFF' }]}>
-            Shantinath Motors Pvt Ltd
-          </Text>
+          <View style={[styles.enterpriseFooter, { borderTopColor: t.border }]}>
+            <BrandLogo width={isTabletWidth(760) ? 260 : 210} height={34} compact />
+            <Text style={[styles.footerCaption, { color: t.sub }]}>Employee & Workforce Management</Text>
+          </View>
+          </View>
         </ScrollView>
 
         {/* ── Quick Actions Bottom Sheet ── */}
@@ -620,50 +776,130 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: moderateScale(16),
-    paddingTop: verticalScale(18),
-    paddingBottom: verticalScale(100),
+    paddingTop: verticalScale(14),
+    paddingBottom: verticalScale(110),
   },
-  headerContainer: {
+  pageContent: {
+    width: '100%',
+    maxWidth: 1120,
+    alignSelf: 'center',
+  },
+  sectionIntro: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: verticalScale(18),
+    marginBottom: verticalScale(14),
   },
-  welcomeText: {
-    fontSize: moderateScale(22),
+  introAccent: {
+    width: 5,
+    height: 38,
+    borderRadius: 3,
+    backgroundColor: BRAND.yellow,
+    marginRight: 10,
+  },
+  introCopy: { flex: 1 },
+  sectionEyebrow: {
+    fontSize: moderateScale(9),
     fontWeight: '800',
-    letterSpacing: -0.2,
+    letterSpacing: 1.4,
   },
-  dateText: {
-    fontSize: moderateScale(12),
-    fontWeight: '500',
-    marginTop: verticalScale(2),
+  sectionTitle: {
+    fontSize: moderateScale(21),
+    fontWeight: '800',
+    marginTop: 2,
   },
-  quickActionsTrigger: {
-    width: moderateScale(42),
-    height: moderateScale(42),
-    borderRadius: moderateScale(12),
-    justifyContent: 'center',
+  liveBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 16,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: BRAND.success,
+    marginRight: 6,
+  },
+  liveText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  attendanceHero: {
+    borderRadius: moderateScale(20),
     borderWidth: 1,
+    padding: moderateScale(16),
+    marginBottom: verticalScale(14),
+    overflow: 'hidden',
+  },
+  attendanceHeroTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  attendanceHeroTitleWrap: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  attendanceHeroIcon: {
+    width: 42, height: 42, borderRadius: 13, backgroundColor: BRAND.yellow,
+    alignItems: 'center', justifyContent: 'center', marginRight: 11,
+  },
+  attendanceHeroEyebrow: { color: '#A1A1AA', fontSize: 9, fontWeight: '800', letterSpacing: 1.1 },
+  attendanceHeroTitle: { color: '#FFFFFF', fontSize: moderateScale(15), fontWeight: '800', marginTop: 2 },
+  attendanceStatusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#25272B', borderRadius: 20, paddingHorizontal: 9, paddingVertical: 6 },
+  attendanceStatusDot: { width: 6, height: 6, borderRadius: 3, marginRight: 5 },
+  attendanceStatusText: { color: '#E4E4E7', fontSize: 8, fontWeight: '900', letterSpacing: 0.8 },
+  attendanceHeroMiddle: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 18 },
+  attendanceHeroTimeLabel: { color: '#71717A', fontSize: 8, fontWeight: '800', letterSpacing: 0.8 },
+  attendanceHeroTime: { color: '#FFFFFF', fontSize: moderateScale(18), fontWeight: '800', marginTop: 2 },
+  attendanceHeroDivider: { width: 1, height: 30, backgroundColor: '#303236', marginHorizontal: 16, marginBottom: 2 },
+  attendanceHeroCta: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', backgroundColor: BRAND.yellow, borderRadius: 12, paddingHorizontal: 11, paddingVertical: 10 },
+  attendanceHeroCtaText: { color: BRAND.black, fontSize: 10, fontWeight: '900', marginRight: 5 },
+  attendanceSummaryRow: { flexDirection: 'row', alignItems: 'center', marginTop: 15, paddingTop: 11, borderTopWidth: 1, borderTopColor: '#2B2D31' },
+  attendanceSummaryText: { color: '#A1A1AA', fontSize: 9, fontWeight: '700', marginRight: 'auto' },
+  attendanceSummaryValue: { color: '#E4E4E7', fontSize: 9, fontWeight: '800', marginLeft: 10 },
+  attendanceSummaryMuted: { color: '#71717A', fontSize: 9, fontWeight: '700', marginLeft: 10 },
+  actionStrip: {
+    flexDirection: 'row',
+    borderRadius: moderateScale(16),
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    marginBottom: verticalScale(16),
+  },
+  actionItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 70,
+  },
+  actionIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 5,
+  },
+  actionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
   },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginVertical: verticalScale(8),
   },
   card: {
-    width: '48%',
+    width: '48.5%',
     borderRadius: moderateScale(16),
     padding: moderateScale(16),
     borderWidth: 1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.055,
+    shadowRadius: 10,
     elevation: 2,
-    marginBottom: verticalScale(16),
-    minHeight: scale(120),
+    marginBottom: verticalScale(12),
+    minHeight: scale(118),
     justifyContent: 'space-between',
   },
   cardHeader: {
@@ -680,31 +916,31 @@ const styles = StyleSheet.create({
   },
   cardValue: {
     fontSize: moderateScale(24),
-    fontWeight: '800',
+    fontWeight: '900',
     marginTop: verticalScale(12),
   },
   cardLabel: {
-    fontSize: moderateScale(12),
-    fontWeight: '600',
+    fontSize: moderateScale(11),
+    fontWeight: '700',
     marginTop: verticalScale(4),
   },
-  brandName: {
-    fontSize: moderateScale(32),
-    fontWeight: '900',
-    fontStyle: 'italic',
-    lineHeight: moderateScale(38),
-    marginTop: verticalScale(24),
-    marginBottom: verticalScale(8),
-    textAlign: 'right',
+  enterpriseFooter: {
+    marginTop: 8,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    alignItems: 'center',
   },
-
-  // ── Bottom Sheet ──────────────────────────────────────────────────────────
+  footerCaption: {
+    fontSize: 10,
+    fontWeight: '500',
+    marginTop: 5,
+  },
   bottomSheetBackground: {
     borderTopLeftRadius: moderateScale(24),
     borderTopRightRadius: moderateScale(24),
   },
   bottomSheetIndicator: {
-    backgroundColor: '#E0E4EF',
+    backgroundColor: '#BFC4C9',
     width: 40,
   },
   bottomSheetContent: {
@@ -718,25 +954,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: verticalScale(16),
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F3FF',
+    borderBottomColor: BRAND.border,
     marginBottom: verticalScale(16),
   },
   quickActionsTitle: {
     fontSize: moderateScale(14),
     fontWeight: '800',
-    letterSpacing: 0.2,
   },
   closeBtn: {
-    width: moderateScale(28),
-    height: moderateScale(28),
-    borderRadius: moderateScale(16),
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(15),
     justifyContent: 'center',
     alignItems: 'center',
   },
-  quickActionsContainer: {
-    gap: 10,
-    paddingBottom: verticalScale(14),
-  },
+  quickActionsContainer: { gap: 10, paddingBottom: verticalScale(14) },
   quickActionItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -746,9 +978,9 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(14),
   },
   quickActionIconWrap: {
-    width: moderateScale(32),
-    height: moderateScale(32),
-    borderRadius: moderateScale(12),
+    width: moderateScale(34),
+    height: moderateScale(34),
+    borderRadius: moderateScale(11),
     justifyContent: 'center',
     alignItems: 'center',
   },

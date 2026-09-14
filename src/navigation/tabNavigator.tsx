@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   useColorScheme,
+  useWindowDimensions,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +16,9 @@ import ProfilePage from '../screens/profile/profile';
 import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import { AuthContext } from '../context/authContext';
 import AppIcon from '../components/appIcon';
+import BrandLogo from '../components/brandLogo';
+import { BRAND, isTabletWidth } from '../assets/style/brandTheme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,6 +30,9 @@ interface HomeHeaderProps {
 const HomeHeader: React.FC<HomeHeaderProps> = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const tablet = isTabletWidth(width);
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
@@ -42,11 +49,10 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ navigation }) => {
   }, []);
 
   const t = {
-    bg: isDarkMode ? '#1E2028' : '#FFFFFF',
-    border: isDarkMode ? '#2A2D38' : '#F0F3FF',
-    text: isDarkMode ? '#F0F0F0' : '#1A1D2E',
-    sub: '#9098B1',
-    primary: '#3B6FD4',
+    bg: isDarkMode ? '#151719' : '#FFFFFF',
+    border: isDarkMode ? '#292C30' : '#E9EDF1',
+    text: isDarkMode ? '#F7F7F8' : '#111827',
+    sub: isDarkMode ? '#A5ABB3' : '#64748B',
   };
 
   return (
@@ -56,33 +62,59 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ navigation }) => {
         {
           backgroundColor: t.bg,
           borderBottomColor: t.border,
+          paddingTop: Math.max(insets.top, 8),
         },
       ]}
     >
-      {/* Left: Welcome text */}
-      <View style={styles.headerLeft}>
-        <Text style={[styles.headerGreeting, { color: t.sub }]}>
-          Welcome Back,
-        </Text>
-        <Text style={[styles.headerName, { color: t.text }]} numberOfLines={1}>
-          {userName || 'User'}
-        </Text>
-        <Text style={[styles.headerSub, { color: t.sub }]}>
-          Here is your progress for today.
-        </Text>
-      </View>
-
-      {/* Right: Notification bell */}
-      <TouchableOpacity
-        onPress={() => navigation.navigate('NotificationScreen')}
-        style={[
-          styles.notifBtn,
-          { backgroundColor: isDarkMode ? '#2A2D38' : '#EEF2FF' },
-        ]}
-        activeOpacity={0.75}
-      >
-        <AppIcon name="Bell" color={t.primary} size={20} />
-      </TouchableOpacity>
+      {tablet ? (
+        <View style={styles.tabletHeaderRow}>
+          <View style={styles.headerLogoWrapTablet}>
+            <BrandLogo width={142} height={43} compact />
+          </View>
+          <View style={styles.headerLeftTablet}>
+            <Text style={[styles.headerGreeting, { color: t.sub }]}>WELCOME BACK</Text>
+            <Text style={[styles.headerName, { color: t.text }]} numberOfLines={1}>
+              {userName || 'Employee'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('NotificationScreen')}
+            style={[styles.notifBtn, { backgroundColor: isDarkMode ? '#25282C' : '#FFF7CC' }]}
+            activeOpacity={0.75}
+          >
+            <AppIcon name="Bell" color={isDarkMode ? BRAND.yellow : BRAND.black} size={21} />
+            <View style={styles.notifDot} />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          <View style={styles.mobileHeaderTop}>
+            <View style={styles.headerLogoWrapMobile}>
+              <BrandLogo width={142} height={42} compact />
+            </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('NotificationScreen')}
+              style={[styles.notifBtn, { backgroundColor: isDarkMode ? '#25282C' : '#FFF7CC' }]}
+              activeOpacity={0.75}
+            >
+              <AppIcon name="Bell" color={isDarkMode ? BRAND.yellow : BRAND.black} size={21} />
+              <View style={styles.notifDot} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.mobileWelcomeRow}>
+            <View style={styles.welcomeAccent} />
+            <View style={styles.headerLeftMobile}>
+              <Text style={[styles.headerGreeting, { color: t.sub }]}>WELCOME BACK</Text>
+              <Text style={[styles.headerName, { color: t.text }]} numberOfLines={1}>
+                {userName || 'Employee'}
+              </Text>
+            </View>
+            <View style={styles.systemBadge}>
+              <Text style={styles.systemBadgeText}>HRMS</Text>
+            </View>
+          </View>
+        </>
+      )}
     </View>
   );
 };
@@ -92,7 +124,7 @@ export default function TabNavigator() {
   const { userInfo } = useContext(AuthContext);
   const isDarkMode = useColorScheme() === 'dark';
   const tabTheme = {
-    active: '#3B82F6',
+    active: BRAND.black,
     inactive: isDarkMode ? '#94A3B8' : '#94A3B8',
     background: isDarkMode ? '#111827' : '#FFFFFF',
     border: isDarkMode ? '#334155' : '#E5E7EB',
@@ -125,9 +157,9 @@ export default function TabNavigator() {
             backgroundColor: tabTheme.background,
             borderTopColor: tabTheme.border,
             borderTopWidth: 1,
-            paddingBottom: 16,
-            height: 70,
-            paddingTop: 10,
+            paddingBottom: 10,
+            height: 68,
+            paddingTop: 8,
           },
         }}
       >
@@ -208,39 +240,92 @@ export default function TabNavigator() {
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   headerContainer: {
+    minHeight: 100,
+    paddingHorizontal: 16,
+    paddingBottom: 11,
+    borderBottomWidth: 1,
+  },
+  tabletHeaderRow: {
+    minHeight: 66,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  mobileHeaderTop: {
+    minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 52, // account for status bar
-    paddingBottom: 14,
-    borderBottomWidth: 1,
   },
-  headerLeft: {
+  headerLogoWrapMobile: {
+    width: 150,
+    height: 43,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  headerLogoWrapTablet: {
+    width: 150,
+    height: 48,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginRight: 18,
+  },
+  headerLeftTablet: {
     flex: 1,
-    marginRight: 12,
+  },
+  mobileWelcomeRow: {
+    minHeight: 38,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  welcomeAccent: {
+    width: 4,
+    height: 30,
+    borderRadius: 2,
+    backgroundColor: BRAND.yellow,
+    marginRight: 9,
+  },
+  headerLeftMobile: {
+    flex: 1,
+    minWidth: 0,
+  },
+  systemBadge: {
+    marginLeft: 10,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 8,
+    backgroundColor: BRAND.black,
+  },
+  systemBadgeText: {
+    color: BRAND.yellow,
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
   headerGreeting: {
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-    marginBottom: 1,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.3,
   },
   headerName: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: '800',
-    letterSpacing: 0.1,
-  },
-  headerSub: {
-    fontSize: 12,
-    fontWeight: '500',
     marginTop: 2,
   },
   notifBtn: {
     width: 42,
     height: 42,
-    borderRadius: 14,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  notifDot: {
+    position: 'absolute',
+    top: 9,
+    right: 10,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D92D20',
   },
 });

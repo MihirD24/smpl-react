@@ -35,6 +35,8 @@ const NotificationScreen: React.FC<
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const notificationCount = notificationList.length;
+
   const handleNotificationData = async () => {
     try {
       setRefreshing(true);
@@ -60,26 +62,27 @@ const NotificationScreen: React.FC<
           { backgroundColor: isDarkMode ? '#1E1E1E' : '#FFFFFF' },
         ]}
       >
-        {/* Left Icon */}
         <View style={styles.iconContainer}>
-          <AppIcon name="MessageSquareMore" size={20} color="#4A90E2" />
+          <AppIcon name="Bell" size={21} color="#111111" />
         </View>
 
-        {/* Text Content */}
         <View style={styles.textContainer}>
-          <Text
-            style={[styles.title, { color: isDarkMode ? '#FFFFFF' : '#222' }]}
-            numberOfLines={1}
-          >
-            {item.title}
-          </Text>
+          <View style={styles.titleRow}>
+            <Text
+              style={[styles.title, { color: isDarkMode ? '#FFFFFF' : '#171717' }]}
+              numberOfLines={2}
+            >
+              {item.title}
+            </Text>
+            <View style={styles.unreadDot} />
+          </View>
 
           <Text
             style={[
               styles.description,
-              { color: isDarkMode ? '#BBBBBB' : '#555' },
+              { color: isDarkMode ? '#B9BEC7' : '#5F6368' },
             ]}
-            numberOfLines={2}
+            numberOfLines={3}
           >
             {item.description}
           </Text>
@@ -99,18 +102,24 @@ const NotificationScreen: React.FC<
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         {loading ? (
           <FlatList
-            contentContainerStyle={{ padding: 16 }}
-            data={[1, 2, 3, 4]}
+            contentContainerStyle={styles.listContent}
+            data={[1, 2, 3, 4, 5]}
             keyExtractor={(_, index) => index.toString()}
             renderItem={() => <NotificationCardSkeleton />}
           />
-        ) : notificationList.length === 0 ? (
+        ) : notificationCount === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={{ color: colors.text }}>No Notifications Found</Text>
+            <View style={styles.emptyIcon}>
+              <AppIcon name="BellOff" size={30} color="#111111" />
+            </View>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>No Notifications</Text>
+            <Text style={[styles.emptyText, { color: isDarkMode ? '#AEB4BD' : '#73777D' }]}>
+              You're all caught up. New updates will appear here.
+            </Text>
           </View>
         ) : (
           <FlatList
-            contentContainerStyle={{ padding: 16 }}
+            contentContainerStyle={styles.listContent}
             data={notificationList}
             keyExtractor={item => item.id.toString()}
             renderItem={renderItem}
@@ -119,7 +128,20 @@ const NotificationScreen: React.FC<
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={handleNotificationData}
+                tintColor={isDarkMode ? '#F9C900' : '#111111'}
               />
+            }
+            ListHeaderComponent={
+              <View style={styles.summaryCard}>
+                <View>
+                  <Text style={styles.summaryEyebrow}>NOTIFICATIONS</Text>
+                  <Text style={styles.summaryTitle}>Stay updated</Text>
+                  <Text style={styles.summarySub}>Latest HRMS updates and alerts</Text>
+                </View>
+                <View style={styles.countBadge}>
+                  <Text style={styles.countText}>{notificationCount}</Text>
+                </View>
+              </View>
             }
           />
         )}
@@ -131,41 +153,121 @@ const NotificationScreen: React.FC<
 export default NotificationScreen;
 
 const styles = StyleSheet.create({
-  card: {
+  listContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 28,
+  },
+  summaryCard: {
+    backgroundColor: '#F9C900',
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
-    borderRadius: 14,
+    justifyContent: 'space-between',
+  },
+  summaryEyebrow: {
+    color: '#111111',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
+  summaryTitle: {
+    color: '#111111',
+    fontSize: 22,
+    fontWeight: '800',
+    marginTop: 3,
+  },
+  summarySub: {
+    color: '#3F3A18',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  countBadge: {
+    minWidth: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: '#111111',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  countText: {
+    color: '#F9C900',
+    fontSize: 19,
+    fontWeight: '800',
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 15,
+    borderRadius: 16,
     marginBottom: 12,
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    shadowRadius: 5,
   },
   iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: '#E8F0FE',
+    width: 44,
+    height: 44,
+    borderRadius: 13,
+    backgroundColor: '#F9C900',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   textContainer: {
     flex: 1,
+    minWidth: 0,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   title: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 4,
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '700',
+    lineHeight: 20,
+    paddingRight: 6,
+  },
+  unreadDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#F9C900',
+    marginTop: 6,
   },
   description: {
     fontSize: 13,
+    lineHeight: 19,
+    marginTop: 5,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  emptyIcon: {
+    width: 68,
+    height: 68,
+    borderRadius: 22,
+    backgroundColor: '#F9C900',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  emptyText: {
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
+    marginTop: 6,
   },
 });
