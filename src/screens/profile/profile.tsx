@@ -25,6 +25,7 @@ import {
 } from 'react-native-size-matters';
 import { useFocusEffect } from '@react-navigation/native';
 import { MoreHorizontal } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import NetInfoComponent from '../../components/netinfoComponent';
 
 type ProfileScreenNav = TabWithStackNavProp<'Profile'>;
@@ -119,7 +120,7 @@ const MenuRow: React.FC<MenuRowProps> = ({
   iconBoxBackgroundColor,
   chevronColor,
   badge,
-  badgeColor = '#DBEAFE',
+  badgeColor = '#FFF7CC',
   badgeTextColor = '#1D4ED8',
   hasDot = false,
   onPress,
@@ -160,7 +161,7 @@ const MenuRow: React.FC<MenuRowProps> = ({
             { backgroundColor: iconBoxBackgroundColor },
           ]}
         >
-          <AppIcon name={iconName} size={19} color="#2563EB" />
+          <AppIcon name={iconName} size={19} color="#111111" />
         </View>
         <Text style={[styles.menuLabel, { color: textColor }]}>{label}</Text>
         {badge && (
@@ -226,6 +227,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
 }) => {
   const { logout } = useAuth();
   const isDarkMode = useColorScheme() === 'dark';
+  const insets = useSafeAreaInsets();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isReady, setIsReady] = useState(false);
 
@@ -237,20 +239,20 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const theme = {
-    screenBg: isDarkMode ? '#111827' : '#F6FAFF',
-    cardBg: isDarkMode ? '#1F2937' : '#FFFFFF',
-    cardBorder: isDarkMode ? '#334155' : '#E2E8F0',
-    sectionLabel: isDarkMode ? '#64748B' : '#94A3B8',
-    title: isDarkMode ? '#F9FAFB' : '#0F172A',
-    text: isDarkMode ? '#E5E7EB' : '#1E293B',
-    muted: isDarkMode ? '#94A3B8' : '#64748B',
-    subMuted: isDarkMode ? '#64748B' : '#CBD5E1',
-    quickIconBg: isDarkMode ? '#172554' : '#EFF6FF',
-    divider: isDarkMode ? '#334155' : '#F1F5F9',
-    signOutBg: isDarkMode ? '#172554' : '#FFFFFF',
-    signOutBorder: isDarkMode ? '#1D4ED8' : '#DBEAFE',
-    heroBg1: isDarkMode ? '#172554' : '#EFF6FF',
-    heroBg2: isDarkMode ? '#1e3a5f' : '#DBEAFE',
+    screenBg: isDarkMode ? '#111111' : '#F5F6F7',
+    cardBg: isDarkMode ? '#1C1C1C' : '#FFFFFF',
+    cardBorder: isDarkMode ? '#333333' : '#E4E6E8',
+    sectionLabel: isDarkMode ? '#A3A3A3' : '#6B7280',
+    title: isDarkMode ? '#FFFFFF' : '#171717',
+    text: isDarkMode ? '#F3F4F6' : '#242424',
+    muted: isDarkMode ? '#A3A3A3' : '#5F6368',
+    subMuted: isDarkMode ? '#737373' : '#8A8F98',
+    quickIconBg: isDarkMode ? '#2A260F' : '#FFF7CC',
+    divider: isDarkMode ? '#333333' : '#EDEDED',
+    signOutBg: isDarkMode ? '#1C1C1C' : '#FFFFFF',
+    signOutBorder: isDarkMode ? '#5A4A00' : '#E7C000',
+    heroBg1: isDarkMode ? '#1C1C1C' : '#111111',
+    heroBg2: isDarkMode ? '#2A2A2A' : '#1C1C1C',
   };
 
   const startEntryAnimations = () => {
@@ -385,9 +387,9 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
       }
     : {
         title: 'ON TIME',
-        iconBg: isDarkMode ? '#172554' : '#DBEAFE',
-        iconColor: isDarkMode ? '#60A5FA' : '#2563EB',
-        titleColor: isDarkMode ? '#BFDBFE' : '#64748B',
+        iconBg: isDarkMode ? '#2A260F' : '#FFF7CC',
+        iconColor: isDarkMode ? '#F9C900' : '#111111',
+        titleColor: isDarkMode ? '#FDE68A' : '#64748B',
         valueColor: isDarkMode ? '#F8FAFC' : '#0F172A',
         unitColor: isDarkMode ? '#94A3B8' : '#94A3B8',
         label: `${formatMinutes(timeDiff)}`,
@@ -414,13 +416,13 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
           <View
             style={[
               styles.decCircle1,
-              { backgroundColor: isDarkMode ? '#1e3a8a' : '#BFDBFE' },
+              { backgroundColor: isDarkMode ? '#3A3300' : '#F9C900' },
             ]}
           />
           <View
             style={[
               styles.decCircle2,
-              { backgroundColor: isDarkMode ? '#1e3358' : '#DBEAFE' },
+              { backgroundColor: isDarkMode ? '#2A260F' : '#FFF7CC' },
             ]}
           />
 
@@ -450,7 +452,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
                 { transform: [{ scale: pulseAnim }] },
               ]}
             >
-              <AppIcon name="BadgeCheck" size={16} color="#2563EB" />
+              <AppIcon name="BadgeCheck" size={16} color="#111111" />
             </Animated.View>
           </Animated.View>
 
@@ -467,7 +469,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             </Text>
 
             <View style={styles.rolePill}>
-              <AppIcon name="Briefcase" size={11} color="#2563EB" />
+              <AppIcon name="Briefcase" size={11} color="#111111" />
               <Text style={styles.rolePillText}>
                 {getRoleLabel(profile?.user_type ?? 'Employee')} • Smpl
               </Text>
@@ -476,11 +478,30 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             <View style={styles.locationRow}>
               <AppIcon name="MapPin" size={12} color="#64748B" />
               <Text style={[styles.locationText, { color: theme.muted }]}>
-                Gandhidham, India
+                Employee Profile
               </Text>
             </View>
           </Animated.View>
         </View>
+
+        {/* ── Employee Information ── */}
+        <AnimatedCard delay={80} style={styles.infoCard}>
+          <View style={styles.infoHeader}>
+            <View style={styles.infoHeaderIcon}>
+              <AppIcon name="UserRound" size={18} color="#111111" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.infoTitle, { color: theme.title }]}>Employee Information</Text>
+              <Text style={[styles.infoSubtitle, { color: theme.muted }]}>Your registered account details</Text>
+            </View>
+          </View>
+
+          <InfoRow label="Employee ID" value={profile?.id ? String(profile.id) : '—'} textColor={theme.text} mutedColor={theme.muted} />
+          <InfoRow label="Username" value={profile?.username || '—'} textColor={theme.text} mutedColor={theme.muted} />
+          <InfoRow label="Mobile" value={profile?.mobile_no || '—'} textColor={theme.text} mutedColor={theme.muted} />
+          <InfoRow label="Email" value={profile?.email || '—'} textColor={theme.text} mutedColor={theme.muted} />
+          <InfoRow label="Date of Joining" value={profile?.doj || '—'} textColor={theme.text} mutedColor={theme.muted} last />
+        </AnimatedCard>
 
         {/* ── Stats Grid (Employee only) ── */}
         {!isAdmin && (
@@ -498,7 +519,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
               >
                 <View style={styles.statGridHeader}>
                   <View style={styles.statGridIconBox}>
-                    <AppIcon name="CalendarX" size={17} color="#2563EB" />
+                    <AppIcon name="CalendarX" size={17} color="#111111" />
                   </View>
                   <Text style={[styles.statGridTitle, { color: theme.muted }]}>
                     MY LEAVES
@@ -570,8 +591,15 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
           color={theme.sectionLabel}
           delay={180}
         />
-        <AnimatedCard delay={220}>
-          <View style={styles.quickGrid}>
+        <AnimatedCard delay={220} style={styles.quickAccessAnimatedCard}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            nestedScrollEnabled
+            directionalLockEnabled
+            contentContainerStyle={styles.quickScrollContent}
+          >
+            <View style={styles.quickGrid}>
             {[
               {
                 icon: 'CalendarCheck',
@@ -604,7 +632,8 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
                 delay={index * 60}
               />
             ))}
-          </View>
+            </View>
+          </ScrollView>
         </AnimatedCard>
 
         {/* ── Operations ── */}
@@ -671,6 +700,19 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
   );
 };
 
+const InfoRow: React.FC<{
+  label: string;
+  value: string;
+  textColor: string;
+  mutedColor: string;
+  last?: boolean;
+}> = ({ label, value, textColor, mutedColor, last }) => (
+  <View style={[styles.infoRow, last && { borderBottomWidth: 0 }]}>
+    <Text style={[styles.infoLabel, { color: mutedColor }]}>{label}</Text>
+    <Text style={[styles.infoValue, { color: textColor }]} numberOfLines={2}>{value}</Text>
+  </View>
+);
+
 // ─── Quick Card with press animation ──────────────────────────
 const QuickCard: React.FC<{
   icon: string;
@@ -715,7 +757,7 @@ const QuickCard: React.FC<{
         onPressOut={handlePressOut}
       >
         <View style={[styles.quickIconBox, { backgroundColor: iconBg }]}>
-          <AppIcon name={icon} size={22} color="#2563EB" />
+          <AppIcon name={icon} size={22} color="#111111" />
         </View>
         <Text style={[styles.quickLabel, { color: textColor }]}>{label}</Text>
       </TouchableOpacity>
@@ -759,7 +801,7 @@ const SignOutButton: React.FC<{
         onPressOut={handlePressOut}
         activeOpacity={1}
       >
-        <AppIcon name="LogOut" size={17} color="#2563EB" />
+        <AppIcon name="LogOut" size={17} color="#111111" />
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
     </Animated.View>
@@ -770,12 +812,14 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingBottom: verticalScale(40) },
+  scrollContent: { paddingBottom: verticalScale(40), width: '100%', alignItems: 'center' },
 
   // ── Hero ──────────────────────────────────────────────────────
   heroBlock: {
+    width: '100%',
+    maxWidth: 1120,
     alignItems: 'center',
-    paddingTop: verticalScale(50),
+    paddingTop: verticalScale(34),
     paddingBottom: verticalScale(32),
     marginBottom: verticalScale(20),
     overflow: 'hidden',
@@ -810,7 +854,7 @@ const styles = StyleSheet.create({
     padding: moderateScale(3),
     borderRadius: moderateScale(50),
     backgroundColor: '#FFFFFF',
-    shadowColor: '#2563EB',
+    shadowColor: '#F9C900',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -847,7 +891,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: moderateScale(5),
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#FFF7CC',
     borderRadius: moderateScale(20),
     paddingHorizontal: moderateScale(12),
     paddingVertical: verticalScale(4),
@@ -855,7 +899,7 @@ const styles = StyleSheet.create({
   },
   rolePillText: {
     fontSize: moderateScale(11),
-    color: '#2563EB',
+    color: '#111111',
     fontWeight: '600',
   },
   locationRow: {
@@ -864,6 +908,38 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   locationText: { fontSize: moderateScale(11), color: '#64748B' },
+
+  // ── Employee Info ────────────────────────────────────────────
+  infoCard: {
+    width: '92%',
+    maxWidth: 980,
+    paddingHorizontal: moderateScale(16),
+    paddingVertical: moderateScale(14),
+    backgroundColor: '#FFFFFF',
+    borderRadius: moderateScale(18),
+    borderWidth: 1,
+    borderColor: '#E4E6E8',
+    marginHorizontal: moderateScale(16),
+    marginBottom: verticalScale(20),
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  infoHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(8) },
+  infoHeaderIcon: {
+    width: moderateScale(38), height: moderateScale(38), borderRadius: moderateScale(11),
+    backgroundColor: '#FFF7CC', alignItems: 'center', justifyContent: 'center', marginRight: moderateScale(10),
+  },
+  infoTitle: { fontSize: moderateScale(14), fontWeight: '800' },
+  infoSubtitle: { fontSize: moderateScale(10), marginTop: 2 },
+  infoRow: {
+    flexDirection: 'row', alignItems: 'center', minHeight: verticalScale(38),
+    paddingVertical: verticalScale(7), borderBottomWidth: 1, borderBottomColor: '#EEEEEE',
+  },
+  infoLabel: { width: moderateScale(105), fontSize: moderateScale(11), fontWeight: '600' },
+  infoValue: { flex: 1, textAlign: 'right', fontSize: moderateScale(12), fontWeight: '600' },
 
   // ── Stats ─────────────────────────────────────────────────────
   statsGrid: {
@@ -895,7 +971,7 @@ const styles = StyleSheet.create({
     width: moderateScale(30),
     height: moderateVerticalScale(30, 0.3),
     borderRadius: moderateScale(7),
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#FFF7CC',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -924,13 +1000,20 @@ const styles = StyleSheet.create({
   },
 
   // ── Quick Access ──────────────────────────────────────────────
-  quickGrid: {
-    flexDirection: 'row',
-    marginHorizontal: moderateScale(12),
-    gap: moderateScale(10),
+  quickAccessAnimatedCard: {
+    width: '100%',
     marginBottom: verticalScale(20),
   },
-  quickCardWrap: { flex: 1 },
+  quickScrollContent: {
+    paddingHorizontal: moderateScale(16),
+  },
+  quickGrid: {
+    flexDirection: 'row',
+    gap: moderateScale(10),
+  },
+  quickCardWrap: {
+    width: moderateScale(118),
+  },
   quickCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -951,7 +1034,7 @@ const styles = StyleSheet.create({
     width: moderateScale(40),
     height: moderateVerticalScale(40, 0.3),
     borderRadius: moderateScale(12),
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FFF7CC',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -977,6 +1060,8 @@ const styles = StyleSheet.create({
 
   // ── Menu Card ─────────────────────────────────────────────────
   menuCard: {
+    width: '92%',
+    maxWidth: 980,
     marginHorizontal: moderateScale(16),
     borderRadius: moderateScale(18),
     marginBottom: verticalScale(18),
@@ -999,7 +1084,7 @@ const styles = StyleSheet.create({
     width: moderateScale(38),
     height: moderateVerticalScale(38),
     borderRadius: moderateScale(11),
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FFF7CC',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1023,14 +1108,14 @@ const styles = StyleSheet.create({
     width: moderateScale(8),
     height: moderateScale(8),
     borderRadius: moderateScale(4),
-    backgroundColor: '#2563EB',
+    backgroundColor: '#F9C900',
     marginRight: scale(4),
   },
   chevronWrapper: {
     width: moderateScale(26),
     height: moderateScale(26),
     borderRadius: moderateScale(8),
-    backgroundColor: 'rgba(37,99,235,0.07)',
+    backgroundColor: 'rgba(249,201,0,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1050,10 +1135,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: moderateScale(16),
     borderWidth: 1.5,
-    borderColor: '#DBEAFE',
+    borderColor: '#E7C000',
     gap: 8,
     marginBottom: verticalScale(20),
-    shadowColor: '#2563EB',
+    shadowColor: '#F9C900',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -1062,7 +1147,7 @@ const styles = StyleSheet.create({
   signOutText: {
     fontSize: moderateScale(14),
     fontWeight: '700',
-    color: '#2563EB',
+    color: '#111111',
     letterSpacing: 0.2,
   },
 

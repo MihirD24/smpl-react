@@ -316,7 +316,7 @@ const SalaryCard = ({
             { backgroundColor: colors.primary + '15' },
           ]}
         >
-          <AppIcon name="Wallet" size={moderateScale(15)} color="#111111" />
+          <AppIcon name="Wallet" size={moderateScale(15)} color="#1164e0" />
         </View>
 
         <View style={styles.headerMeta}>
@@ -353,7 +353,7 @@ const SalaryCard = ({
         <StatPill
           label="WORKING  DAYS"
           value={String(salaryDetail?.working_days || 0)}
-          color="#111111"
+          color="#1164E0"
         />
 
         <VDivider isDarkMode={isDarkMode} />
@@ -428,7 +428,7 @@ const SalaryCard = ({
             <View style={styles.bottomItem}>
               <Text style={styles.salaryMetaLabel}>Paid</Text>
 
-              <Text style={[styles.salaryMetaValue, { color: '#111111' }]}>
+              <Text style={[styles.salaryMetaValue, { color: '#1164E0' }]}>
                 {formatCurrency(item.paid_amount)}
               </Text>
             </View>
@@ -560,7 +560,7 @@ const Salary = () => {
           {error}
         </Text>
         <TouchableOpacity style={styles.retryBtn} onPress={() => fetchSalary()}>
-          <Text style={[styles.retryText, {color: '#111111'}]}>Retry</Text>
+          <Text style={styles.retryText}>Retry</Text>
         </TouchableOpacity>
       </View>
     );
@@ -574,10 +574,6 @@ const Salary = () => {
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <ModuleIntro eyebrow="PAYROLL / SALARY" title="Salary" description="Review monthly earnings, deductions, payment status and salary slips." />
-      <View style={[styles.overviewStrip, isDarkMode && styles.overviewStripDark]}>
-        <View><Text style={styles.overviewLabel}>PAYROLL</Text><Text style={[styles.overviewTitle, isDarkMode && styles.textDark]}>Salary history</Text></View>
-        <View style={styles.overviewBadge}><Text style={styles.overviewBadgeText}>{salaryData.length} RECORDS</Text></View>
-      </View>
       <NetInfoComponent onReconnect={fetchSalary} />
       <View style={[styles.screen, isDarkMode && styles.screenDark]}>
         <FlatList
@@ -600,8 +596,8 @@ const Salary = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              colors={['#F9C900']}
-              tintColor="#F9C900"
+              colors={['#0040A1']}
+              tintColor="#0040A1"
             />
           }
           ListEmptyComponent={
@@ -624,16 +620,6 @@ export default Salary;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  overviewStrip: {
-    marginHorizontal: scale(14), marginTop: verticalScale(8), marginBottom: verticalScale(2),
-    paddingHorizontal: scale(14), paddingVertical: verticalScale(10), borderRadius: moderateScale(12),
-    backgroundColor: '#FFF7CC', borderWidth: 1, borderColor: '#F9C900', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-  },
-  overviewStripDark: { backgroundColor: '#292713', borderColor: '#6B5A00' },
-  overviewLabel: { fontSize: moderateScale(8), fontFamily: 'PTSans-Bold', letterSpacing: 1, color: '#6B5A00' },
-  overviewTitle: { marginTop: 2, fontSize: moderateScale(14), fontFamily: 'PTSans-Bold', color: '#111111' },
-  overviewBadge: { backgroundColor: '#F9C900', borderRadius: moderateScale(20), paddingHorizontal: scale(9), paddingVertical: verticalScale(5) },
-  overviewBadgeText: { fontSize: moderateScale(8), fontFamily: 'PTSans-Bold', color: '#111111', letterSpacing: .5 },
   screen: { flex: 1, backgroundColor: '#F4F5FA' },
   screenDark: { backgroundColor: '#12121E' },
   centered: {
@@ -709,7 +695,7 @@ const styles = StyleSheet.create({
   netBadgeAmount: {
     fontSize: moderateScale(14),
     fontFamily: 'PTSans-Bold',
-    color: '#111111',
+    color: '#1164E0',
   },
 
   // ── Dividers ─────────────────────────────────────────────
@@ -762,7 +748,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(8),
     paddingHorizontal: scale(24),
     paddingVertical: verticalScale(8),
-    backgroundColor: '#F9C900',
+    backgroundColor: '#0040A1',
     borderRadius: moderateScale(8),
   },
   retryText: {
@@ -798,11 +784,11 @@ const styles = StyleSheet.create({
     width: moderateScale(40),
     height: moderateScale(40),
     borderRadius: moderateScale(20),
-    backgroundColor: '#F9C900',
+    backgroundColor: '#1164E0',
     alignItems: 'center',
     justifyContent: 'center',
     gap: verticalScale(2),
-    shadowColor: '#F9C900',
+    shadowColor: '#1164E0',
     shadowOffset: {
       width: 0,
       height: 4,
