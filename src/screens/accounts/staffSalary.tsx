@@ -164,14 +164,14 @@ const AvatarPlaceholder = ({
 };
 const avatarStyles = StyleSheet.create({
   circle: {
-    backgroundColor: '#E8EDF5',
+    backgroundColor: '#FFF7CC',
     alignItems: 'center',
     justifyContent: 'center',
   },
   initials: {
     fontSize: moderateScale(13),
     fontWeight: '700',
-    color: '#4A6CF7',
+    color: '#111111',
   },
 });
 
@@ -223,6 +223,9 @@ const EmployeeRow = ({
         <View style={styles.employeeInfo}>
           <Text style={[styles.employeeName, isDarkMode && styles.textDark]}>
             {item.name}
+          </Text>
+          <Text style={[styles.employeeMeta, isDarkMode && styles.textMutedDark]}>
+            Staff ID: {item.id}
           </Text>
         </View>
         <View style={styles.employeeRight}>
@@ -568,6 +571,39 @@ const StaffSalary = () => {
         <NetInfoComponent onReconnect={fetchSalary} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View style={[styles.screen, isDarkMode && styles.screenDark]}>
+          {/* Payroll overview */}
+          <View style={[styles.hero, isDarkMode && styles.heroDark]}>
+            <View style={styles.heroTop}>
+              <View style={styles.heroIcon}>
+                <AppIcon name="BadgeIndianRupee" size={moderateScale(22)} color="#111111" />
+              </View>
+              <View style={styles.heroCopy}>
+                <Text style={[styles.heroTitle, isDarkMode && styles.textDark]}>Payroll Control Center</Text>
+                <Text style={[styles.heroSubtitle, isDarkMode && styles.textMutedDark]}>
+                  {MONTHS[selectedMonth].abbr} {selectedYear} · Staff salary overview
+                </Text>
+              </View>
+            </View>
+            <View style={styles.kpiRow}>
+              <View style={[styles.kpi, isDarkMode && styles.kpiDark]}>
+                <Text style={[styles.kpiValue, isDarkMode && styles.textDark]}>{filteredData.length}</Text>
+                <Text style={[styles.kpiLabel, isDarkMode && styles.textMutedDark]}>Employees</Text>
+              </View>
+              <View style={[styles.kpi, isDarkMode && styles.kpiDark]}>
+                <Text style={[styles.kpiValue, isDarkMode && styles.textDark]}>
+                  {filteredData.filter(x => x.status === 'PAID').length}
+                </Text>
+                <Text style={[styles.kpiLabel, isDarkMode && styles.textMutedDark]}>Paid</Text>
+              </View>
+              <View style={[styles.kpi, isDarkMode && styles.kpiDark]}>
+                <Text style={[styles.kpiValue, isDarkMode && styles.textDark]}>
+                  {filteredData.filter(x => x.status === 'PENDING').length}
+                </Text>
+                <Text style={[styles.kpiLabel, isDarkMode && styles.textMutedDark]}>Pending</Text>
+              </View>
+            </View>
+          </View>
+
           {/* Search + filter button */}
           <View
             style={[
@@ -582,7 +618,7 @@ const StaffSalary = () => {
               style={[
                 commonFilterStyles.filterIconBtn,
                 hasActiveFilters && commonFilterStyles.filterIconBtnActive,
-                { borderColor: '#BFDBFE' },
+                { borderColor: '#F9C900' },
               ]}
               onPress={openFilterSheet}
               activeOpacity={0.8}
@@ -590,7 +626,7 @@ const StaffSalary = () => {
               <AppIcon
                 name="ListFilter"
                 size={modScaleLocal(20)}
-                color={hasActiveFilters ? '#FFFFFF' : '#3B82F6'}
+                color={hasActiveFilters ? '#111111' : '#111111'}
               />
               {totalActiveFilters > 0 && (
                 <View style={commonFilterStyles.filterBadge}>
@@ -666,7 +702,7 @@ const StaffSalary = () => {
           >
             {loading ? (
               <View style={styles.loaderContainer}>
-                <ActivityIndicator size="large" color="#2563EB" />
+                <ActivityIndicator size="large" color="#F9C900" />
               </View>
             ) : filteredData.length === 0 ? (
               <View style={styles.noDataContainer}>
@@ -718,129 +754,72 @@ export default StaffSalary;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F4F5FA' },
-  screenDark: { backgroundColor: '#12121E' },
-  scrollContent: {
-    paddingHorizontal: scale(14),
-    paddingTop: verticalScale(8),
-    paddingBottom: verticalScale(60),
+  screen: { flex: 1, backgroundColor: '#F5F6F7' },
+  screenDark: { backgroundColor: '#111111' },
+  hero: {
+    marginHorizontal: scale(14),
+    marginTop: verticalScale(8),
+    marginBottom: verticalScale(8),
+    padding: moderateScale(14),
+    borderRadius: moderateScale(18),
+    backgroundColor: '#111111',
   },
+  heroDark: { backgroundColor: '#1C1C1C', borderWidth: 1, borderColor: '#333333' },
+  heroTop: { flexDirection: 'row', alignItems: 'center', gap: scale(10) },
+  heroIcon: {
+    width: scale(44), height: scale(44), borderRadius: scale(14),
+    backgroundColor: '#F9C900', alignItems: 'center', justifyContent: 'center',
+  },
+  heroCopy: { flex: 1 },
+  heroTitle: { fontSize: moderateScale(17), fontWeight: '800', color: '#FFFFFF' },
+  heroSubtitle: { marginTop: verticalScale(3), fontSize: moderateScale(11), fontWeight: '600', color: '#D6D6D6' },
+  kpiRow: { flexDirection: 'row', gap: scale(8), marginTop: verticalScale(12) },
+  kpi: {
+    flex: 1, minHeight: verticalScale(58), borderRadius: moderateScale(12),
+    paddingHorizontal: scale(10), paddingVertical: verticalScale(8),
+    backgroundColor: '#FFFFFF',
+  },
+  kpiDark: { backgroundColor: '#252525' },
+  kpiValue: { fontSize: moderateScale(19), fontWeight: '800', color: '#111111' },
+  kpiLabel: { marginTop: verticalScale(2), fontSize: moderateScale(10), fontWeight: '700', color: '#6B7280' },
+  scrollContent: { paddingHorizontal: scale(14), paddingTop: verticalScale(8), paddingBottom: verticalScale(60) },
   loaderContainer: { alignItems: 'center', paddingTop: verticalScale(80) },
   summaryBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: scale(14),
-    paddingVertical: verticalScale(8),
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    marginHorizontal: scale(14), paddingHorizontal: scale(14), paddingVertical: verticalScale(10),
+    borderRadius: moderateScale(12), borderWidth: 1, borderColor: '#E4E6E8', backgroundColor: '#FFFFFF',
   },
-  summaryBarDark: { backgroundColor: '#1E1E2E', borderBottomColor: '#2A2A3E' },
-  summaryBarText: { fontSize: moderateScale(12), color: '#64748B' },
-  summaryBarAmount: {
-    fontSize: moderateScale(13),
-    fontWeight: '700',
-    color: '#1A1A2E',
-  },
+  summaryBarDark: { backgroundColor: '#1C1C1C', borderColor: '#333333' },
+  summaryBarText: { fontSize: moderateScale(12), color: '#5F6368', fontWeight: '600' },
+  summaryBarAmount: { fontSize: moderateScale(13), fontWeight: '800', color: '#111111' },
   employeeList: { gap: verticalScale(8) },
   employeeCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: moderateScale(14),
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    backgroundColor: '#FFFFFF', borderRadius: moderateScale(16), overflow: 'hidden',
+    borderWidth: 1, borderColor: '#E4E6E8', shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
   },
-  employeeCardDark: {
-    backgroundColor: '#1E1E2E',
-    borderWidth: 1,
-    borderColor: '#2A2A3E',
-  },
-  employeeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: moderateScale(14),
-    paddingVertical: moderateScale(12),
-    gap: scale(10),
-  },
+  employeeCardDark: { backgroundColor: '#1C1C1C', borderColor: '#333333' },
+  employeeRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: moderateScale(14), paddingVertical: moderateScale(13), gap: scale(10) },
   employeeInfo: { flex: 1, gap: verticalScale(2) },
-  employeeName: {
-    fontSize: moderateScale(15),
-    fontWeight: '700',
-    color: '#1A1A2E',
-  },
+  employeeName: { fontSize: moderateScale(15), fontWeight: '800', color: '#111111' },
+  employeeMeta: { fontSize: moderateScale(10), fontWeight: '600', color: '#8A8F98' },
   employeeRight: { alignItems: 'flex-end', gap: verticalScale(4) },
-  employeeAmount: {
-    fontSize: moderateScale(14),
-    fontWeight: '700',
-    color: '#1A1A2E',
-  },
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: scale(8),
-    paddingVertical: scale(3),
-    borderRadius: scale(20),
-    borderWidth: 1,
-  },
+  employeeAmount: { fontSize: moderateScale(14), fontWeight: '800', color: '#111111' },
+  statusPill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: scale(8), paddingVertical: scale(3), borderRadius: scale(20), borderWidth: 1 },
   statusDotSmall: { width: scale(5), height: scale(5), borderRadius: scale(3) },
-  statusPillText: { fontSize: moderateScale(10), fontWeight: '700' },
-  expandedPanel: {
-    backgroundColor: '#F8F9FC',
-    paddingHorizontal: moderateScale(14),
-    paddingVertical: moderateScale(14),
-    gap: verticalScale(12),
-    borderTopWidth: 1,
-    borderTopColor: '#EEF0F5',
-  },
-  expandedPanelDark: { backgroundColor: '#161625', borderTopColor: '#2A2A3E' },
+  statusPillText: { fontSize: moderateScale(10), fontWeight: '800' },
+  expandedPanel: { backgroundColor: '#FAFAFA', paddingHorizontal: moderateScale(14), paddingVertical: moderateScale(14), gap: verticalScale(12), borderTopWidth: 1, borderTopColor: '#E4E6E8' },
+  expandedPanelDark: { backgroundColor: '#161616', borderTopColor: '#333333' },
   infoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: verticalScale(12) },
   infoCell: { width: '47%', gap: verticalScale(3) },
-  infoCellLabel: {
-    fontSize: moderateScale(9),
-    color: '#9CA3AF',
-    letterSpacing: 0.6,
-    fontWeight: '600',
-  },
-  infoCellValue: {
-    fontSize: moderateScale(12),
-    fontWeight: '700',
-    color: '#1A1A2E',
-  },
-  additionalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: moderateScale(10),
-    paddingHorizontal: scale(14),
-    paddingVertical: verticalScale(10),
-    borderWidth: 1,
-    borderColor: '#EEF0F5',
-  },
-  additionalRowDark: { backgroundColor: '#1E1E2E', borderColor: '#2A2A3E' },
-  additionalLabel: { fontSize: moderateScale(13), color: '#6B7280' },
-  additionalValue: {
-    fontSize: moderateScale(15),
-    fontWeight: '700',
-    color: '#1A1A2E',
-  },
-  noDataContainer: {
-    alignItems: 'center',
-    paddingTop: verticalScale(160),
-    paddingHorizontal: scale(40),
-  },
-  noDataText: {
-    fontSize: moderateScale(18),
-    fontWeight: '600',
-    color: '#1E293B',
-    marginTop: scale(16),
-    marginBottom: scale(8),
-  },
+  infoCellLabel: { fontSize: moderateScale(9), color: '#8A8F98', letterSpacing: 0.6, fontWeight: '700' },
+  infoCellValue: { fontSize: moderateScale(12), fontWeight: '800', color: '#111111' },
+  additionalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: moderateScale(10), paddingHorizontal: scale(14), paddingVertical: verticalScale(10), borderWidth: 1, borderColor: '#E4E6E8' },
+  additionalRowDark: { backgroundColor: '#1C1C1C', borderColor: '#333333' },
+  additionalLabel: { fontSize: moderateScale(13), color: '#5F6368', fontWeight: '600' },
+  additionalValue: { fontSize: moderateScale(15), fontWeight: '800', color: '#111111' },
+  noDataContainer: { alignItems: 'center', paddingTop: verticalScale(130), paddingHorizontal: scale(40) },
+  noDataText: { fontSize: moderateScale(18), fontWeight: '800', color: '#111111', marginTop: scale(16), marginBottom: scale(8) },
   textDark: { color: '#F0F0F0' },
   textMutedDark: { color: '#9CA3AF' },
 });
