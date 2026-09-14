@@ -130,11 +130,13 @@ const CalculateSalary = () => {
             label="Calculate Salary"
             onPress={handleCalculate}
             disabled={loading}
+            style={{ backgroundColor: '#F9C900' }}
+            textStyle={{ color: '#111111', fontWeight: '800' }}
           />
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#3B82F6" style={{ marginTop: 20 }} />
+          <ActivityIndicator size="large" color="#F9C900" style={{ marginTop: 20 }} />
         ) : calcResult ? (
           <View style={[styles.resultCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <Text style={[styles.resultTitle, { color: theme.label }]}>Calculation Summary</Text>

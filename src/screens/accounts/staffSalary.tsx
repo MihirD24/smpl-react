@@ -171,7 +171,7 @@ const avatarStyles = StyleSheet.create({
   initials: {
     fontSize: moderateScale(13),
     fontWeight: '700',
-    color: '#4A6CF7',
+    color: '#111111',
   },
 });
 
@@ -568,6 +568,10 @@ const StaffSalary = () => {
         <NetInfoComponent onReconnect={fetchSalary} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View style={[styles.screen, isDarkMode && styles.screenDark]}>
+          <View style={[styles.payrollHeader, isDarkMode && styles.payrollHeaderDark]}>
+            <View><Text style={styles.payrollEyebrow}>PAYROLL / ADMIN</Text><Text style={[styles.payrollTitle, isDarkMode && styles.textDark]}>Staff Salary</Text></View>
+            <View style={styles.payrollBadge}><Text style={styles.payrollBadgeText}>{filteredData.length} STAFF</Text></View>
+          </View>
           {/* Search + filter button */}
           <View
             style={[
@@ -582,7 +586,7 @@ const StaffSalary = () => {
               style={[
                 commonFilterStyles.filterIconBtn,
                 hasActiveFilters && commonFilterStyles.filterIconBtnActive,
-                { borderColor: '#BFDBFE' },
+                { borderColor: '#F9C900' },
               ]}
               onPress={openFilterSheet}
               activeOpacity={0.8}
@@ -590,7 +594,7 @@ const StaffSalary = () => {
               <AppIcon
                 name="ListFilter"
                 size={modScaleLocal(20)}
-                color={hasActiveFilters ? '#FFFFFF' : '#3B82F6'}
+                color={hasActiveFilters ? '#111111' : '#111111'}
               />
               {totalActiveFilters > 0 && (
                 <View style={commonFilterStyles.filterBadge}>
@@ -666,7 +670,7 @@ const StaffSalary = () => {
           >
             {loading ? (
               <View style={styles.loaderContainer}>
-                <ActivityIndicator size="large" color="#2563EB" />
+                <ActivityIndicator size="large" color="#F9C900" />
               </View>
             ) : filteredData.length === 0 ? (
               <View style={styles.noDataContainer}>
@@ -718,7 +722,13 @@ export default StaffSalary;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F4F5FA' },
+  payrollHeader: { marginHorizontal: scale(14), marginTop: verticalScale(8), marginBottom: verticalScale(8), padding: scale(14), borderRadius: moderateScale(14), backgroundColor: '#111111', borderBottomWidth: 3, borderBottomColor: '#F9C900', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  payrollHeaderDark: { backgroundColor: '#202020' },
+  payrollEyebrow: { color: '#F9C900', fontSize: moderateScale(8), fontWeight: '800', letterSpacing: 1 },
+  payrollTitle: { color: '#FFFFFF', fontSize: moderateScale(19), fontWeight: '800', marginTop: 2 },
+  payrollBadge: { backgroundColor: '#F9C900', paddingHorizontal: scale(9), paddingVertical: verticalScale(5), borderRadius: moderateScale(20) },
+  payrollBadgeText: { color: '#111111', fontSize: moderateScale(8), fontWeight: '800' },
+  screen: { flex: 1, backgroundColor: '#F5F6F7' },
   screenDark: { backgroundColor: '#12121E' },
   scrollContent: {
     paddingHorizontal: scale(14),
@@ -790,7 +800,7 @@ const styles = StyleSheet.create({
   statusDotSmall: { width: scale(5), height: scale(5), borderRadius: scale(3) },
   statusPillText: { fontSize: moderateScale(10), fontWeight: '700' },
   expandedPanel: {
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#FAFAF8',
     paddingHorizontal: moderateScale(14),
     paddingVertical: moderateScale(14),
     gap: verticalScale(12),
