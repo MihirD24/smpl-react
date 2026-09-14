@@ -84,6 +84,8 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   const { userInfo } = useContext(AuthContext);
   const MainStyles = MainStyle();
   const isDarkMode = useColorScheme() === 'dark';
+  const { width } = Dimensions.get('window');
+  const isTablet = width >= 768;
 
   const theme = {
     screenBg: isDarkMode ? '#111827' : '#F6FAFF',
@@ -301,6 +303,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
           style={[
             MainStyles.mainContainer,
             { backgroundColor: theme.screenBg, paddingHorizontal: 0 },
+            isTablet && { alignSelf: 'center', width: '100%', maxWidth: 980 },
           ]}
         >
           <View style={styles.sectionLabelRow}>
@@ -308,8 +311,8 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             <Text style={[styles.sectionLabel, { color: theme.muted }]}>LEAVE OVERVIEW</Text>
           </View>
           <View style={styles.summaryRow}>
-            <SummaryCard label="Total" value={leaveSummary.total} icon="CalendarDays" tone="#64748B" dark={isDarkMode} />
-            <SummaryCard label="Pending" value={leaveSummary.pending} icon="Clock3" tone="#F59E0B" dark={isDarkMode} />
+            <SummaryCard label="Total" value={leaveSummary.total} icon="CalendarDays" tone={BRAND.black} dark={isDarkMode} />
+            <SummaryCard label="Pending" value={leaveSummary.pending} icon="Clock3" tone={BRAND.yellow} dark={isDarkMode} />
             <SummaryCard label="Approved" value={leaveSummary.approved} icon="CircleCheck" tone="#16A34A" dark={isDarkMode} />
             <SummaryCard label="Rejected" value={leaveSummary.rejected} icon="CircleX" tone="#DC2626" dark={isDarkMode} />
           </View>
@@ -330,9 +333,9 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                 style={[
                   commonFilterStyles.filterIconBtn,
                   {
-                    borderColor: hasActiveFilters ? '#3B82F6' : theme.border,
+                    borderColor: hasActiveFilters ? BRAND.yellow : theme.border,
                     backgroundColor: hasActiveFilters
-                      ? '#3B82F6'
+                      ? BRAND.yellow
                       : theme.softBg,
                   },
                 ]}
@@ -342,7 +345,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                 <AppIcon
                   name="ListFilter"
                   size={moderateScale(20)}
-                  color={hasActiveFilters ? '#FFFFFF' : '#3B82F6'}
+                  color={hasActiveFilters ? '#111111' : BRAND.black}
                 />
                 {totalActiveFilters > 0 && (
                   <View style={commonFilterStyles.filterBadge}>
@@ -409,8 +412,8 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
                   <RefreshControl
                     refreshing={refreshing}
                     onRefresh={onRefresh}
-                    tintColor="#3B82F6"
-                    colors={['#3B82F6']}
+                    tintColor={BRAND.yellow}
+                    colors={[BRAND.yellow]}
                   />
                 }
               />

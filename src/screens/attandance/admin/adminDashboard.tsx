@@ -981,6 +981,34 @@ const AdminDashboard: React.FC = ({
           )}
 
           {/* =================================================
+              ADMIN QUICK ACTIONS
+          ================================================= */}
+          <View style={styles.quickActionsSection}>
+            <View style={styles.quickActionsHeader}>
+              <Text style={[styles.quickActionsTitle, { color: colors.textPrimary }]}>
+                Admin Actions
+              </Text>
+              <Text style={[styles.quickActionsSubtitle, { color: colors.textSecondary }]}>
+                Review workforce requests
+              </Text>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.82}
+              onPress={() => navigation.navigate('LeaveList')}
+              style={[styles.quickActionCard, { backgroundColor: colors.cardBg, borderColor: colors.cardBorder }]}
+            >
+              <View style={[styles.quickActionIcon, { backgroundColor: '#FFF7CC' }]}>
+                <AppIcon name="CalendarDays" size={22} color={colors.accent} />
+              </View>
+              <View style={styles.quickActionCopy}>
+                <Text style={[styles.quickActionTitle, { color: colors.textPrimary }]}>Leave Requests</Text>
+                <Text style={[styles.quickActionMeta, { color: colors.textSecondary }]}>Review & approve</Text>
+              </View>
+              <AppIcon name="ChevronRight" size={18} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+
+          {/* =================================================
               ATTENDANCE CARD
           ================================================= */}
 
@@ -2103,6 +2131,51 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
+  quickActionsSection: {
+    marginTop: 14,
+    marginBottom: 2,
+  },
+  quickActionsHeader: {
+    marginBottom: 9,
+  },
+  quickActionsTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  quickActionsSubtitle: {
+    fontSize: 11,
+    marginTop: 2,
+  },
+  quickActionCard: {
+    minHeight: 68,
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 13,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quickActionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 11,
+  },
+  quickActionCopy: {
+    flex: 1,
+  },
+  quickActionTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  quickActionMeta: {
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 3,
+  },
+
 });
 
 export default AdminDashboard;
