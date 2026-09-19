@@ -13,6 +13,10 @@ import { Dimensions } from 'react-native';
 type Props = {
   title?: string;
   onComplete: () => void;
+  trackColor?: string;
+  knobColor?: string;
+  textColor?: string;
+  iconTintColor?: string;
 };
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -24,6 +28,10 @@ const COMPLETE_THRESHOLD = BUTTON_WIDTH * 0.6;
 export default function SlideToPunchButton({
   title = 'SLIDE TO PUNCH IN',
   onComplete,
+  trackColor = '#F4C400',
+  knobColor = '#111111',
+  textColor = '#111111',
+  iconTintColor = '#F4C400',
 }: Props) {
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -66,10 +74,10 @@ export default function SlideToPunchButton({
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.track}>
+      <View style={[styles.track, { backgroundColor: trackColor }]}>
         {/* ✅ Centered fading text */}
         <Animated.Text
-          style={[styles.label, { opacity: textOpacity }]}
+          style={[styles.label, { opacity: textOpacity, color: textColor }]}
           numberOfLines={1}
         >
           {title}
@@ -77,12 +85,15 @@ export default function SlideToPunchButton({
 
         {/* ✅ Sliding knob */}
         <Animated.View
-          style={[styles.knob, { transform: [{ translateX }] }]}
+          style={[
+            styles.knob,
+            { backgroundColor: knobColor, transform: [{ translateX }] },
+          ]}
           {...panResponder.panHandlers}
         >
           <Image
             source={require('../assets/images/icons/fast-forward.png')}
-            style={styles.icon}
+            style={[styles.icon, { tintColor: iconTintColor }]}
           />
         </Animated.View>
       </View>

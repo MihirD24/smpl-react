@@ -34,12 +34,15 @@ import { checkPunch, punchIn, punchOut } from '../../services';
 import AppIcon from '../../components/appIcon';
 import { BottomTabScreenProps } from '../../navigation/navigationTypes';
 import moment from 'moment';
-import { LogIn, LogOut, MapPin, Navigation } from 'lucide-react-native';
+import { LogIn, LogOut, MapPin, Navigation, Clock, Coffee } from 'lucide-react-native';
 import CustomMarker from './customMarker';
 import ToastUtil from '../../utils/toastAndroid';
 import SlideToPunchButton from '../../components/slideToPunchButton';
 import CameraScreen from '../../components/cameraScreen';
 import NetInfoComponent from '../../components/netinfoComponent';
+import { PunchSession, GraceInfo } from '../../types/adminAttendance';
+import GraceTrackerWidget from '../../components/graceTrackerWidget';
+import PunchSessionsTimeline from '../../components/punchSessionsTimeline';
 if (!(Geocoder as any).isInitialized) {
   Geocoder.init('AIzaSyBHL-m8PpehMXtvM5sRlEpMWxJJGycmmo4');
   (Geocoder as any).isInitialized = true;
@@ -91,10 +94,15 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
   var min = new Date().getMinutes(); //Current Minutes
   var sec = new Date().getSeconds(); //Current Seconds
 
-  const [punchLabel, setPunchLabel] = useState('');
+  const [punchLabel, setPunchLabel] = useState<'Punch_in' | 'Punch_out' | string>('Punch_in');
   const [screenLoading, setScreenLoading] = useState(true);
 
   const [todaysStatus, setTodaysStatus] = useState('');
+  const [totalWorkFormatted, setTotalWorkFormatted] = useState('00h 00m');
+  const [totalBreakFormatted, setTotalBreakFormatted] = useState('00h 00m');
+  const [punches, setPunches] = useState<PunchSession[]>([]);
+  const [graceInfo, setGraceInfo] = useState<GraceInfo | null>(null);
+
   const [fileUri, setFileUri] = useState('');
   const [lat, setLat] = useState('');
   const [long, setLong] = useState('');
