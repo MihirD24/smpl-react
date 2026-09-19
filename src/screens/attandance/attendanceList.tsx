@@ -24,6 +24,8 @@ import AttendanceCard, { fmtMins } from '../attandance/attendanceCard';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
 import NetInfoComponent from '../../components/netinfoComponent';
 import ModuleIntro from '../../components/moduleIntro';
+import GraceTrackerWidget from '../../components/graceTrackerWidget';
+import PunchSessionsTimeline from '../../components/punchSessionsTimeline';
 
 // ─── Scaling ──────────────────────────────────────────────────────────────────
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -43,6 +45,12 @@ interface UserAttendanceCount {
   total_late_time_in_min: number;
   total_extra_time_in_min: number;
   total_early_exit_in_min: number;
+  late_grace_allowed?: number;
+  late_grace_remaining?: number;
+  late_grace_excess?: number;
+  early_grace_allowed?: number;
+  early_grace_remaining?: number;
+  early_grace_excess?: number;
 }
 
 const EMPTY_COUNT: UserAttendanceCount = {
@@ -54,6 +62,12 @@ const EMPTY_COUNT: UserAttendanceCount = {
   total_late_time_in_min: 0,
   total_extra_time_in_min: 0,
   total_early_exit_in_min: 0,
+  late_grace_allowed: 45,
+  late_grace_remaining: 45,
+  late_grace_excess: 0,
+  early_grace_allowed: 45,
+  early_grace_remaining: 45,
+  early_grace_excess: 0,
 };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -503,9 +517,35 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
               />
             </View>
 
+            {/* ── Monthly Grace Tracker Widget ── */}
+            {attandanceCount?.late_grace_allowed !== undefined && (
+              <View style={{ paddingHorizontal: scale(16), marginBottom: verticalScale(12) }}>
+                <GraceTrackerWidget
+                  graceInfo={{
+                    late_grace_allowed: attandanceCount.late_grace_allowed || 45,
+                    late_used_minutes: Math.max(
+                      0,
+                      (attandanceCount.late_grace_allowed || 45) -
+                        (attandanceCount.late_grace_remaining ?? 0),
+                    ),
+                    late_remaining_minutes: attandanceCount.late_grace_remaining ?? 0,
+                    late_excess_minutes: attandanceCount.late_grace_excess ?? 0,
+                    early_grace_allowed: attandanceCount.early_grace_allowed || 45,
+                    early_used_minutes: Math.max(
+                      0,
+                      (attandanceCount.early_grace_allowed || 45) -
+                        (attandanceCount.early_grace_remaining ?? 0),
+                    ),
+                    early_remaining_minutes: attandanceCount.early_grace_remaining ?? 0,
+                    early_excess_minutes: attandanceCount.early_grace_excess ?? 0,
+                  }}
+                  monthName={moment(monthYear, 'YYYY-MM').format('MMMM YYYY')}
+                />
+              </View>
+            )}
+
             {/* ── Punch Section ── */}
-            {todayAttendance?.in_time && !todayAttendance?.out_time ? (
-              // ── Active punch-in card ──
+            {todayAttendance?.in_time ? (
               <View
                 style={[
                   cardStyles.cardWithMargin,
@@ -514,9 +554,47 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                 ]}
               >
                 <View style={styles.activePunchHeader}>
-                  <View style={styles.punchedInBadge}>
-                    <View style={styles.punchedInDot} />
-                    <Text style={styles.punchedInText}>PUNCHED IN</Text>
+                  <View
+                    style={[
+                      styles.punchedInBadge,
+                      {
+                        backgroundColor:
+                          todayAttendance.status === 'Present'
+                            ? '#DCFCE7'
+                            : todayAttendance.status === 'Half Day'
+                            ? '#FEF3C7'
+                            : '#DBEAFE',
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.punchedInDot,
+                        {
+                          backgroundColor:
+                            todayAttendance.status === 'Present'
+                              ? '#16A34A'
+                              : todayAttendance.status === 'Half Day'
+                              ? '#F59E0B'
+                              : '#2563EB',
+                        },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.punchedInText,
+                        {
+                          color:
+                            todayAttendance.status === 'Present'
+                              ? '#15803D'
+                              : todayAttendance.status === 'Half Day'
+                              ? '#B45309'
+                              : '#1D4ED8',
+                        },
+                      ]}
+                    >
+                      {todayAttendance.status ? todayAttendance.status.toUpperCase() : 'ATTENDANCE ACTIVE'}
+                    </Text>
                   </View>
                   <View style={styles.currentTimeCompact}>
                     <Text
@@ -553,6 +631,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     </View>
                   </View>
                 </View>
+
                 {/* Hours worked block — uses shared contentBlock */}
                 <View
                   style={[
@@ -583,10 +662,43 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[styles.hoursWorkedValue, { color: blueText }]}
                     >
-                      {calculateWorkedHours()}
+                      {todayAttendance.total_work_formatted || (todayAttendance.out_time ? getTotalHours() : calculateWorkedHours())}
                     </Text>
                   </View>
+                  {todayAttendance.total_break_formatted && (
+                    <View style={{ alignItems: 'flex-end' }}>
+                      <Text
+                        style={[
+                          styles.hoursWorkedLabel,
+                          isDarkMode
+                            ? cardStyles.textSecondaryDark
+                            : cardStyles.textSecondaryLight,
+                        ]}
+                      >
+                        BREAK
+                      </Text>
+                      <Text
+                        style={[
+                          styles.hoursWorkedValue,
+                          { color: isDarkMode ? '#FCD34D' : '#D97706' },
+                        ]}
+                      >
+                        {todayAttendance.total_break_formatted}
+                      </Text>
+                    </View>
+                  )}
                 </View>
+
+                {/* Punch Sessions Timeline if multiple sessions present */}
+                {todayAttendance.punches && todayAttendance.punches.length > 0 && (
+                  <View style={{ marginBottom: verticalScale(10) }}>
+                    <PunchSessionsTimeline
+                      punches={todayAttendance.punches}
+                      isDarkMode={isDarkMode}
+                    />
+                  </View>
+                )}
+
                 <TouchableOpacity
                   style={styles.punchOutButton}
                   onPress={() =>
@@ -599,14 +711,15 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                   ) : (
                     <>
                       <AppIcon
-                        name="LogOut"
+                        name="Clock"
                         size={moderateScale(18)}
                         color="#FFFFFF"
                       />
-                      <Text style={styles.punchOutButtonText}>Punch Out</Text>
+                      <Text style={styles.punchOutButtonText}>Punch & Attendance</Text>
                     </>
                   )}
                 </TouchableOpacity>
+
                 {todayAttendance?.in_location && (
                   <Text
                     style={[
@@ -619,109 +732,6 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     📍 {todayAttendance.in_location}
                   </Text>
                 )}
-              </View>
-            ) : todayAttendance?.out_time ? (
-              // ── Completed shift card ──
-              <View
-                style={[
-                  cardStyles.cardWithMargin,
-                  isDarkMode ? cardStyles.cardDark : cardStyles.cardLight,
-                  styles.completedSummarySection,
-                ]}
-              >
-                <View style={styles.completedSummaryHeader}>
-                  <View
-                    style={[
-                      cardStyles.badge,
-                      { backgroundColor: '#D1FAE5' },
-                    ]}
-                  >
-                    <AppIcon
-                      name="CheckCircle"
-                      size={moderateScale(14)}
-                      color="#10B981"
-                      style={cardStyles.badgeIcon}
-                    />
-                    <Text style={[cardStyles.badgeText, { color: '#059669' }]}>
-                      SHIFT COMPLETED
-                    </Text>
-                  </View>
-                  <View style={styles.totalHoursPill}>
-                    <Text
-                      style={[
-                        styles.timeItemLabel,
-                        isDarkMode
-                          ? cardStyles.textSecondaryDark
-                          : cardStyles.textSecondaryLight,
-                      ]}
-                    >
-                      TOTAL
-                    </Text>
-                    <Text
-                      style={[
-                        styles.completedTotalHours,
-                        isDarkMode
-                          ? cardStyles.textPrimaryDark
-                          : cardStyles.textPrimaryLight,
-                      ]}
-                    >
-                      {getTotalHours()}
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={[
-                    cardStyles.divider,
-                    isDarkMode
-                      ? cardStyles.dividerDark
-                      : cardStyles.dividerLight,
-                    { width: '100%' },
-                  ]}
-                />
-                <View style={styles.timeRow}>
-                  {[
-                    {
-                      label: 'IN TIME',
-                      value: todayAttendance?.in_time || 'N/A',
-                    },
-                    {
-                      label: 'OUT TIME',
-                      value: todayAttendance?.out_time || 'N/A',
-                    },
-                  ].map(t => (
-                    <View
-                      key={t.label}
-                      style={[
-                        styles.completedTimeItem,
-                        {
-                          backgroundColor: isDarkMode ? '#111827' : '#F9FAFB',
-                          borderColor: isDarkMode ? '#2E2E2E' : '#E5E7EB',
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.timeItemLabel,
-                          isDarkMode
-                            ? cardStyles.textSecondaryDark
-                            : cardStyles.textSecondaryLight,
-                        ]}
-                      >
-                        {t.label}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.timeItemValue,
-                          isDarkMode
-                            ? cardStyles.textPrimaryDark
-                            : cardStyles.textPrimaryLight,
-                        ]}
-                      >
-                        {t.value}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
               </View>
             ) : null}
 

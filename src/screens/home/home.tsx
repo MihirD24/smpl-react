@@ -213,12 +213,16 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     inTime: string;
     outTime: string;
     attendanceStatus: string;
+    totalWorkFormatted?: string;
+    totalBreakFormatted?: string;
   }>({
     status: 'BEFORE_PUNCH_IN',
     label: 'Punch In',
     inTime: '',
     outTime: '',
     attendanceStatus: '',
+    totalWorkFormatted: '',
+    totalBreakFormatted: '',
   });
 
 
@@ -296,19 +300,33 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
         const inTime = punch?.in_time || '';
         const outTime = punch?.out_time || '';
         const attendanceStatus = punch?.today_attendance_status || '';
-        const status = attendanceStatus === 'Absent'
+        const showLabel = punch?.show_label || (inTime && !outTime ? 'Punch_out' : 'Punch_in');
+
+        const isLeave = attendanceStatus === 'Leave' || attendanceStatus === 'Paid Leave';
+        const isWorking = showLabel === 'Punch_out';
+
+        const status = isLeave
           ? 'ON_LEAVE'
-          : !inTime
-            ? 'BEFORE_PUNCH_IN'
-            : !outTime
-              ? 'AFTER_PUNCH_IN'
-              : 'AFTER_PUNCH_OUT';
+          : isWorking
+          ? 'AFTER_PUNCH_IN'
+          : inTime
+          ? 'AFTER_PUNCH_OUT'
+          : 'BEFORE_PUNCH_IN';
+
+        const ctaLabel = isLeave
+          ? 'View'
+          : isWorking
+          ? 'Punch Out'
+          : 'Punch In';
+
         setTodayPunch({
           status,
-          label: punch?.show_label || (status === 'AFTER_PUNCH_IN' ? 'Punch Out' : status === 'AFTER_PUNCH_OUT' ? 'Completed' : 'Punch In'),
+          label: ctaLabel,
           inTime,
           outTime,
           attendanceStatus,
+          totalWorkFormatted: punch?.total_work_formatted || '',
+          totalBreakFormatted: punch?.total_break_formatted || '',
         });
       }
     } catch (error) {
@@ -480,14 +498,42 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                   <View>
                     <Text style={styles.attendanceHeroEyebrow}>TODAY'S ATTENDANCE</Text>
                     <Text style={styles.attendanceHeroTitle}>
-                      {todayPunch.status === 'AFTER_PUNCH_OUT' ? 'Attendance completed' : todayPunch.status === 'AFTER_PUNCH_IN' ? 'You are working' : todayPunch.status === 'ON_LEAVE' ? 'Leave / absent' : 'Ready to start'}
+                      {todayPunch.status === 'AFTER_PUNCH_IN'
+                        ? 'You are working'
+                        : todayPunch.status === 'ON_LEAVE'
+                        ? 'On approved leave'
+                        : todayPunch.inTime
+                        ? 'On break / Ready to resume'
+                        : 'Ready to start'}
                     </Text>
                   </View>
                 </View>
                 <View style={styles.attendanceStatusBadge}>
-                  <View style={[styles.attendanceStatusDot, { backgroundColor: todayPunch.status === 'AFTER_PUNCH_IN' ? BRAND.success : todayPunch.status === 'ON_LEAVE' ? '#F59E0B' : BRAND.yellow }]} />
+                  <View
+                    style={[
+                      styles.attendanceStatusDot,
+                      {
+                        backgroundColor:
+                          todayPunch.status === 'AFTER_PUNCH_IN'
+                            ? BRAND.success
+                            : todayPunch.status === 'ON_LEAVE'
+                            ? '#F59E0B'
+                            : todayPunch.inTime
+                            ? '#3B82F6'
+                            : BRAND.yellow,
+                      },
+                    ]}
+                  />
                   <Text style={styles.attendanceStatusText}>
-                    {todayPunch.status === 'AFTER_PUNCH_IN' ? 'WORKING' : todayPunch.status === 'AFTER_PUNCH_OUT' ? 'DONE' : todayPunch.status === 'ON_LEAVE' ? 'LEAVE' : 'READY'}
+                    {todayPunch.status === 'AFTER_PUNCH_IN'
+                      ? 'WORKING'
+                      : todayPunch.status === 'ON_LEAVE'
+                      ? 'LEAVE'
+                      : todayPunch.attendanceStatus
+                      ? todayPunch.attendanceStatus.toUpperCase()
+                      : todayPunch.inTime
+                      ? 'BREAK'
+                      : 'READY'}
                   </Text>
                 </View>
               </View>
@@ -502,14 +548,27 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                   <Text style={styles.attendanceHeroTimeLabel}>PUNCH OUT</Text>
                   <Text style={styles.attendanceHeroTime}>{todayPunch.outTime || '--:--'}</Text>
                 </View>
+                {todayPunch.totalWorkFormatted ? (
+                  <>
+                    <View style={styles.attendanceHeroDivider} />
+                    <View>
+                      <Text style={styles.attendanceHeroTimeLabel}>NET WORK</Text>
+                      <Text style={[styles.attendanceHeroTime, { color: BRAND.yellow }]}>
+                        {todayPunch.totalWorkFormatted}
+                      </Text>
+                    </View>
+                  </>
+                ) : null}
                 <View style={styles.attendanceHeroCta}>
-                  <Text style={styles.attendanceHeroCtaText}>{todayPunch.status === 'AFTER_PUNCH_IN' ? 'Punch Out' : todayPunch.status === 'AFTER_PUNCH_OUT' ? 'View' : 'Punch In'}</Text>
+                  <Text style={styles.attendanceHeroCtaText}>{todayPunch.label}</Text>
                   <AppIcon name="ArrowUpRight" size={16} color={BRAND.black} />
                 </View>
               </View>
 
               <View style={styles.attendanceSummaryRow}>
-                <Text style={styles.attendanceSummaryText}>This month</Text>
+                <Text style={styles.attendanceSummaryText}>
+                  {todayPunch.totalBreakFormatted ? `Break: ${todayPunch.totalBreakFormatted}` : 'This month'}
+                </Text>
                 <Text style={styles.attendanceSummaryValue}>{attendanceSummary.present} Present</Text>
                 <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.absent} Absent</Text>
                 <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.paidleave} Leave</Text>
