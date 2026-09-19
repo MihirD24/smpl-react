@@ -5,6 +5,8 @@ import { AttendanceItem } from '../../types/adminAttendance';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
 import AppIcon from '../../components/appIcon';
 
+import PunchSessionsTimeline from '../../components/punchSessionsTimeline';
+
 // ─── Scaling ──────────────────────────────────────────────────────────────────
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_WIDTH = 375;
@@ -83,7 +85,10 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
   const workHoursLabel = (() => {
     if (isLeave) return getLeaveSubtitle(attendanceData);
     if (isAbsent) return 'No Record';
-    const mins = attendanceData?.total_minutes;
+    if (attendanceData?.total_work_formatted) {
+      return `Workday • ${attendanceData.total_work_formatted}${attendanceData.total_break_formatted ? ` (Break ${attendanceData.total_break_formatted})` : ''}`;
+    }
+    const mins = attendanceData?.total_minutes || attendanceData?.total_work_minutes;
     if (mins) return `Workday • ${fmtMins(mins)}`;
     return 'In Progress';
   })();
@@ -134,6 +139,14 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
     }
   }
 
+  if (attendanceData?.punches && attendanceData.punches.length > 1) {
+    chips.push({
+      label: `${attendanceData.punches.length} SESSIONS`,
+      color: '#2563EB',
+      bg: '#DBEAFE',
+    });
+  }
+
   const openImage = (url?: string | null) => {
     if (!url) return;
     navigation?.navigate('showImage', { url });
@@ -165,7 +178,8 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
     },
   ].filter(item => item.image || item.location);
 
-  const hasPunchDetails = punchDetails.length > 0;
+  const hasPunchesTimeline = Boolean(attendanceData?.punches && attendanceData.punches.length > 0);
+  const hasPunchDetails = punchDetails.length > 0 || hasPunchesTimeline;
 
   // Date box colors
   const dateBg = isToday ? '#2563EB' : isLeave ? '#FEE2E2' : theme.iconBoxBg;
@@ -414,7 +428,7 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
                 isDarkMode ? cardStyles.textMutedDark : cardStyles.textMutedLight,
               ]}
             >
-              Punch Photos
+              Punch Sessions & Details
             </Text>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -431,7 +445,18 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
               <AppIcon name="X" size={moderateScale(13)} color="#6B7280" />
             </TouchableOpacity>
           </View>
-          <View style={{ flexDirection: 'row', gap: scale(8) }}>
+
+          {hasPunchesTimeline && (
+            <View style={{ marginBottom: verticalScale(10) }}>
+              <PunchSessionsTimeline
+                punches={attendanceData.punches}
+                isDarkMode={isDarkMode}
+              />
+            </View>
+          )}
+
+          {punchDetails.length > 0 && (
+            <View style={{ flexDirection: 'row', gap: scale(8) }}>
             {punchDetails.map(item => (
               <View
                 key={item.label}
@@ -510,10 +535,11 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
               </View>
             ))}
           </View>
-        </View>
-      )}
-    </View>
-  );
+        )}
+      </View>
+    )}
+  </View>
+);
 };
 
 export default AttendanceCard;

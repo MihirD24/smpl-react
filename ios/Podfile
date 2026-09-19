@@ -27,8 +27,6 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-
-
 target 'Smpl' do
   config = use_native_modules!
 
@@ -48,13 +46,17 @@ target 'Smpl' do
       'Debug' => '$(PODS_ROOT)/../../.env.development',
       'Release' => '$(PODS_ROOT)/../../.env.production',
     }
+iinstaller.pods_project.targets.each do |target|
+  target.build_configurations.each do |config|
+    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+    config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+  end
 
-    installer.pods_project.targets.each do |target|
-      if target.name == 'react-native-config'
-        target.build_configurations.each do |config|
-          config.build_settings['ENVFILE'] = envfiles[config.name]
-        end
-      end
+  if target.name == 'react-native-config'
+    target.build_configurations.each do |config|
+      config.build_settings['ENVFILE'] = envfiles[config.name]
     end
+  end
+end
   end
 end

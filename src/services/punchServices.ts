@@ -8,9 +8,9 @@ export const punchIn = async (formData: FormData) => {
     const response = await apiPostUpload(API_ENDPOINTS.ADD_IN_TIME, formData);
 
     if (response.success) {
-      return { success: true, message: response.message };
+      return { success: true, message: response.message, data: response.data };
     } else {
-      return { success: false, message: response.message };
+      return { success: false, message: response.message, data: response.data };
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -27,9 +27,9 @@ export const punchOut = async (formData: FormData) => {
     const response = await apiPostUpload(API_ENDPOINTS.ADD_OUT_TIME, formData);
 
     if (response.success) {
-      return { success: true, message: response.message };
+      return { success: true, message: response.message, data: response.data };
     } else {
-      return { success: false, message: response.message };
+      return { success: false, message: response.message, data: response.data };
     }
   } catch (error) {
     if (error instanceof Error) {
