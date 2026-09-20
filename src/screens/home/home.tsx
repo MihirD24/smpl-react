@@ -319,14 +319,33 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
           ? 'Punch Out'
           : 'Punch In';
 
+        let workFormatted = punch?.total_work_formatted || '';
+        let breakFormatted = punch?.total_break_formatted || '';
+        if ((!workFormatted || workFormatted === '00h 00m') && Array.isArray(punch?.punches)) {
+          let workMins = 0;
+          for (const p of punch.punches) {
+            if (p.punch_in && p.punch_out) {
+              const tIn = moment(p.punch_in, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              const tOut = moment(p.punch_out, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              if (tIn.isValid() && tOut.isValid()) workMins += Math.max(0, tOut.diff(tIn, 'minutes'));
+            } else if (p.punch_in && !p.punch_out) {
+              const tIn = moment(p.punch_in, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              if (tIn.isValid()) workMins += Math.max(0, moment().diff(tIn, 'minutes'));
+            }
+          }
+          if (workMins > 0) {
+            workFormatted = `${String(Math.floor(workMins / 60)).padStart(2, '0')}h ${String(workMins % 60).padStart(2, '0')}m`;
+          }
+        }
+
         setTodayPunch({
           status,
           label: ctaLabel,
           inTime,
           outTime,
           attendanceStatus,
-          totalWorkFormatted: punch?.total_work_formatted || '',
-          totalBreakFormatted: punch?.total_break_formatted || '',
+          totalWorkFormatted: workFormatted,
+          totalBreakFormatted: breakFormatted,
         });
       }
     } catch (error) {

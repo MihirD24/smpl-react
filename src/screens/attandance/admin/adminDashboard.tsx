@@ -45,6 +45,11 @@ interface AttendanceItem {
   extraTime?: string | number;
   status: string[];
   time: string[];
+  totalWorkFormatted?: string;
+  totalBreakFormatted?: string;
+  isActive?: boolean;
+  punchesCount?: number;
+  punches?: any[];
 }
 
 interface StatCard {
@@ -457,6 +462,21 @@ const AdminDashboard: React.FC = ({
                   status,
 
                   time,
+
+                  totalWorkFormatted: item.total_work_formatted || '',
+
+                  totalBreakFormatted: item.total_break_formatted || '',
+
+                  isActive: Boolean(
+                    item.is_active ||
+                    (item.in_time && item.in_time !== '-' && (!item.out_time || item.out_time === '-'))
+                  ),
+
+                  punchesCount: Array.isArray(item.punches)
+                    ? item.punches.length
+                    : (item.in_time && item.in_time !== '-' ? 1 : 0),
+
+                  punches: Array.isArray(item.punches) ? item.punches : [],
                 };
               },
             );
@@ -803,7 +823,7 @@ const AdminDashboard: React.FC = ({
                     day: 'numeric',
                     year: 'numeric',
                   },
-                )}
+                ) }
               </Text>
             </View>
           </View>
@@ -1560,28 +1580,59 @@ const AdminDashboard: React.FC = ({
                                   'Employee'}
                               </Text>
 
-                              {item.employeeId !==
-                                undefined &&
-                                item.employeeId !==
-                                  null && (
+                              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, flexWrap: 'wrap' }}>
+                                {item.employeeId !==
+                                  undefined &&
+                                  item.employeeId !==
+                                    null && (
+                                    <Text
+                                      style={[
+                                        styles.employeeId,
+                                        {
+                                          color:
+                                            colors.textMuted,
+                                        },
+                                      ]}
+                                      numberOfLines={
+                                        1
+                                      }
+                                    >
+                                      ID:{' '}
+                                      {
+                                        item.employeeId
+                                      }
+                                    </Text>
+                                  )}
+                                {item.totalWorkFormatted ? (
                                   <Text
                                     style={[
                                       styles.employeeId,
                                       {
-                                        color:
-                                          colors.textMuted,
+                                        color: '#16A34A',
+                                        marginLeft: 6,
+                                        fontWeight: '600',
                                       },
                                     ]}
-                                    numberOfLines={
-                                      1
-                                    }
+                                    numberOfLines={1}
                                   >
-                                    ID:{' '}
-                                    {
-                                      item.employeeId
-                                    }
+                                    • {item.totalWorkFormatted}
                                   </Text>
-                                )}
+                                ) : null}
+                                {item.totalBreakFormatted && item.totalBreakFormatted !== '00h 00m' ? (
+                                  <Text
+                                    style={[
+                                      styles.employeeId,
+                                      {
+                                        color: '#D97706',
+                                        marginLeft: 4,
+                                      },
+                                    ]}
+                                    numberOfLines={1}
+                                  >
+                                    (Brk {item.totalBreakFormatted})
+                                  </Text>
+                                ) : null}
+                              </View>
                             </View>
                           </View>
 
@@ -1636,32 +1687,41 @@ const AdminDashboard: React.FC = ({
                               style={[
                                 styles.timeValue,
                                 {
-                                  color:
-                                    colors.textPrimary,
+                                  color: item.isActive
+                                    ? '#16A34A'
+                                    : colors.textPrimary,
+                                  fontWeight: item.isActive ? '700' : '600',
                                 },
                               ]}
                               numberOfLines={
                                 1
                               }
                             >
-                              {formatPunchTime(
-                                item.outTime,
-                              )}
+                              {item.isActive
+                                ? 'Active Now'
+                                : formatPunchTime(
+                                    item.outTime,
+                                  )}
                             </Text>
 
                             <Text
                               style={[
                                 styles.timeNote,
                                 {
-                                  color:
-                                    outNoteColor,
+                                  color: item.isActive
+                                    ? '#16A34A'
+                                    : outNoteColor,
                                 },
                               ]}
                               numberOfLines={
                                 1
                               }
                             >
-                              {outNote}
+                              {item.isActive
+                                ? (item.punchesCount && item.punchesCount > 1
+                                  ? `Session ${item.punchesCount}`
+                                  : 'Clocked In')
+                                : outNote}
                             </Text>
                           </View>
                         </View>

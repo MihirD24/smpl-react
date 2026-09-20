@@ -86,7 +86,8 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
     if (isLeave) return getLeaveSubtitle(attendanceData);
     if (isAbsent) return 'No Record';
     if (attendanceData?.total_work_formatted) {
-      return `Workday • ${attendanceData.total_work_formatted}${attendanceData.total_break_formatted ? ` (Break ${attendanceData.total_break_formatted})` : ''}`;
+      const hasBreak = attendanceData.total_break_formatted && attendanceData.total_break_formatted !== '00h 00m';
+      return `Workday • ${attendanceData.total_work_formatted}${hasBreak ? ` (Break ${attendanceData.total_break_formatted})` : ''}`;
     }
     const mins = attendanceData?.total_minutes || attendanceData?.total_work_minutes;
     if (mins) return `Workday • ${fmtMins(mins)}`;

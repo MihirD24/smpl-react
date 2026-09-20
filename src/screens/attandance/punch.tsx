@@ -287,14 +287,14 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
     today_attendance_status?: string,
     show_label?: string,
   ) => {
+    if (show_label === 'Punch_out') {
+      return 'AFTER_PUNCH_IN';
+    }
     if (
       today_attendance_status === 'Leave' ||
       today_attendance_status === 'Paid Leave'
     ) {
       return 'ON_LEAVE';
-    }
-    if (show_label === 'Punch_out') {
-      return 'AFTER_PUNCH_IN';
     }
     return 'BEFORE_PUNCH_IN';
   };
@@ -313,10 +313,53 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
         setPunchLabel(label);
         setTodaysStatus(status);
         setFirstInTime(inT);
-        setLastOutTime(outT);
-        setTotalWorkFormatted(punchData.total_work_formatted || '00h 00m');
-        setTotalBreakFormatted(punchData.total_break_formatted || '00h 00m');
-        setPunches(Array.isArray(punchData.punches) ? punchData.punches : []);
+        const rawPunches = Array.isArray(punchData.punches) ? punchData.punches : [];
+        setPunches(rawPunches);
+
+        let workFmt = punchData.total_work_formatted;
+        let breakFmt = punchData.total_break_formatted;
+
+        // Fallback / dynamic client-side summation if backend formatted strings are default or missing
+        if (!workFmt || workFmt === '00h 00m') {
+          let workMins = 0;
+          for (let i = 0; i < rawPunches.length; i++) {
+            const p = rawPunches[i];
+            if (p.punch_in && p.punch_out) {
+              const tIn = moment(p.punch_in, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              const tOut = moment(p.punch_out, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              if (tIn.isValid() && tOut.isValid()) {
+                workMins += Math.max(0, tOut.diff(tIn, 'minutes'));
+              }
+            } else if (p.punch_in && !p.punch_out) {
+              const tIn = moment(p.punch_in, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              if (tIn.isValid()) {
+                workMins += Math.max(0, moment().diff(tIn, 'minutes'));
+              }
+            }
+          }
+          if (workMins > 0) {
+            workFmt = `${String(Math.floor(workMins / 60)).padStart(2, '0')}h ${String(workMins % 60).padStart(2, '0')}m`;
+          }
+        }
+
+        if (!breakFmt || breakFmt === '00h 00m') {
+          let breakMins = 0;
+          for (let i = 1; i < rawPunches.length; i++) {
+            if (rawPunches[i - 1]?.punch_out && rawPunches[i]?.punch_in) {
+              const prevOut = moment(rawPunches[i - 1].punch_out, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              const currIn = moment(rawPunches[i].punch_in, ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DD HH:mm:ss']);
+              if (prevOut.isValid() && currIn.isValid()) {
+                breakMins += Math.max(0, currIn.diff(prevOut, 'minutes'));
+              }
+            }
+          }
+          if (breakMins > 0) {
+            breakFmt = `${String(Math.floor(breakMins / 60)).padStart(2, '0')}h ${String(breakMins % 60).padStart(2, '0')}m`;
+          }
+        }
+
+        setTotalWorkFormatted(workFmt || '00h 00m');
+        setTotalBreakFormatted(breakFmt || '00h 00m');
 
         if (punchData.grace_info) {
           setGraceInfo(punchData.grace_info);
@@ -1377,7 +1420,9 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
                         ]}
                       >
                         {punchLabel === 'Punch_in'
-                          ? 'CONFIRM & PUNCH IN'
+                          ? punches.length > 0
+                            ? 'CONFIRM & RESUME WORK'
+                            : 'CONFIRM & PUNCH IN'
                           : 'CONFIRM & PUNCH OUT'}
                       </Text>
                     </View>

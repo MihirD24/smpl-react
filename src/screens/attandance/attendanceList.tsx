@@ -662,10 +662,12 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[styles.hoursWorkedValue, { color: blueText }]}
                     >
-                      {todayAttendance.total_work_formatted || (todayAttendance.out_time ? getTotalHours() : calculateWorkedHours())}
+                      {(todayAttendance.total_work_formatted && todayAttendance.total_work_formatted !== '00h 00m')
+                        ? todayAttendance.total_work_formatted
+                        : (todayAttendance.out_time ? getTotalHours() : calculateWorkedHours())}
                     </Text>
                   </View>
-                  {todayAttendance.total_break_formatted && (
+                  {todayAttendance.total_break_formatted && todayAttendance.total_break_formatted !== '00h 00m' && (
                     <View style={{ alignItems: 'flex-end' }}>
                       <Text
                         style={[
