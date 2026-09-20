@@ -34,8 +34,6 @@ import {
   getEmployeeList,
   getEmployeesByBranch,
   getMachineModelsList,
-  getPartyList,
-  getPartyByMachine,
   storeMachine,
   getDaAmount,
   addServiceVisit,
@@ -62,13 +60,10 @@ const AddServiceVisit = ({ navigation }: any) => {
   const [isEngineer, setIsEngineer] = useState<'Yes' | 'No'>('No');
   const [additionalEmployeeIds, setAdditionalEmployeeIds] = useState<number[]>([]);
   const [engineerId, setEngineerId] = useState<number | null>(null);
-  const [partyIdDriver, setPartyIdDriver] = useState<number | null>(null);
   const [salesPartyName, setSalesPartyName] = useState('');
   const [machineNumber, setMachineNumber] = useState('');
   const [machineId, setMachineId] = useState<number | null>(null);
   const [machineModelId, setMachineModelId] = useState<number | null>(null);
-  const [partyId, setPartyId] = useState<number | null>(null);
-  const [partyName, setPartyName] = useState('');
   const [visitCategory, setVisitCategory] = useState<string | null>(null);
   const [workDescription, setWorkDescription] = useState('');
   const [location, setLocation] = useState('');
@@ -93,18 +88,34 @@ const AddServiceVisit = ({ navigation }: any) => {
   // Master Data Dropdowns
   const [branches, setBranches] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
-  const [parties, setParties] = useState<any[]>([]);
+  const [allEmployees, setAllEmployees] = useState<any[]>([]);
   const [machineModels, setMachineModels] = useState<any[]>([]);
+
+  const isOwner = useMemo(() => {
+    return userInfo?.role === 'Owner' || userInfo?.user_type === 'Owner';
+  }, [userInfo]);
+
+  const loggedInEmployeeId = useMemo(() => {
+    const directId = Number(userInfo?.employee_id || userInfo?.user_type_id);
+    if (directId) return directId;
+    if (userInfo?.name) {
+      const sourceList = allEmployees.length > 0 ? allEmployees : employees;
+      const found = sourceList.find(
+        (e: any) => e.name?.trim().toLowerCase() === userInfo.name?.trim().toLowerCase()
+      );
+      if (found) return Number(found.id);
+    }
+    return null;
+  }, [userInfo, allEmployees, employees]);
 
   // Load Dropdown Data
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
       try {
-        const [branchRes, empRes, partyRes, modelRes] = await Promise.all([
+        const [branchRes, empRes, modelRes] = await Promise.all([
           getBranchList(),
           getEmployeeList(),
-          getPartyList(),
           getMachineModelsList(),
         ]);
 
@@ -112,18 +123,32 @@ const AddServiceVisit = ({ navigation }: any) => {
         if (empRes.success) {
           const empList = empRes.data || [];
           setEmployees(empList);
+          setAllEmployees(empList);
 
-          // Set current user as default logged-in employee if match found
-          if (userInfo?.name) {
+          if (isOwner) {
+            // Set current user as default logged-in employee if match found
+            if (userInfo?.name) {
+              const foundUser = empList.find(
+                (e: any) => e.name?.toLowerCase() === userInfo.name?.toLowerCase()
+              );
+              if (foundUser) {
+                setEmployeeId(foundUser.id);
+              }
+            }
+          } else {
+            const userEmpId = Number(userInfo?.employee_id || userInfo?.user_type_id);
             const foundUser = empList.find(
-              (e: any) => e.name?.toLowerCase() === userInfo.name?.toLowerCase()
+              (e: any) =>
+                (userEmpId && Number(e.id) === userEmpId) ||
+                (userInfo?.name && e.name?.trim().toLowerCase() === userInfo.name?.trim().toLowerCase())
             );
             if (foundUser) {
               setEmployeeId(foundUser.id);
+            } else if (userEmpId) {
+              setEmployeeId(userEmpId);
             }
           }
         }
-        if (partyRes.success) setParties(partyRes.data || []);
         if (modelRes.success) setMachineModels(modelRes.data || []);
       } catch (err) {
         console.error('Initial data load error:', err);
@@ -133,7 +158,7 @@ const AddServiceVisit = ({ navigation }: any) => {
       }
     };
     loadInitialData();
-  }, [userInfo]);
+  }, [userInfo, isOwner]);
 
   // Reload employees when branch changes (branch-filtered employee list)
   useEffect(() => {
@@ -144,7 +169,13 @@ const AddServiceVisit = ({ navigation }: any) => {
           const empList = res.data || [];
           setEmployees(empList);
           // Reset employee selections when branch changes
-          setEmployeeId(null);
+          if (isOwner) {
+            setEmployeeId(null);
+          } else {
+            if (loggedInEmployeeId) {
+              setEmployeeId(loggedInEmployeeId);
+            }
+          }
           setAdditionalEmployeeIds([]);
         }
       } catch (err) {
@@ -157,34 +188,110 @@ const AddServiceVisit = ({ navigation }: any) => {
       reloadEmployeesByBranch();
     } else {
       // Branch cleared – reset employee dropdown
-      setEmployeeId(null);
+      setEmployees(allEmployees);
+      if (isOwner) {
+        setEmployeeId(null);
+      } else {
+        if (loggedInEmployeeId) {
+          setEmployeeId(loggedInEmployeeId);
+        }
+      }
       setAdditionalEmployeeIds([]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [branchId]);
+  }, [branchId, isOwner, loggedInEmployeeId, allEmployees]);
+
+  useEffect(() => {
+    if (!isOwner && loggedInEmployeeId && employeeId !== loggedInEmployeeId) {
+      setEmployeeId(loggedInEmployeeId);
+    }
+  }, [isOwner, loggedInEmployeeId, employeeId]);
+
+const SERVICE_DESIGNATION_IDS = [3, 5, 7, 9, 10, 12, 14, 15, 18, 23, 24, 26];
+const SERVICE_DESIGNATION_NAMES = [
+  'JUNIOR SERVICE ENGINER',
+  'JUNIOR SERVICE ENGINEER',
+  'ASSISTANT SERVICE MANAGER',
+  'WORKSHOP INCHARGE',
+  'SERVICE MANAGER',
+  'ASST SERVICE MANAGER',
+  'GM SERVICE',
+  'BRANCH MANAGER',
+  'INCHARGE',
+  'ASSISSTANT HL MANAGER',
+  'ASSISTANT HL MANAGER',
+  'SENIOR SERVICE ENGINEER',
+  'JUNIOR TECHNICIAN',
+  'SERVICE ENGINEER',
+];
+
+const DRIVER_DESIGNATION_IDS = [6];
+const DRIVER_DESIGNATION_NAMES = ['DRIVER'];
 
   // Determine selected employee details
   const selectedEmployee = useMemo(() => {
     if (!employeeId) return null;
-    return employees.find((e: any) => e.id === employeeId);
-  }, [employeeId, employees]);
+    return (
+      employees.find((e: any) => Number(e.id) === Number(employeeId)) ||
+      allEmployees.find((e: any) => Number(e.id) === Number(employeeId)) ||
+      null
+    );
+  }, [employeeId, employees, allEmployees]);
 
   const selectedBranch = useMemo(() => {
     if (!branchId) return null;
     return branches.find((b: any) => b.id === branchId);
   }, [branchId, branches]);
 
-  // Department type rules (per README spec):
-  // - dept == 5 (Driver)         → 'ADMIN'
-  // - dept == 4 (Engineer/Service) → 'SERVICE'
-  // - All other departments       → 'Sales'
+  // Designation rules:
+  // - Service: JUNIOR SERVICE ENGINER, ASSISTANT SERVICE MANAGER, WORKSHOP INCHARGE, SERVICE MANAGER,
+  //   ASST SERVICE MANAGER, GM SERVICE, BRANCH MANAGER, INCHARGE, ASSISSTANT HL MANAGER,
+  //   SENIOR SERVICE ENGINEER, JUNIOR TECHNICIAN, SERVICE ENGINEER
+  // - Driver / Admin: DRIVER
+  // - Sales: ACCOUNTANT, ASSISTANT MANAGER, ASSISTANT PARTS MANAGER, PEON, OFFICE BOY, SALES MANAGER,
+  //   SALES GM, PURCHASE INCHARGE, PARTS MANAGER, SENIOR EXECUTIVE, HELPER, EXECUTIVE, and others
   const userType = useMemo<'SERVICE' | 'Sales' | 'ADMIN'>(() => {
     if (!selectedEmployee) return 'Sales';
-    const deptId = Number(selectedEmployee.department_id || selectedEmployee.department);
-    if (deptId === 5) return 'ADMIN';
-    if (deptId === 4) return 'SERVICE';
+
+    // 1. If backend already sent service_visit_type
+    if (selectedEmployee.service_visit_type) {
+      const svType = String(selectedEmployee.service_visit_type).toUpperCase();
+      if (svType === 'SERVICE') return 'SERVICE';
+      if (svType === 'DRIVER') return 'ADMIN';
+      if (svType === 'SALES') return 'Sales';
+    }
+
+    const desigId = Number(selectedEmployee.designation_id || selectedEmployee.designation?.id);
+    const desigName = (
+      selectedEmployee.designation_name ||
+      selectedEmployee.designation?.name ||
+      ''
+    ).trim().toUpperCase();
+
+    // Check Driver
+    if (DRIVER_DESIGNATION_IDS.includes(desigId) || DRIVER_DESIGNATION_NAMES.includes(desigName)) {
+      return 'ADMIN';
+    }
+
+    // Check Service (Engineer)
+    if (SERVICE_DESIGNATION_IDS.includes(desigId) || SERVICE_DESIGNATION_NAMES.includes(desigName)) {
+      return 'SERVICE';
+    }
+
+    // Default to Sales
     return 'Sales';
   }, [selectedEmployee]);
+
+  const serviceEngineers = useMemo(() => {
+    return employees.filter((e: any) => {
+      if (e.service_visit_type) {
+        return String(e.service_visit_type).toUpperCase() === 'SERVICE';
+      }
+      const desigId = Number(e.designation_id || e.designation?.id);
+      const desigName = (e.designation_name || e.designation?.name || '').trim().toUpperCase();
+      return SERVICE_DESIGNATION_IDS.includes(desigId) || SERVICE_DESIGNATION_NAMES.includes(desigName);
+    });
+  }, [employees]);
 
   // Handle Dynamic Additional Employee list updates
   useEffect(() => {
@@ -288,39 +395,13 @@ const AddServiceVisit = ({ navigation }: any) => {
     setShowDatePicker(false);
   };
 
-  // Machine Search automatically via debounce when machineNumber changes
+  // Machine reset when machineNumber changes
   useEffect(() => {
     if (!machineNumber.trim()) {
       setMachineId(null);
-      setPartyId(null);
-      setPartyName('');
       setMachineModelId(null);
       return;
     }
-
-    // const delayDebounceFn = setTimeout(async () => {
-    //   setSearchingMachine(true);
-    //   try {
-    //     const res = await getPartyByMachine(machineNumber);
-    //     if (res.data) {
-    //       setMachineId(res.data.machine?.id || null);
-    //       setMachineModelId(res.data.machine?.machine_model_id || null);
-    //       setPartyId(res.data.party?.id || null);
-    //       setPartyName(res.data.party?.name || '');
-    //       ToastUtil.success(res.message || 'Machine and Customer found!');
-    //     } else {
-    //       setMachineId(null);
-    //       setPartyId(null);
-    //       setPartyName('');
-    //     }
-    //   } catch (err) {
-    //     console.error(err);
-    //   } finally {
-    //     setSearchingMachine(false);
-    //   }
-    // }, 600);
-
-    // return () => clearTimeout(delayDebounceFn);
   }, [machineNumber]);
 
   // Handle Photo attachment
@@ -355,9 +436,11 @@ const AddServiceVisit = ({ navigation }: any) => {
 
   // Form Submit Handler
   const handleFormSubmit = async () => {
+    const currentEmpId = isOwner ? employeeId : (employeeId || loggedInEmployeeId);
+
     // Validate Required parameters
     if (!branchId) return ToastUtil.info('Branch is required');
-    if (!employeeId) return ToastUtil.info('Visiting Employee is required');
+    if (!currentEmpId) return ToastUtil.info('Visiting Employee is required');
     if (!location.trim()) return ToastUtil.info('Location is required');
     if (km === undefined || km === null || isNaN(km)) return ToastUtil.info('KM is required');
 
@@ -372,7 +455,7 @@ const AddServiceVisit = ({ navigation }: any) => {
     formData.append('visit_date', formatDate(visitDate, 'api'));
     formData.append('company_vehicle', companyVehicle);
     formData.append('no_of_employe', String(noOfEmployee));
-    formData.append('employee_id', String(employeeId));
+    formData.append('employee_id', String(currentEmpId));
     formData.append('is_engineer', isEngineer);
     formData.append('location', location);
     formData.append('remarks', remarks);
@@ -389,7 +472,7 @@ const AddServiceVisit = ({ navigation }: any) => {
       if (machineModelId) formData.append('machine_model_id', String(machineModelId));
       formData.append('machine_number', machineNumber);
       formData.append('machine_no', machineNumber);
-      if (partyId) formData.append('party_id', String(partyId));
+      if (salesPartyName.trim()) formData.append('sales_party_name', salesPartyName);
       formData.append('visit_category', visitCategory || '');
       formData.append('work_description', workDescription);
       formData.append('complain', complain);
@@ -397,11 +480,11 @@ const AddServiceVisit = ({ navigation }: any) => {
       formData.append('svr', String(svr));
       formData.append('call_count', String(callCount));
     } else if (userType === 'Sales') {
-      formData.append('sales_party_name', salesPartyName);
+      if (salesPartyName.trim()) formData.append('sales_party_name', salesPartyName);
     } else if (userType === 'ADMIN') {
       if (isEngineer === 'Yes') {
         if (engineerId) formData.append('engineer_id', String(engineerId));
-        if (partyIdDriver) formData.append('party_id', String(partyIdDriver));
+        if (salesPartyName.trim()) formData.append('sales_party_name', salesPartyName);
       } else {
         formData.append('work_description', workDescription);
       }
@@ -553,22 +636,41 @@ const AddServiceVisit = ({ navigation }: any) => {
             </View>
           </View>
 
-          <View style={formStyles.fieldContainer}>
-            <FormLabel label="Visiting Employee" required color={theme.label} />
-            <CustomDropdown
-              label=""
-              data={employees}
-              value={employeeId}
-              placeholder="Select Employee"
-              onChange={(item) => setEmployeeId(item.id)}
-              labelField="name"
-              valueField="id"
-              renderItem={renderItem}
-              colors={colors}
-              search
-              searchPlaceholder="Search employee..."
-            />
-          </View>
+          {isOwner ? (
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Visiting Employee" required color={theme.label} />
+              <CustomDropdown
+                label=""
+                data={employees}
+                value={employeeId}
+                placeholder="Select Employee"
+                onChange={(item) => setEmployeeId(item.id)}
+                labelField="name"
+                valueField="id"
+                renderItem={renderItem}
+                colors={colors}
+                search
+                searchPlaceholder="Search employee..."
+              />
+            </View>
+          ) : (
+            <View style={formStyles.fieldContainer}>
+              <FormLabel label="Visiting Employee" color={theme.label} />
+              <View
+                style={[
+                  styles.readOnlyContainer,
+                  {
+                    backgroundColor: isDarkMode ? '#1E232A' : '#F3F4F6',
+                    borderColor: theme.border,
+                  },
+                ]}
+              >
+                <Text style={{ color: theme.inputText, fontSize: 14, fontWeight: '500' }}>
+                  {selectedEmployee?.name || userInfo?.name || 'Current Employee'}
+                </Text>
+              </View>
+            </View>
+          )}
 
           {/* Dynamic Extra Employees Dropdowns */}
           {additionalEmployeeIds.map((val, idx) => (
@@ -630,11 +732,10 @@ const AddServiceVisit = ({ navigation }: any) => {
               </View>
 
               <CustomInput
-                label="Customer (Party Name)"
-                value={partyName}
-                onChangeText={setPartyName}
-                placeholder=""
-                style={{ opacity: 0.85 }}
+                label="Customer / Client Name"
+                value={salesPartyName}
+                onChangeText={setSalesPartyName}
+                placeholder="Enter client name"
               />
 
               <View style={formStyles.fieldContainer}>
@@ -810,7 +911,7 @@ const AddServiceVisit = ({ navigation }: any) => {
                     <FormLabel label="Select Engineer" color={theme.label} />
                     <CustomDropdown
                       label=""
-                      data={employees}
+                      data={serviceEngineers.length > 0 ? serviceEngineers : employees}
                       value={engineerId}
                       placeholder="Select Engineer"
                       onChange={(item) => setEngineerId(item.id)}
@@ -822,21 +923,12 @@ const AddServiceVisit = ({ navigation }: any) => {
                     />
                   </View>
 
-                  <View style={formStyles.fieldContainer}>
-                    <FormLabel label="Customer (Party List)" color={theme.label} />
-                    <CustomDropdown
-                      label=""
-                      data={parties}
-                      value={partyIdDriver}
-                      placeholder="Select Customer Party"
-                      onChange={(item) => setPartyIdDriver(item.id)}
-                      labelField="name"
-                      valueField="id"
-                      renderItem={renderItem}
-                      colors={colors}
-                      search
-                    />
-                  </View>
+                  <CustomInput
+                    label="Customer / Client Name"
+                    value={salesPartyName}
+                    onChangeText={setSalesPartyName}
+                    placeholder="Enter client name"
+                  />
                 </>
               ) : (
                 <CustomInput
@@ -1234,5 +1326,12 @@ const styles = StyleSheet.create({
   stepperValue: {
     fontSize: moderateScale(15),
     fontWeight: '700',
+  },
+  readOnlyContainer: {
+    height: 48,
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: moderateScale(12),
+    justifyContent: 'center',
   },
 });
