@@ -120,6 +120,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
   const [totalBreakFormatted, setTotalBreakFormatted] = useState('00h 00m');
   const [punches, setPunches] = useState<PunchSession[]>([]);
   const [graceInfo, setGraceInfo] = useState<GraceInfo | null>(null);
+  const [shiftDisplay, setShiftDisplay] = useState('Day Shift (09:30 AM - 07:00 PM)');
 
   const [fileUri, setFileUri] = useState('');
   const [lat, setLat] = useState('');
@@ -363,6 +364,10 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
 
         if (punchData.grace_info) {
           setGraceInfo(punchData.grace_info);
+        }
+
+        if (punchData.shift_info?.shift_display) {
+          setShiftDisplay(punchData.shift_info.shift_display);
         }
 
         const mode = resolveScreenMode(status, label);
@@ -829,7 +834,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
                           { color: theme.textSecondary },
                         ]}
                       >
-                        Day Shift (10:00 AM - 07:30 PM)
+                        {shiftDisplay}
                       </Text>
                     </View>
                   </View>

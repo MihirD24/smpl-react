@@ -14,7 +14,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LeaveRequestCard from './leaveRquestCard';
-import { AuthContext } from '../../context/authContext';
+import { AuthContext, useAuth } from '../../context/authContext';
 import SearchBarComponent from '../../components/searchBarComponent';
 import LeaveCardSkeleton from '../../skeletonview/leaveCardSkeleton';
 import { getLeaveRequest } from '../../services';
@@ -81,7 +81,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   navigation,
 }) => {
   const isFocused = useIsFocused();
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo } = useAuth();
   const MainStyles = MainStyle();
   const isDarkMode = useColorScheme() === 'dark';
   const { width } = Dimensions.get('window');
@@ -96,9 +96,9 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   };
 
 
-  const [loginType, setLoginType] = useState(userInfo.role);
-  const [loginuserrole, setLoginuserrole] = useState(userInfo.role);
-  const [loginuserId, setLoginuserId] = useState(userInfo.id);
+  const [loginType, setLoginType] = useState(userInfo?.role || '');
+  const [loginuserrole, setLoginuserrole] = useState(userInfo?.role || '');
+  const [loginuserId, setLoginuserId] = useState(userInfo?.id || '');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [masterJobData, setMasterJobData] = useState<LeaveData[]>([]);
@@ -106,6 +106,7 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
   const [search, setSearch] = useState('');
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedLeaveTypes, setSelectedLeaveTypes] = useState<string[]>([]);
+  const [leaveBalance, setLeaveBalance] = useState<{ allowed_paid_leave: number; remaining_paid_leave: number } | null>(null);
   const filterSheetRef = useRef<FilterBottomSheetHandle>(null);
 
   const isAdmin = loginuserrole === 'Owner';
@@ -122,9 +123,15 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
       if (!userdata) return;
       const parsed = JSON.parse(userdata);
       const userIdToUse = userId || parsed.id;
-      const leaveData = await getLeaveRequest(userIdToUse);
-      setMasterJobData(leaveData);
-      applyAllFilters(leaveData, search, selectedStatuses, selectedLeaveTypes);
+      const response = await getLeaveRequest(userIdToUse);
+      const items: LeaveData[] = Array.isArray(response)
+        ? response
+        : (response?.data || []);
+      setMasterJobData(items);
+      if (response?.leave_balance) {
+        setLeaveBalance(response.leave_balance);
+      }
+      applyAllFilters(items, search, selectedStatuses, selectedLeaveTypes);
     } catch (e) {
       console.error('Error fetching leave data:', e);
     } finally {
@@ -310,6 +317,56 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
             <View style={styles.sectionBar} />
             <Text style={[styles.sectionLabel, { color: theme.muted }]}>LEAVE OVERVIEW</Text>
           </View>
+
+          {/* ── Remaining Leave Balance Banner ── */}
+          {leaveBalance !== null && (
+            <View
+              style={[
+                styles.balanceBanner,
+                {
+                  backgroundColor: isDarkMode ? '#1E293B' : '#EFF6FF',
+                  borderColor: isDarkMode ? '#334155' : '#BFDBFE',
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.balanceIconWrap,
+                  { backgroundColor: isDarkMode ? '#172554' : '#DBEAFE' },
+                ]}
+              >
+                <AppIcon name="CalendarCheck" size={moderateScale(20)} color="#2563EB" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={[
+                    styles.balanceLabel,
+                    { color: isDarkMode ? '#94A3B8' : '#64748B' },
+                  ]}
+                >
+                  REMAINING PAID LEAVE
+                </Text>
+                <Text
+                  style={[
+                    styles.balanceValue,
+                    { color: isDarkMode ? '#F8FAFC' : '#1E3A8A' },
+                  ]}
+                >
+                  {leaveBalance.remaining_paid_leave}{' '}
+                  <Text
+                    style={{
+                      fontSize: moderateScale(12),
+                      fontWeight: '600',
+                      color: isDarkMode ? '#94A3B8' : '#64748B',
+                    }}
+                  >
+                    / {leaveBalance.allowed_paid_leave} days
+                  </Text>
+                </Text>
+              </View>
+            </View>
+          )}
+
           <View style={styles.summaryRow}>
             <SummaryCard label="Total" value={leaveSummary.total} icon="CalendarDays" tone={BRAND.black} dark={isDarkMode} />
             <SummaryCard label="Pending" value={leaveSummary.pending} icon="Clock3" tone={BRAND.yellow} dark={isDarkMode} />
@@ -458,6 +515,34 @@ const LeaveList: React.FC<AppStackScreenProps<'LeaveList'>> = ({
 };
 
 const styles = StyleSheet.create({
+  balanceBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: moderateScale(14),
+    marginHorizontal: moderateScale(14),
+    marginBottom: moderateScale(10),
+    paddingHorizontal: moderateScale(14),
+    paddingVertical: moderateScale(10),
+  },
+  balanceIconWrap: {
+    width: moderateScale(36),
+    height: moderateScale(36),
+    borderRadius: moderateScale(10),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: moderateScale(12),
+  },
+  balanceLabel: {
+    fontSize: moderateScale(10),
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  balanceValue: {
+    fontSize: moderateScale(16),
+    fontWeight: '800',
+    marginTop: moderateScale(2),
+  },
   summaryRow: {
     flexDirection: 'row',
     paddingHorizontal: moderateScale(14),

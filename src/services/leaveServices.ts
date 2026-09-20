@@ -9,9 +9,13 @@ export const getLeaveRequest = async (loginuserId: string) => {
     const response = await apiPostUpload(API_ENDPOINTS.LEAVE_BY_USER, formData);
 
     if (response.success) {
-      return response.data;
+      return {
+        data: response.data || [],
+        leave_balance: response.leave_balance || { allowed_paid_leave: 0, remaining_paid_leave: 0 },
+        success: true,
+      };
     } else {
-      return {success: false, message: response.message};
+      return {success: false, message: response.message, data: [], leave_balance: { allowed_paid_leave: 0, remaining_paid_leave: 0 }};
     }
   } catch (error) {
     if (error instanceof Error)
@@ -19,6 +23,8 @@ export const getLeaveRequest = async (loginuserId: string) => {
     return {
       success: false,
       message: 'An error occurred while fetching leave request.',
+      data: [],
+      leave_balance: { allowed_paid_leave: 0, remaining_paid_leave: 0 },
     };
   }
 };

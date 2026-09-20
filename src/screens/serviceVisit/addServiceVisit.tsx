@@ -310,16 +310,15 @@ const DRIVER_DESIGNATION_NAMES = ['DRIVER'];
   }, [noOfEmployee]);
 
   // 1. Travel Allowance (TA) Calculation
-  // - If company_vehicle == 'no' AND employee is NOT Sales (6) AND employee is NOT Driver (5) AND branch is NOT 'Khavda':
+  // - If company_vehicle == 'no' AND employee is NOT Driver (5) AND branch is NOT 'Khavda':
   //   - ta_amount = km * 3.50
   // - Else: ta_amount = 0
   useEffect(() => {
-    const isSales = userType === 'Sales';
     const isDriver = userType === 'ADMIN';
     const branchName = selectedBranch?.name || selectedBranch?.title || '';
     const isKhavda = branchName.toLowerCase().includes('khavda');
 
-    if (companyVehicle === 'no' && !isSales && !isDriver && !isKhavda) {
+    if (companyVehicle === 'no' && !isDriver && !isKhavda) {
       setTaAmount(Number((km * 3.50).toFixed(2)));
     } else {
       setTaAmount(0);
