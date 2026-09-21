@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import { requestNotificationPermission } from './src/utils';
+import { checkForInAppUpdate } from './src/helper/inAppUpdate';
 import { AuthProvider } from './src/context/authContext';
 import AppNav from './src/navigation/appNav';
 import {
@@ -78,6 +79,7 @@ function App(): JSX.Element {
     };
 
     initializeNotifications();
+    checkForInAppUpdate();
 
     // App state listener
     const appStateListener = AppState.addEventListener(
@@ -85,6 +87,7 @@ function App(): JSX.Element {
       nextAppState => {
         if (nextAppState === 'active') {
           notifee.cancelAllNotifications();
+          checkForInAppUpdate();
         }
       },
     );
