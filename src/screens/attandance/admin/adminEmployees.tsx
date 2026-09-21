@@ -88,6 +88,7 @@ const AdminEmployees: React.FC = () => {
     setRefreshing(true);
     try {
       const response = await getEmployeeList();
+      console.log('Admin employee refresh response:', response);
       setEmployees(extractEmployees(response));
     } catch (error) {
       console.error('Admin employee refresh error:', error);
@@ -103,9 +104,9 @@ const AdminEmployees: React.FC = () => {
       const haystack = [
         pick(item, ['name', 'employee_name', 'full_name', 'username']),
         pick(item, ['employee_id', 'employeeId', 'id']),
-        pick(item, ['branch', 'branch_name']),
-        pick(item, ['department', 'department_name']),
-        pick(item, ['designation', 'designation_name', 'role']),
+        pick(item?.branch, ['branch', 'branch_name']),
+        pick(item?.department, ['department', 'department_name']),
+        pick(item?.designation, ['designation', 'designation_name', 'role']),
         pick(item, ['mobile', 'phone', 'contact_no']),
         pick(item, ['email', 'email_id']),
       ].join(' ').toLowerCase();
@@ -182,10 +183,10 @@ const AdminEmployees: React.FC = () => {
             <View style={isTablet ? styles.grid : undefined}>
               {filteredEmployees.map((item, index) => {
                 const name = pick(item, ['name', 'employee_name', 'full_name', 'username'], 'Employee');
-                const id = pick(item, ['employee_id', 'employeeId', 'id'], '--');
-                const designation = pick(item, ['designation', 'designation_name', 'role'], 'Team Member');
-                const branch = pick(item, ['branch', 'branch_name'], 'Branch not assigned');
-                const department = pick(item, ['department', 'department_name'], 'Department not assigned');
+                const id = pick(item, ['employee_code', 'employee_code', 'employee_code'], '--');
+                const designation = pick(item?.designation, ['designation', 'designation_name', 'role'], 'Team Member');
+                const branch = pick(item?.branch, ['branch', 'branch_name'], 'Branch not assigned');
+                const department = pick(item?.department, ['department', 'department_name'], 'Department not assigned');
                 const mobile = pick(item, ['mobile', 'phone', 'contact_no']);
                 const email = pick(item, ['email', 'email_id']);
                 const status = pick(item, ['status', 'employee_status'], 'Active');

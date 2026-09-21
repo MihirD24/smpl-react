@@ -44,6 +44,11 @@ export interface LeaveData {
   to_date: string;
   leave_status: number; // 0: Pending, 1: Approved, 2: Rejected
   leave_type: string;
+  holiday?: {
+    id: number;
+    name: string;
+    date: string;
+  } | null;
   created_at: string;
   updated_at: string;
   get_staff_detail: StaffDetail;

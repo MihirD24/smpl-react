@@ -129,9 +129,11 @@ export const getServiceVisitsList = async (data: any = {}) => {
   }
 };
 
-export const bulkApproveServiceVisits = async (data: { updates: { id: number; status: number; deduction_amount?: number; approval_remarks?: string }[] }) => {
+export const bulkApproveServiceVisits = async (formData: FormData) => {
   try {
-    const response = await apiPost(API_ENDPOINTS.SERVICE_VISITS_BULK_APPROVE, data);
+    console.log('bulkApproveServiceVisits data:', formData);
+    const response = await apiPost(API_ENDPOINTS.SERVICE_VISITS_BULK_APPROVE, formData);
+    console.log('bulkApproveServiceVisits response:', response);
     return response;
   } catch (error) {
     console.error('bulkApproveServiceVisits error:', error);

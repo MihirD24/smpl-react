@@ -18,6 +18,7 @@ import MonthSelector from '../../components/monthSelector';
 import { getAttendance, getCount } from '../../services';
 import { AppStackScreenProps } from '../../navigation/navigationTypes';
 import { AttendanceItem } from '../../types/adminAttendance';
+import { useAuth } from '../../context/authContext';
 import AppIcon from '../../components/appIcon';
 import ScreenWrapper from '../../components/screenWrapper';
 import AttendanceCard, { fmtMins } from '../attandance/attendanceCard';
@@ -51,6 +52,9 @@ interface UserAttendanceCount {
   early_grace_allowed?: number;
   early_grace_remaining?: number;
   early_grace_excess?: number;
+  late_subtext?: string;
+  early_subtext?: string;
+  overtime_subtext?: string;
 }
 
 const EMPTY_COUNT: UserAttendanceCount = {
@@ -279,6 +283,8 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
     useState<UserAttendanceCount>(EMPTY_COUNT);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [punchingOut] = useState(false);
+  const { userInfo } = useAuth();
+  const isAdmin = userInfo?.role === 'Owner' || userInfo?.user_type === 'Owner';
   const isDarkMode = useColorScheme() === 'dark';
 
   // ── Shared theme ──
@@ -404,7 +410,15 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
       backgroundColor={isDarkMode ? '#111827' : '#F7F8FA'}
     >
       <NetInfoComponent onReconnect={handleRefresh} />
-      <ModuleIntro eyebrow="WORKFORCE / ATTENDANCE" title="Attendance" description="Your monthly attendance, working hours, late marks and overtime." />
+      <ModuleIntro
+        eyebrow="WORKFORCE / ATTENDANCE"
+        title="Attendance"
+        description={
+          isAdmin
+            ? 'Your monthly attendance, working hours, late marks and overtime.'
+            : 'Your monthly attendance, working hours and late marks.'
+        }
+      />
       <>
         {!isReady ? (
           <ScrollView
@@ -474,7 +488,7 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     ? fmtMins(attandanceCount.total_early_exit_in_min)
                     : '0'
                 }
-                subtext="Before 7.30 pm"
+                subtext={attandanceCount?.early_subtext || 'Before 07.00 pm'}
                 accentColor="#F97316"
                 valueColor="#F97316"
                 subtextColor="#F97316"
@@ -496,25 +510,27 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     ? fmtMins(attandanceCount?.total_late_time_in_min || 0)
                     : '0'
                 }
-                subtext="After 10.00 am"
+                subtext={attandanceCount?.late_subtext || 'After 09.30 am'}
                 accentColor="#F59E0B"
                 valueColor="#F59E0B"
                 subtextColor="#F59E0B"
                 isDarkMode={isDarkMode}
               />
-              <StatCard
-                label="TOTAL OVERTIME"
-                value={
-                  attandanceCount?.total_extra_time_in_min > 0
-                    ? fmtMins(attandanceCount?.total_extra_time_in_min || 0)
-                    : '0'
-                }
-                subtext="After 7.30 pm"
-                accentColor="#8B5CF6"
-                valueColor="#8B5CF6"
-                subtextColor="#8B5CF6"
-                isDarkMode={isDarkMode}
-              />
+              {isAdmin && (
+                <StatCard
+                  label="TOTAL OVERTIME"
+                  value={
+                    attandanceCount?.total_extra_time_in_min > 0
+                      ? fmtMins(attandanceCount?.total_extra_time_in_min || 0)
+                      : '0'
+                  }
+                  subtext={attandanceCount?.overtime_subtext || 'After 07.00 pm'}
+                  accentColor="#8B5CF6"
+                  valueColor="#8B5CF6"
+                  subtextColor="#8B5CF6"
+                  isDarkMode={isDarkMode}
+                />
+              )}
             </View>
 
             {/* ── Monthly Grace Tracker Widget ── */}
@@ -662,10 +678,12 @@ const Attendancelist: React.FC<AppStackScreenProps<'Attendancelist'>> = ({
                     <Text
                       style={[styles.hoursWorkedValue, { color: blueText }]}
                     >
-                      {todayAttendance.total_work_formatted || (todayAttendance.out_time ? getTotalHours() : calculateWorkedHours())}
+                      {(todayAttendance.total_work_formatted && todayAttendance.total_work_formatted !== '00h 00m')
+                        ? todayAttendance.total_work_formatted
+                        : (todayAttendance.out_time ? getTotalHours() : calculateWorkedHours())}
                     </Text>
                   </View>
-                  {todayAttendance.total_break_formatted && (
+                  {todayAttendance.total_break_formatted && todayAttendance.total_break_formatted !== '00h 00m' && (
                     <View style={{ alignItems: 'flex-end' }}>
                       <Text
                         style={[

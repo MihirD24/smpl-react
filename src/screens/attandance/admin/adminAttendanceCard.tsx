@@ -14,6 +14,7 @@ import {
 import moment from 'moment';
 import { useTheme } from '@react-navigation/native';
 import AppIcon from '../../../components/appIcon';
+import PunchSessionsTimeline from '../../../components/punchSessionsTimeline';
 import { cardStyles, getCardTheme } from '../../../assets/style/cardStyles';
 import { moderateScale, s, scale, verticalScale } from 'react-native-size-matters';
 
@@ -62,9 +63,16 @@ const calcWorked = (inTime?: string, outTime?: string): string => {
   return mins > 0 ? fmtMins(mins) : '';
 };
 
-// ─── Component ────────────────────────────────────────────────────────────────
+interface AdminAttendanceCardProps {
+  attendanceData: any;
+  navigation: any;
+  userrole?: string;
+}
 
-export default function AdminAttendanceCard({ attendanceData, navigation }) {
+export default function AdminAttendanceCard({
+  attendanceData,
+  navigation,
+}: AdminAttendanceCardProps) {
   const { colors } = useTheme();
   const isDarkMode = useColorScheme() === 'dark';
   const [isExpanded, setIsExpanded] = useState(false);
@@ -87,17 +95,37 @@ export default function AdminAttendanceCard({ attendanceData, navigation }) {
     attendanceData?.employee?.profile_image || 'https://via.placeholder.com/40';
 
   // ── Duration ────────────────────────────────────────────────────────────────
-  const workedStr = calcWorked(
-    attendanceData?.in_time,
-    attendanceData?.out_time,
+  const workdayLabel = (() => {
+    if (attendanceData?.total_work_formatted) {
+      const hasBreak =
+        attendanceData.total_break_formatted &&
+        attendanceData.total_break_formatted !== '00h 00m';
+      return `Workday · ${attendanceData.total_work_formatted}${
+        hasBreak ? ` (Break ${attendanceData.total_break_formatted})` : ''
+      }`;
+    }
+    const mins =
+      attendanceData?.total_minutes || attendanceData?.total_work_minutes;
+    if (mins) return `Workday · ${fmtMins(mins)}`;
+    const workedStr = calcWorked(
+      attendanceData?.in_time,
+      attendanceData?.out_time,
+    );
+    return workedStr ? `Workday · ${workedStr}` : 'In Progress';
+  })();
+
+  const isActive = Boolean(
+    attendanceData?.is_active ||
+      (attendanceData?.in_time && !attendanceData?.out_time),
   );
-  const workdayLabel = workedStr ? `Workday · ${workedStr}` : 'In Progress';
   const durationIn = fmtDurationTime(attendanceData?.in_time);
   const durationOut = attendanceData?.out_time
     ? fmtDurationTime(attendanceData?.out_time)
     : null;
   const durationLabel = durationOut
     ? `${durationIn} - ${durationOut}`
+    : isActive
+    ? `${durationIn} (Active)`
     : durationIn;
 
   // ── Chips ───────────────────────────────────────────────────────────────────
@@ -108,6 +136,9 @@ export default function AdminAttendanceCard({ attendanceData, navigation }) {
   const chips: { label: string; color: string; bg: string }[] = [];
 
   if (isPresent) {
+    if (isActive) {
+      chips.push({ label: 'ACTIVE NOW', color: '#16A34A', bg: '#DCFCE7' });
+    }
     chips.push(
       lateMins === 0
         ? { label: 'ON TIME', color: '#10B981', bg: '#D1FAE5' }
@@ -255,6 +286,16 @@ export default function AdminAttendanceCard({ attendanceData, navigation }) {
 
       {isExpanded && isPresent && (
         <View style={[styles.expandedSection, { borderTopColor: ct.divider }]}>
+          {Array.isArray(attendanceData?.punches) &&
+            attendanceData.punches.length > 0 && (
+              <View style={{ marginBottom: verticalScale(14) }}>
+                <PunchSessionsTimeline
+                  punches={attendanceData.punches}
+                  isDarkMode={isDarkMode}
+                />
+              </View>
+            )}
+
           {/* Punch-In */}
           {attendanceData?.in_time && (
             <View style={styles.punchDetailsSection}>

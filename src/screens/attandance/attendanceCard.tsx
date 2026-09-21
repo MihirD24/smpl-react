@@ -4,6 +4,7 @@ import moment from 'moment';
 import { AttendanceItem } from '../../types/adminAttendance';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
 import AppIcon from '../../components/appIcon';
+import { useAuth } from '../../context/authContext';
 
 import PunchSessionsTimeline from '../../components/punchSessionsTimeline';
 
@@ -63,6 +64,8 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
   isDarkMode = false,
   navigation,
 }) => {
+  const { userInfo } = useAuth();
+  const isAdmin = userInfo?.role === 'Owner' || userInfo?.user_type === 'Owner';
   const [showPunchDetails, setShowPunchDetails] = useState(false);
   const theme = getCardTheme(isDarkMode);
 
@@ -86,7 +89,8 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
     if (isLeave) return getLeaveSubtitle(attendanceData);
     if (isAbsent) return 'No Record';
     if (attendanceData?.total_work_formatted) {
-      return `Workday • ${attendanceData.total_work_formatted}${attendanceData.total_break_formatted ? ` (Break ${attendanceData.total_break_formatted})` : ''}`;
+      const hasBreak = attendanceData.total_break_formatted && attendanceData.total_break_formatted !== '00h 00m';
+      return `Workday • ${attendanceData.total_work_formatted}${hasBreak ? ` (Break ${attendanceData.total_break_formatted})` : ''}`;
     }
     const mins = attendanceData?.total_minutes || attendanceData?.total_work_minutes;
     if (mins) return `Workday • ${fmtMins(mins)}`;
@@ -123,7 +127,7 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
         bg: '#FEF3C7',
       });
     }
-    if (extraTime > 0) {
+    if (isAdmin && extraTime > 0) {
       chips.push({
         label: `OVERTIME +${fmtMins(extraTime)}`,
         color: '#8B5CF6',

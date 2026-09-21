@@ -20,6 +20,7 @@ import ScreenWrapper from '../../components/screenWrapper';
 import AttendanceCard from '../attandance/attendanceCard';
 import { cardStyles, getCardTheme } from '../../assets/style/cardStyles'; // adjust path as needed
 import NetInfoComponent from '../../components/netinfoComponent';
+import { useAuth } from '../../context/authContext';
 
 // ─── Scaling ───────────────────────────────────────────────────────────────────
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -238,6 +239,9 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('All');
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
 
+  const { userInfo } = useAuth();
+  const isAdmin = userInfo?.role === 'Owner' || userInfo?.user_type === 'Owner';
+
   // Use shared theme
   const theme = getCardTheme(isDarkMode);
 
@@ -252,9 +256,15 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
     'Present',
     'Late',
     'Leave',
-    'Overtime',
+    ...(isAdmin ? (['Overtime'] as FilterType[]) : []),
     'EarlyExit',
   ];
+
+  useEffect(() => {
+    if (!isAdmin && selectedFilter === 'Overtime') {
+      setSelectedFilter('All');
+    }
+  }, [isAdmin, selectedFilter]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -418,7 +428,7 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
     if (!a || a.status !== 'Present') return [];
     const dots: string[] = [];
     if ((a.late_entry ?? 0) !== 0) dots.push('#F59E0B');
-    if ((a.extra_time ?? 0) > 0) dots.push('#8B5CF6');
+    if (isAdmin && (a.extra_time ?? 0) > 0) dots.push('#8B5CF6');
     if ((a.early_exit ?? 0) > 0) dots.push('#F97316');
     return dots;
   };
@@ -605,7 +615,7 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
             <View style={s.legendGrid}>
               {[
                 { label: 'Late arrival', color: '#F59E0B' },
-                { label: 'Overtime', color: '#8B5CF6' },
+                ...(isAdmin ? [{ label: 'Overtime', color: '#8B5CF6' }] : []),
                 { label: 'Early exit', color: '#F97316' },
               ].map(l => (
                 <View key={l.label} style={s.legendItem}>
@@ -743,7 +753,7 @@ const AttendanceFilter: React.FC<AppStackScreenProps<'AttendanceFilter'>> = ({
                     activeOpacity={0.8}
                   >
                     <AppIcon
-                      name={getFilterIcon(filter)}
+                      name={getFilterIcon(filter) as any}
                       size={moderateScale(13)}
                       color={active ? '#FFFFFF' : color}
                     />

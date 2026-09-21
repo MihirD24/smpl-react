@@ -312,6 +312,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
   const fetchProfile = async () => {
     try {
       const data = await userDetails();
+      console.log('data',data)
       setProfile(data);
     } catch (e) {
       console.error('Profile fetch failed', e);
@@ -496,11 +497,10 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             </View>
           </View>
 
-          <InfoRow label="Employee ID" value={profile?.id ? String(profile.id) : '—'} textColor={theme.text} mutedColor={theme.muted} />
-          <InfoRow label="Username" value={profile?.username || '—'} textColor={theme.text} mutedColor={theme.muted} />
+          <InfoRow label="Employee ID" value={profile?.employee?.employee_code ? String(profile?.employee?.employee_code) : '—'} textColor={theme.text} mutedColor={theme.muted} />
           <InfoRow label="Mobile" value={profile?.mobile_no || '—'} textColor={theme.text} mutedColor={theme.muted} />
           <InfoRow label="Email" value={profile?.email || '—'} textColor={theme.text} mutedColor={theme.muted} />
-          <InfoRow label="Date of Joining" value={profile?.doj || '—'} textColor={theme.text} mutedColor={theme.muted} last />
+          <InfoRow label="Date of Joining" value={profile?.employee?.date_of_joining || '—'} textColor={theme.text} mutedColor={theme.muted} last />
         </AnimatedCard>
 
         {/* ── Stats Grid (Employee only) ── */}
@@ -1132,7 +1132,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: moderateScale(14),
     paddingVertical: verticalScale(14),
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#E7C000',
     borderRadius: moderateScale(16),
     borderWidth: 1.5,
     borderColor: '#E7C000',
@@ -1147,7 +1147,7 @@ const styles = StyleSheet.create({
   signOutText: {
     fontSize: moderateScale(14),
     fontWeight: '700',
-    color: '#111111',
+    color: '#5e5c5c',
     letterSpacing: 0.2,
   },
 

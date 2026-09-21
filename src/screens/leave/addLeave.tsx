@@ -15,7 +15,7 @@ import CustomDropdown from '../../components/formComponent/customDropdown';
 import CustomInput from '../../components/formComponent/customInput';
 import CustomButton from '../../components/button/customButton';
 import CalendarPickerModal from '../../components/formComponent/calendarpickermodal';
-import { addLeave } from '../../services';
+import { addLeave, getHolidayList, getLeaveRequest } from '../../services';
 import { getDevelopersList, Developer } from '../../services/salaryService';
 import { AppStackScreenProps } from '../../navigation/navigationTypes';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -32,12 +32,25 @@ import ScreenWrapper from '../../components/screenWrapper';
 import moment from 'moment';
 import NetInfoComponent from '../../components/netinfoComponent';
 import { BRAND } from '../../assets/style/brandTheme';
+import { useAuth } from '../../context/authContext';
+
+interface HolidayItem {
+  id: number;
+  name: string;
+  date: string;
+}
+
 const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
   navigation,
 }) => {
   const isDarkMode = useColorScheme() === 'dark';
   const { colors } = useTheme();
   const theme = getFormTheme(isDarkMode);
+  const { userInfo } = useAuth();
+
+  const isOwner = userInfo?.role === 'Owner' || userInfo?.user_type === 'Owner';
+  const defaultEmpId = (userInfo?.employee_id || userInfo?.user_type_id || '')?.toString();
+
   const [leaveFor, setLeaveFor] = useState<'0' | '1'>('0');
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -58,20 +71,52 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
   const [reason, setReason] = useState('');
   const [disableBtn, setDisableBtn] = useState(false);
   const [leaveType, setLeaveType] = useState('');
-  const [employeeId, setEmployeeId] = useState('');
+  const [holidayId, setHolidayId] = useState('');
+  const [holidays, setHolidays] = useState<HolidayItem[]>([]);
+  const [employeeId, setEmployeeId] = useState(defaultEmpId);
   const [employees, setEmployees] = useState<Developer[]>([]);
+  const [leaveBalance, setLeaveBalance] = useState<{ allowed_paid_leave: number; remaining_paid_leave: number } | null>(null);
   const [attachment, setAttachment] = useState<any>(null);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      const result = await getDevelopersList();
-      if (result.success) {
-        setEmployees(result.data);
+    if (isOwner) {
+      const fetchEmployees = async () => {
+        const result = await getDevelopersList();
+        if (result.success) {
+          setEmployees(result.data);
+        }
+      };
+      fetchEmployees();
+    } else {
+      setEmployeeId(defaultEmpId);
+    }
+  }, [isOwner, defaultEmpId]);
+
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      const res = await getHolidayList();
+      if (Array.isArray(res)) {
+        setHolidays(res);
+      } else if (res?.data && Array.isArray(res.data)) {
+        setHolidays(res.data);
       }
     };
-    fetchEmployees();
+    fetchHolidays();
   }, []);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const currentUserId = userInfo?.id || defaultEmpId;
+      if (currentUserId) {
+        const res = await getLeaveRequest(currentUserId.toString());
+        if (res?.leave_balance) {
+          setLeaveBalance(res.leave_balance);
+        }
+      }
+    };
+    fetchBalance();
+  }, [userInfo?.id, defaultEmpId]);
 
   const leaveOptions = [
     { id: 'Paternity Leave', name: 'Paternity Leave', icon: 'Baby' },
@@ -195,8 +240,14 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
         ToastUtil.info('Please select an employee');
         return;
       }
-      if (!leaveType) {
+      // If full day, leave type is strictly required. For half day, it is optional.
+      if (leaveFor === '0' && !leaveType) {
         ToastUtil.info('Please select leave type');
+        return;
+      }
+      // If Optional Leave is selected, holiday must be chosen
+      if (leaveType === 'Optional Leave' && !holidayId) {
+        ToastUtil.info('Please select a holiday for optional leave');
         return;
       }
       if (!startDateServer) {
@@ -217,9 +268,12 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
 
       let formData = new FormData();
       formData.append('employee_id', employeeId);
-      formData.append('type', leaveType);
+      formData.append('type', leaveType || (leaveFor === '1' ? 'Half Day Leave' : ''));
       formData.append('mode', leaveFor);
       formData.append('from_date', startDateServer);
+      if (leaveType === 'Optional Leave' && holidayId) {
+        formData.append('holiday_id', holidayId);
+      }
 
       // For half day, end date is same as start date
       formData.append(
@@ -300,21 +354,67 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 Add your leave details and attach proof if needed.
               </Text>
             </View>
-            {/* ── Employee ────────────────────────────────────────────────── */}
-            <View style={formStyles.fieldContainer}>
-              <FormLabel label="Employee" required color={theme.label} />
-              <CustomDropdown
-                data={employees}
-                value={employeeId}
-                placeholder="Select employee..."
-                searchPlaceholder="Search employee..."
-                onChange={item => setEmployeeId(item.id.toString())}
-                labelField="name"
-                valueField="id"
-                colors={colors}
-                label=""
-              />
-            </View>
+
+            {/* ── Remaining Leave Balance Card ────────────────────────────── */}
+            {leaveBalance !== null && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: isDarkMode ? '#1E293B' : '#EFF6FF',
+                  borderWidth: 1,
+                  borderColor: isDarkMode ? '#334155' : '#BFDBFE',
+                  borderRadius: moderateScale(12),
+                  paddingHorizontal: moderateScale(14),
+                  paddingVertical: moderateScale(12),
+                  marginBottom: moderateScale(16),
+                }}
+              >
+                <View
+                  style={{
+                    width: moderateScale(38),
+                    height: moderateScale(38),
+                    borderRadius: moderateScale(10),
+                    backgroundColor: isDarkMode ? '#172554' : '#DBEAFE',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: moderateScale(12),
+                  }}
+                >
+                  <AppIcon name="CalendarCheck" size={moderateScale(20)} color="#2563EB" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: moderateScale(11), fontWeight: '600', color: isDarkMode ? '#94A3B8' : '#64748B' }}>
+                    REMAINING PAID LEAVE
+                  </Text>
+                  <Text style={{ fontSize: moderateScale(16), fontWeight: '800', color: isDarkMode ? '#F8FAFC' : '#1E3A8A', marginTop: moderateScale(2) }}>
+                    {leaveBalance.remaining_paid_leave}{' '}
+                    <Text style={{ fontSize: moderateScale(12), fontWeight: '600', color: isDarkMode ? '#94A3B8' : '#64748B' }}>
+                      / {leaveBalance.allowed_paid_leave} days
+                    </Text>
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* ── Employee (Visible only for Owner / Admin) ──────────────── */}
+            {isOwner && (
+              <View style={formStyles.fieldContainer}>
+                <FormLabel label="Employee" required color={theme.label} />
+                <CustomDropdown
+                  data={employees}
+                  value={employeeId}
+                  placeholder="Select employee..."
+                  searchPlaceholder="Search employee..."
+                  onChange={item => setEmployeeId(item.id.toString())}
+                  labelField="name"
+                  valueField="id"
+                  colors={colors}
+                  label=""
+                />
+              </View>
+            )}
+
             {/* ── Leave For ──────────────────────────────────────────────── */}
             <View style={formStyles.fieldContainer}>
               <FormLabel label="Leave For" color={theme.label} required />
@@ -327,13 +427,19 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 onChange={val => handleLeaveForChange(val as '0' | '1')}
               />
             </View>
-            {/* ── Leave Type ─────────────────────────────────────────────── */}
+
+            {/* ── Leave Type (Required only on Full Day, Optional on Half Day) ─── */}
             <View style={formStyles.fieldContainer}>
-              <FormLabel label="Leave Type" required color={theme.label} />
+              <FormLabel
+                label="Leave Type"
+                required={leaveFor === '0'}
+                optional={leaveFor === '1'}
+                color={theme.label}
+              />
               <CustomDropdown
                 data={leaveOptions}
                 value={leaveType}
-                placeholder="Select type..."
+                placeholder={leaveFor === '1' ? 'Select type (Optional)...' : 'Select type...'}
                 searchPlaceholder="Search leave type..."
                 onChange={item => setLeaveType(item.id)}
                 labelField="name"
@@ -344,6 +450,24 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
                 label=""
               />
             </View>
+
+            {/* ── Holiday Dropdown (Visible only when Optional Leave selected) ─── */}
+            {leaveType === 'Optional Leave' && (
+              <View style={formStyles.fieldContainer}>
+                <FormLabel label="Select Holiday" required color={theme.label} />
+                <CustomDropdown
+                  data={holidays}
+                  value={holidayId}
+                  placeholder="Select holiday..."
+                  searchPlaceholder="Search holiday..."
+                  onChange={item => setHolidayId(item.id.toString())}
+                  labelField="name"
+                  valueField="id"
+                  colors={colors}
+                  label=""
+                />
+              </View>
+            )}
             {/* ── Dates (conditional Full / Half) ────────────────────────── */}
             {leaveFor === '0' ? (
               <View style={formStyles.dateRow}>

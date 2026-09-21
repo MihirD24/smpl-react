@@ -178,7 +178,9 @@ export default function LeaveRequestCard({
                 ]}
               >
                 <Text style={[styles.leaveTypeText, { color: leaveTypeColor }]}>
-                  {leaveData.type || 'Leave'}
+                  {leaveData.type === 'Optional Leave' && leaveData.holiday?.name
+                    ? `Optional (${leaveData.holiday.name})`
+                    : (leaveData.type || 'Leave')}
                 </Text>
               </View>
               <Text style={[styles.dot, { color: ct.textMuted }]}>•</Text>
