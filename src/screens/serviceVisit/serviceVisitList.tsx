@@ -19,7 +19,10 @@ import AppIcon from '../../components/appIcon';
 import AddButton from '../../components/button/addButton';
 import CustomInput from '../../components/formComponent/customInput';
 import ToastUtil from '../../utils/toastAndroid';
-import { getServiceVisitsList, bulkApproveServiceVisits } from '../../services/serviceVisitServices';
+import {
+  getServiceVisitsList,
+  bulkApproveServiceVisits,
+} from '../../services/serviceVisitServices';
 import { formatDate } from '../../utils/dateUtils';
 import { useAuth } from '../../context/authContext';
 import ModuleIntro from '../../components/moduleIntro';
@@ -49,9 +52,11 @@ const ServiceVisitList = ({ navigation }: any) => {
   const [submittingApproval, setSubmittingApproval] = useState(false);
   const [visits, setVisits] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // New States for approval flows
-  const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Approved'>('All');
+  const [statusFilter, setStatusFilter] = useState<
+    'All' | 'Pending' | 'Approved'
+  >('All');
   const [selectedVisitIds, setSelectedVisitIds] = useState<number[]>([]);
   const [isApprovalModalVisible, setIsApprovalModalVisible] = useState(false);
   const [deductionAmount, setDeductionAmount] = useState('0');
@@ -97,35 +102,47 @@ const ServiceVisitList = ({ navigation }: any) => {
     const q = searchQuery.toLowerCase();
     const empName = (item.employee?.name || '').toLowerCase();
     const loc = (item.location || '').toLowerCase();
-    const party = (item.party?.name || item.sales_party_name || '').toLowerCase();
+    const party = (
+      item.party?.name ||
+      item.sales_party_name ||
+      ''
+    ).toLowerCase();
     const machine = (item.machine_number || '').toLowerCase();
     const cat = (item.visit_category || '').toLowerCase();
 
-    return empName.includes(q) || loc.includes(q) || party.includes(q) || machine.includes(q) || cat.includes(q);
+    return (
+      empName.includes(q) ||
+      loc.includes(q) ||
+      party.includes(q) ||
+      machine.includes(q) ||
+      cat.includes(q)
+    );
   });
 
   // Toggle selection for a single visit
   const handleToggleSelect = (id: number) => {
-    setSelectedVisitIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    setSelectedVisitIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id],
     );
   };
 
   // Select/Deselect all pending visible visits
   const pendingVisits = filteredVisits.filter((item: any) => item.status === 0);
-  const isAllSelected = pendingVisits.length > 0 && pendingVisits.every((v) => selectedVisitIds.includes(v.id));
+  const isAllSelected =
+    pendingVisits.length > 0 &&
+    pendingVisits.every(v => selectedVisitIds.includes(v.id));
 
   const handleSelectAll = () => {
     if (isAllSelected) {
       // Remove all pending visits currently shown
-      const pendingIds = pendingVisits.map((v) => v.id);
-      setSelectedVisitIds((prev) => prev.filter((id) => !pendingIds.includes(id)));
+      const pendingIds = pendingVisits.map(v => v.id);
+      setSelectedVisitIds(prev => prev.filter(id => !pendingIds.includes(id)));
     } else {
       // Add all pending visits currently shown
-      const pendingIds = pendingVisits.map((v) => v.id);
-      setSelectedVisitIds((prev) => {
+      const pendingIds = pendingVisits.map(v => v.id);
+      setSelectedVisitIds(prev => {
         const next = [...prev];
-        pendingIds.forEach((id) => {
+        pendingIds.forEach(id => {
           if (!next.includes(id)) {
             next.push(id);
           }
@@ -138,29 +155,43 @@ const ServiceVisitList = ({ navigation }: any) => {
   // Submit Bulk Approval
   const handleBulkApprove = async () => {
     if (selectedVisitIds.length === 0) return;
-    
-    setSubmittingApproval(true);
-    try {
-      const updates = selectedVisitIds.map((id) => ({
-        id,
-        status: 1, // Approved
-        deduction_amount: Number(deductionAmount) || 0,
-        approval_remarks: approvalRemarks.trim(),
-      }));
 
-      const res = await bulkApproveServiceVisits({ updates });
+    setSubmittingApproval(true);
+
+    try {
+      const formData = new FormData();
+
+      selectedVisitIds.forEach((id, index) => {
+        formData.append(`updates[${index}][id]`, String(id));
+        formData.append(`updates[${index}][status]`, '1');
+        formData.append(
+          `updates[${index}][deduction_amount]`,
+          String(Number(deductionAmount) || 0),
+        );
+        formData.append(
+          `updates[${index}][approval_remarks]`,
+          approvalRemarks.trim(),
+        );
+      });
+
+      const res = await bulkApproveServiceVisits(formData);
+
       if (res.success) {
-        ToastUtil.success(res.message || 'Service visits approved successfully.');
+        ToastUtil.success(
+          res.message || 'Service visits approved successfully.',
+        );
+
         setSelectedVisitIds([]);
         setIsApprovalModalVisible(false);
         setDeductionAmount('0');
         setApprovalRemarks('');
+
         fetchList(false);
       } else {
         ToastUtil.error(res.message || 'Failed to approve visits.');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Bulk approval error:', err);
       ToastUtil.error('Failed to submit bulk approval.');
     } finally {
       setSubmittingApproval(false);
@@ -168,14 +199,20 @@ const ServiceVisitList = ({ navigation }: any) => {
   };
 
   const renderVisitCard = ({ item }: { item: any }) => {
-    const displayCategory = item.visit_category || (item.sales_party_name ? 'Sales' : 'Admin/Driver');
-    
+    const displayCategory =
+      item.visit_category || (item.sales_party_name ? 'Sales' : 'Admin/Driver');
+
     // Net Amount = total_amount - deduction_amount
     const netAmount = (item.total_amount || 0) - (item.deduction_amount || 0);
     const isSelected = selectedVisitIds.includes(item.id);
 
     return (
-      <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: theme.cardBg, borderColor: theme.border },
+        ]}
+      >
         <View style={styles.cardMainRow}>
           {/* Checkbox for Owners to approve pending visits */}
           {isAdmin && item.status === 0 && (
@@ -197,8 +234,22 @@ const ServiceVisitList = ({ navigation }: any) => {
             {/* Header row */}
             <View style={styles.cardHeader}>
               <View style={styles.badgeContainer}>
-                <View style={[styles.badge, { backgroundColor: item.sales_party_name ? '#EFF6FF' : '#ECFDF5' }]}>
-                  <Text style={[styles.badgeText, { color: item.sales_party_name ? '#3B82F6' : '#10B981' }]}>
+                <View
+                  style={[
+                    styles.badge,
+                    {
+                      backgroundColor: item.sales_party_name
+                        ? '#EFF6FF'
+                        : '#ECFDF5',
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.badgeText,
+                      { color: item.sales_party_name ? '#3B82F6' : '#10B981' },
+                    ]}
+                  >
                     {displayCategory}
                   </Text>
                 </View>
@@ -206,10 +257,21 @@ const ServiceVisitList = ({ navigation }: any) => {
                 <View
                   style={[
                     styles.badge,
-                    { backgroundColor: item.status === 1 ? '#ECFDF5' : '#FFFBEB' },
+                    {
+                      backgroundColor:
+                        item.status === 1 ? '#ECFDF5' : '#FFFBEB',
+                    },
                   ]}
                 >
-                  <Text style={[styles.badgeText, { color: item.status === 1 ? theme.success : theme.warning }]}>
+                  <Text
+                    style={[
+                      styles.badgeText,
+                      {
+                        color:
+                          item.status === 1 ? theme.success : theme.warning,
+                      },
+                    ]}
+                  >
                     {item.status === 1 ? 'Approved' : 'Pending'}
                   </Text>
                 </View>
@@ -235,24 +297,49 @@ const ServiceVisitList = ({ navigation }: any) => {
 
             {/* Content detail rows */}
             <View style={styles.detailRow}>
-              <AppIcon name="User" size={16} color={theme.subText} style={styles.detailIcon} />
-              <Text style={[styles.detailText, { color: theme.text }]} numberOfLines={1}>
+              <AppIcon
+                name="User"
+                size={16}
+                color={theme.subText}
+                style={styles.detailIcon}
+              />
+              <Text
+                style={[styles.detailText, { color: theme.text }]}
+                numberOfLines={1}
+              >
                 {item.employee?.name || 'Unknown Employee'}
               </Text>
             </View>
 
             <View style={styles.detailRow}>
-              <AppIcon name="MapPin" size={16} color={theme.subText} style={styles.detailIcon} />
-              <Text style={[styles.detailText, { color: theme.text }]} numberOfLines={1}>
-                {item.location || 'No Location'} {item.km ? `(${item.km} KM)` : ''}
+              <AppIcon
+                name="MapPin"
+                size={16}
+                color={theme.subText}
+                style={styles.detailIcon}
+              />
+              <Text
+                style={[styles.detailText, { color: theme.text }]}
+                numberOfLines={1}
+              >
+                {item.location || 'No Location'}{' '}
+                {item.km ? `(${item.km} KM)` : ''}
               </Text>
             </View>
 
             {/* Customer / Party details */}
             {(item.party?.name || item.sales_party_name) && (
               <View style={styles.detailRow}>
-                <AppIcon name="Building2" size={16} color={theme.subText} style={styles.detailIcon} />
-                <Text style={[styles.detailText, { color: theme.text }]} numberOfLines={1}>
+                <AppIcon
+                  name="Building2"
+                  size={16}
+                  color={theme.subText}
+                  style={styles.detailIcon}
+                />
+                <Text
+                  style={[styles.detailText, { color: theme.text }]}
+                  numberOfLines={1}
+                >
                   {item.party?.name || item.sales_party_name}
                 </Text>
               </View>
@@ -261,8 +348,16 @@ const ServiceVisitList = ({ navigation }: any) => {
             {/* Machine details if service visit */}
             {item.machine_number && (
               <View style={styles.detailRow}>
-                <AppIcon name="Cpu" size={16} color={theme.subText} style={styles.detailIcon} />
-                <Text style={[styles.detailText, { color: theme.text }]} numberOfLines={1}>
+                <AppIcon
+                  name="Cpu"
+                  size={16}
+                  color={theme.subText}
+                  style={styles.detailIcon}
+                />
+                <Text
+                  style={[styles.detailText, { color: theme.text }]}
+                  numberOfLines={1}
+                >
                   Machine: {item.machine_number}
                 </Text>
               </View>
@@ -270,8 +365,16 @@ const ServiceVisitList = ({ navigation }: any) => {
 
             {/* Remarks Display */}
             {item.approval_remarks ? (
-              <View style={[styles.remarksRow, { backgroundColor: isDarkMode ? '#374151' : '#F8FAFC' }]}>
-                <Text style={[styles.remarksText, { color: theme.subText }]} numberOfLines={2}>
+              <View
+                style={[
+                  styles.remarksRow,
+                  { backgroundColor: isDarkMode ? '#374151' : '#F8FAFC' },
+                ]}
+              >
+                <Text
+                  style={[styles.remarksText, { color: theme.subText }]}
+                  numberOfLines={2}
+                >
                   Approval Remark: {item.approval_remarks}
                 </Text>
               </View>
@@ -282,15 +385,25 @@ const ServiceVisitList = ({ navigation }: any) => {
             {/* Footer row */}
             <View style={styles.cardFooter}>
               <View style={styles.footerItem}>
-                <AppIcon name="Calendar" size={14} color={theme.subText} style={styles.footerIcon} />
+                <AppIcon
+                  name="Calendar"
+                  size={14}
+                  color={theme.subText}
+                  style={styles.footerIcon}
+                />
                 <Text style={[styles.footerText, { color: theme.subText }]}>
-                  {item.visit_date ? formatDate(new Date(item.visit_date), 'display') : ''}
+                  {item.visit_date
+                    ? formatDate(new Date(item.visit_date), 'display')
+                    : ''}
                 </Text>
               </View>
 
               <View style={styles.footerRight}>
                 {item.remarks ? (
-                  <Text style={[styles.notesText, { color: theme.subText }]} numberOfLines={1}>
+                  <Text
+                    style={[styles.notesText, { color: theme.subText }]}
+                    numberOfLines={1}
+                  >
                     💬 {item.remarks}
                   </Text>
                 ) : null}
@@ -300,15 +413,21 @@ const ServiceVisitList = ({ navigation }: any) => {
                   <TouchableOpacity
                     style={[styles.svrButton, { borderColor: theme.border }]}
                     onPress={() => {
-                      Linking.openURL(item.svr_file).catch((e) => {
+                      Linking.openURL(item.svr_file).catch(e => {
                         console.error('Error opening SVR URL:', e);
                         ToastUtil.error('Failed to open SVR attachment.');
                       });
                     }}
                     activeOpacity={0.7}
                   >
-                    <AppIcon name="DownloadCloud" size={14} color={theme.primary} />
-                    <Text style={[styles.svrText, { color: theme.primary }]}>SVR</Text>
+                    <AppIcon
+                      name="DownloadCloud"
+                      size={14}
+                      color={theme.primary}
+                    />
+                    <Text style={[styles.svrText, { color: theme.primary }]}>
+                      SVR
+                    </Text>
                   </TouchableOpacity>
                 ) : null}
               </View>
@@ -330,22 +449,34 @@ const ServiceVisitList = ({ navigation }: any) => {
       {/* Compact ERP summary */}
       <View style={styles.summaryCard}>
         <View style={styles.summaryItem}>
-          <Text style={[styles.summaryValue, { color: theme.text }]}>{visits.length}</Text>
-          <Text style={[styles.summaryLabel, { color: theme.subText }]}>Total visits</Text>
+          <Text style={[styles.summaryValue, { color: theme.text }]}>
+            {visits.length}
+          </Text>
+          <Text style={[styles.summaryLabel, { color: theme.subText }]}>
+            Total visits
+          </Text>
         </View>
-        <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
+        <View
+          style={[styles.summaryDivider, { backgroundColor: theme.border }]}
+        />
         <View style={styles.summaryItem}>
           <Text style={[styles.summaryValue, { color: theme.warning }]}>
             {visits.filter((v: any) => v.status === 0).length}
           </Text>
-          <Text style={[styles.summaryLabel, { color: theme.subText }]}>Pending</Text>
+          <Text style={[styles.summaryLabel, { color: theme.subText }]}>
+            Pending
+          </Text>
         </View>
-        <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
+        <View
+          style={[styles.summaryDivider, { backgroundColor: theme.border }]}
+        />
         <View style={styles.summaryItem}>
           <Text style={[styles.summaryValue, { color: theme.success }]}>
             {visits.filter((v: any) => v.status === 1).length}
           </Text>
-          <Text style={[styles.summaryLabel, { color: theme.subText }]}>Approved</Text>
+          <Text style={[styles.summaryLabel, { color: theme.subText }]}>
+            Approved
+          </Text>
         </View>
       </View>
 
@@ -361,7 +492,7 @@ const ServiceVisitList = ({ navigation }: any) => {
 
         {/* Status Filter Row */}
         <View style={styles.filterRow}>
-          {(['All', 'Pending', 'Approved'] as const).map((filter) => {
+          {(['All', 'Pending', 'Approved'] as const).map(filter => {
             const isSelected = statusFilter === filter;
             return (
               <TouchableOpacity
@@ -383,7 +514,9 @@ const ServiceVisitList = ({ navigation }: any) => {
                 <Text
                   style={[
                     styles.filterTabText,
-                    isSelected ? { color: '#111827', fontWeight: '800' } : { color: theme.subText },
+                    isSelected
+                      ? { color: '#111827', fontWeight: '800' }
+                      : { color: theme.subText },
                   ]}
                 >
                   {filter}
@@ -424,18 +557,34 @@ const ServiceVisitList = ({ navigation }: any) => {
         <FlatList
           data={filteredVisits}
           renderItem={renderVisitCard}
-          keyExtractor={(item) => String(item.id)}
+          keyExtractor={item => String(item.id)}
           contentContainerStyle={[
             styles.listContent,
-            selectedVisitIds.length > 0 && { paddingBottom: verticalScale(160) },
+            selectedVisitIds.length > 0 && {
+              paddingBottom: verticalScale(160),
+            },
           ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={[theme.primary]} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[theme.primary]}
+            />
           }
           ListEmptyComponent={
-            <View style={[styles.emptyContainer, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-              <View style={[styles.emptyIconWrap, { backgroundColor: isDarkMode ? '#2A2412' : '#FFF8D6' }]}>
+            <View
+              style={[
+                styles.emptyContainer,
+                { backgroundColor: theme.cardBg, borderColor: theme.border },
+              ]}
+            >
+              <View
+                style={[
+                  styles.emptyIconWrap,
+                  { backgroundColor: isDarkMode ? '#2A2412' : '#FFF8D6' },
+                ]}
+              >
                 <AppIcon name="MapPin" size={28} color="#EAB308" />
               </View>
               <Text style={[styles.emptyTitle, { color: theme.text }]}>
@@ -471,7 +620,12 @@ const ServiceVisitList = ({ navigation }: any) => {
 
       {/* Sticky Bottom Action Bar for Admin Bulk Approval */}
       {isAdmin && selectedVisitIds.length > 0 && (
-        <View style={[styles.actionBar, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.actionBar,
+            { backgroundColor: theme.cardBg, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.actionBarLeft}>
             <Text style={[styles.selectedCountText, { color: theme.text }]}>
               {selectedVisitIds.length} visits selected
@@ -479,13 +633,23 @@ const ServiceVisitList = ({ navigation }: any) => {
           </View>
           <View style={styles.actionBarButtons}>
             <TouchableOpacity
-              style={[styles.actionBtn, styles.deselectBtn, { borderColor: theme.border }]}
+              style={[
+                styles.actionBtn,
+                styles.deselectBtn,
+                { borderColor: theme.border },
+              ]}
               onPress={() => setSelectedVisitIds([])}
             >
-              <Text style={[styles.deselectBtnText, { color: theme.text }]}>Deselect</Text>
+              <Text style={[styles.deselectBtnText, { color: theme.text }]}>
+                Deselect
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionBtn, styles.approveBtn, { backgroundColor: theme.primary }]}
+              style={[
+                styles.actionBtn,
+                styles.approveBtn,
+                { backgroundColor: theme.primary },
+              ]}
               onPress={() => setIsApprovalModalVisible(true)}
             >
               <Text style={styles.approveBtnText}>Approve</Text>
@@ -502,16 +666,23 @@ const ServiceVisitList = ({ navigation }: any) => {
         onRequestClose={() => setIsApprovalModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.cardBg }]}>
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Bulk Approve Service Visits</Text>
-            
+          <View
+            style={[styles.modalContent, { backgroundColor: theme.cardBg }]}
+          >
+            <Text style={[styles.modalTitle, { color: theme.text }]}>
+              Bulk Approve Service Visits
+            </Text>
+
             <Text style={[styles.modalSubText, { color: theme.subText }]}>
-              You are approving {selectedVisitIds.length} pending service visit logs.
+              You are approving {selectedVisitIds.length} pending service visit
+              logs.
             </Text>
 
             {/* Deduction Input */}
             <View style={styles.inputGroup}>
-              <Text style={[styles.inputLabel, { color: theme.text }]}>Deduction Amount (₹)</Text>
+              <Text style={[styles.inputLabel, { color: theme.text }]}>
+                Deduction Amount (₹)
+              </Text>
               <TextInput
                 style={[
                   styles.modalInput,
@@ -531,7 +702,9 @@ const ServiceVisitList = ({ navigation }: any) => {
 
             {/* Remarks Input */}
             <View style={styles.inputGroup}>
-              <Text style={[styles.inputLabel, { color: theme.text }]}>Approval Remarks</Text>
+              <Text style={[styles.inputLabel, { color: theme.text }]}>
+                Approval Remarks
+              </Text>
               <TextInput
                 style={[
                   styles.modalInput,
@@ -554,7 +727,11 @@ const ServiceVisitList = ({ navigation }: any) => {
             {/* Action Buttons */}
             <View style={styles.modalActions}>
               <TouchableOpacity
-                style={[styles.modalBtn, styles.cancelBtn, { borderColor: theme.border }]}
+                style={[
+                  styles.modalBtn,
+                  styles.cancelBtn,
+                  { borderColor: theme.border },
+                ]}
                 onPress={() => {
                   setIsApprovalModalVisible(false);
                   setDeductionAmount('0');
@@ -562,11 +739,17 @@ const ServiceVisitList = ({ navigation }: any) => {
                 }}
                 disabled={submittingApproval}
               >
-                <Text style={[styles.cancelBtnText, { color: theme.text }]}>Cancel</Text>
+                <Text style={[styles.cancelBtnText, { color: theme.text }]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.modalBtn, styles.confirmBtn, { backgroundColor: theme.primary }]}
+                style={[
+                  styles.modalBtn,
+                  styles.confirmBtn,
+                  { backgroundColor: theme.primary },
+                ]}
                 onPress={handleBulkApprove}
                 disabled={submittingApproval}
               >
@@ -967,4 +1150,3 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
