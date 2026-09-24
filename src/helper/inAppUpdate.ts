@@ -6,9 +6,10 @@ import SpInAppUpdates, {
 } from 'sp-react-native-in-app-updates';
 import DeviceInfo from 'react-native-device-info';
 
-const inAppUpdates = new SpInAppUpdates(
-  __DEV__, // true in debug mode to enable logging, false in production
-);
+let inAppUpdates: SpInAppUpdates | null = null;
+if (Platform.OS === 'android') {
+  inAppUpdates = new SpInAppUpdates(__DEV__);
+}
 
 /**
  * Checks Google Play Store for an app update.
@@ -21,6 +22,8 @@ export const checkForInAppUpdate = async (): Promise<void> => {
   }
 
   try {
+    if (!inAppUpdates) return;
+
     const curVersionCode = DeviceInfo.getBuildNumber();
 
     const result = await inAppUpdates.checkNeedsUpdate({
