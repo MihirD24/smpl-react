@@ -486,7 +486,16 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
         </View>
 
         {/* ── Employee Information ── */}
-        <AnimatedCard delay={80} style={styles.infoCard}>
+        <AnimatedCard
+          delay={80}
+          style={[
+            styles.infoCard,
+            {
+              backgroundColor: theme.cardBg,
+              borderColor: theme.cardBorder,
+            },
+          ]}
+        >
           <View style={styles.infoHeader}>
             <View style={styles.infoHeaderIcon}>
               <AppIcon name="UserRound" size={18} color="#111111" />
@@ -497,10 +506,10 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             </View>
           </View>
 
-          <InfoRow label="Employee ID" value={profile?.employee?.employee_code ? String(profile?.employee?.employee_code) : '—'} textColor={theme.text} mutedColor={theme.muted} />
-          <InfoRow label="Mobile" value={profile?.mobile_no || '—'} textColor={theme.text} mutedColor={theme.muted} />
-          <InfoRow label="Email" value={profile?.email || '—'} textColor={theme.text} mutedColor={theme.muted} />
-          <InfoRow label="Date of Joining" value={profile?.employee?.date_of_joining || '—'} textColor={theme.text} mutedColor={theme.muted} last />
+          <InfoRow label="Employee ID" value={profile?.employee?.employee_code ? String(profile?.employee?.employee_code) : '—'} textColor={theme.text} mutedColor={theme.muted} dividerColor={theme.divider} />
+          <InfoRow label="Mobile" value={profile?.mobile_no || '—'} textColor={theme.text} mutedColor={theme.muted} dividerColor={theme.divider} />
+          <InfoRow label="Email" value={profile?.email || '—'} textColor={theme.text} mutedColor={theme.muted} dividerColor={theme.divider} />
+          <InfoRow label="Date of Joining" value={profile?.employee?.date_of_joining || '—'} textColor={theme.text} mutedColor={theme.muted} dividerColor={theme.divider} last />
         </AnimatedCard>
 
         {/* ── Stats Grid (Employee only) ── */}
@@ -688,6 +697,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileScreenNav }> = ({
             onPress={logout}
             bg={theme.signOutBg}
             border={theme.signOutBorder}
+            textColor={theme.text}
           />
         </AnimatedCard>
 
@@ -705,9 +715,16 @@ const InfoRow: React.FC<{
   value: string;
   textColor: string;
   mutedColor: string;
+  dividerColor?: string;
   last?: boolean;
-}> = ({ label, value, textColor, mutedColor, last }) => (
-  <View style={[styles.infoRow, last && { borderBottomWidth: 0 }]}>
+}> = ({ label, value, textColor, mutedColor, dividerColor = '#EEEEEE', last }) => (
+  <View
+    style={[
+      styles.infoRow,
+      { borderBottomColor: dividerColor },
+      last && { borderBottomWidth: 0 },
+    ]}
+  >
     <Text style={[styles.infoLabel, { color: mutedColor }]}>{label}</Text>
     <Text style={[styles.infoValue, { color: textColor }]} numberOfLines={2}>{value}</Text>
   </View>
@@ -757,7 +774,11 @@ const QuickCard: React.FC<{
         onPressOut={handlePressOut}
       >
         <View style={[styles.quickIconBox, { backgroundColor: iconBg }]}>
-          <AppIcon name={icon} size={22} color="#111111" />
+          <AppIcon
+            name={icon}
+            size={22}
+            color={iconBg === '#2A260F' ? '#F9C900' : '#111111'}
+          />
         </View>
         <Text style={[styles.quickLabel, { color: textColor }]}>{label}</Text>
       </TouchableOpacity>
@@ -770,7 +791,8 @@ const SignOutButton: React.FC<{
   onPress: () => void;
   bg: string;
   border: string;
-}> = ({ onPress, bg, border }) => {
+  textColor: string;
+}> = ({ onPress, bg, border, textColor }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () =>
@@ -801,8 +823,8 @@ const SignOutButton: React.FC<{
         onPressOut={handlePressOut}
         activeOpacity={1}
       >
-        <AppIcon name="LogOut" size={17} color="#111111" />
-        <Text style={styles.signOutText}>Sign Out</Text>
+        <AppIcon name="LogOut" size={17} color={textColor} />
+        <Text style={[styles.signOutText, { color: textColor }]}>Sign Out</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -917,10 +939,8 @@ const styles = StyleSheet.create({
     maxWidth: 980,
     paddingHorizontal: moderateScale(16),
     paddingVertical: moderateScale(14),
-    backgroundColor: '#FFFFFF',
     borderRadius: moderateScale(18),
     borderWidth: 1,
-    borderColor: '#E4E6E8',
     marginHorizontal: moderateScale(16),
     marginBottom: verticalScale(20),
     shadowColor: '#000000',
@@ -932,13 +952,13 @@ const styles = StyleSheet.create({
   infoHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(8) },
   infoHeaderIcon: {
     width: moderateScale(38), height: moderateScale(38), borderRadius: moderateScale(11),
-    backgroundColor: '#FFF7CC', alignItems: 'center', justifyContent: 'center', marginRight: moderateScale(10),
+    alignItems: 'center', justifyContent: 'center', marginRight: moderateScale(10),
   },
   infoTitle: { fontSize: moderateScale(14), fontWeight: '800', fontFamily: 'Poppins-SemiBold' },
   infoSubtitle: { fontSize: moderateScale(10), marginTop: 2, fontFamily: 'Poppins-Regular' },
   infoRow: {
     flexDirection: 'row', alignItems: 'center', minHeight: verticalScale(38),
-    paddingVertical: verticalScale(7), borderBottomWidth: 1, borderBottomColor: '#EEEEEE',
+    paddingVertical: verticalScale(7), borderBottomWidth: 1,
   },
   infoLabel: { width: moderateScale(105), fontSize: moderateScale(11), fontWeight: '600', fontFamily: 'Poppins-Medium' },
   infoValue: { flex: 1, textAlign: 'right', fontSize: moderateScale(12), fontWeight: '600', fontFamily: 'Poppins-Medium' },

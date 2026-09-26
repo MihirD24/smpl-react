@@ -157,6 +157,7 @@ export default function TabNavigator() {
           tabBarLabelStyle: {
             fontFamily: 'Poppins-Medium',
             fontSize: 11,
+            fontWeight: '500',
           },
           tabBarActiveTintColor: tabTheme.active,
           tabBarInactiveTintColor: tabTheme.inactive,

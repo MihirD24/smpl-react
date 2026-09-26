@@ -447,7 +447,12 @@ const ServiceVisitList = ({ navigation }: any) => {
       />
 
       {/* Compact ERP summary */}
-      <View style={styles.summaryCard}>
+      <View
+        style={[
+          styles.summaryCard,
+          { backgroundColor: theme.cardBg, borderColor: theme.border },
+        ]}
+      >
         <View style={styles.summaryItem}>
           <Text style={[styles.summaryValue, { color: theme.text }]}>
             {visits.length}
@@ -778,7 +783,6 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(16),
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: moderateScale(8),
@@ -796,10 +800,12 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: moderateScale(19),
     fontWeight: '900',
+    fontFamily: 'Poppins-ExtraBold',
   },
   summaryLabel: {
     fontSize: moderateScale(9.5),
     fontWeight: '700',
+    fontFamily: 'Poppins-Medium',
     marginTop: verticalScale(2),
     letterSpacing: 0.2,
   },
@@ -832,6 +838,7 @@ const styles = StyleSheet.create({
   filterTabText: {
     fontSize: moderateScale(12),
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
   },
   selectAllRow: {
     flexDirection: 'row',
@@ -918,6 +925,7 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: moderateScale(13),
     fontWeight: '500',
+    fontFamily: 'Poppins-Regular',
   },
   remarksRow: {
     marginTop: verticalScale(8),
@@ -993,10 +1001,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: moderateScale(17),
     fontWeight: '900',
+    fontFamily: 'Poppins-ExtraBold',
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: moderateScale(11),
+    fontFamily: 'Poppins-Regular',
     lineHeight: verticalScale(17),
     textAlign: 'center',
     marginTop: verticalScale(6),
@@ -1017,6 +1027,7 @@ const styles = StyleSheet.create({
     color: '#111827',
     fontSize: moderateScale(12),
     fontWeight: '900',
+    fontFamily: 'Poppins-ExtraBold',
   },
   addButton: {
     backgroundColor: '#FACC15',

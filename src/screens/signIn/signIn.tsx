@@ -157,7 +157,15 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
                 ]}
               >
                 <Text style={[styles.label, { color: theme.label }]}>MOBILE NUMBER</Text>
-                <View style={styles.inputShell}>
+                <View
+                  style={[
+                    styles.inputShell,
+                    {
+                      backgroundColor: theme.inputBg,
+                      borderColor: theme.inputBorder,
+                    },
+                  ]}
+                >
                   <Text style={[styles.prefix, { color: theme.placeholder }]}>+91</Text>
                   <TextInput
                     placeholder="Enter mobile number"
@@ -172,7 +180,15 @@ const SignIn: React.FC<AuthStackScreenProps<'signIn'>> = ({ navigation }) => {
                 </View>
 
                 <Text style={[styles.label, { color: theme.label }]}>PASSWORD</Text>
-                <View style={styles.passwordWrapper}>
+                <View
+                  style={[
+                    styles.passwordWrapper,
+                    {
+                      backgroundColor: theme.inputBg,
+                      borderColor: theme.inputBorder,
+                    },
+                  ]}
+                >
                   <TextInput
                     placeholder="Enter password"
                     style={[styles.passwordInput, { color: theme.inputText }]}
@@ -322,6 +338,7 @@ const styles = StyleSheet.create({
     width: '90%',
     fontSize: 10,
     fontWeight: '800',
+    fontFamily: 'Poppins-SemiBold',
     letterSpacing: 1.8,
     marginBottom: 8,
   },
@@ -329,11 +346,13 @@ const styles = StyleSheet.create({
     width: '90%',
     fontSize: 30,
     fontWeight: '800',
+    fontFamily: 'Poppins-SemiBold',
     letterSpacing: -0.7,
   },
   subtitle: {
     width: '90%',
     fontSize: 13,
+    fontFamily: 'Poppins-Regular',
     lineHeight: 20,
     marginTop: 6,
     marginBottom: 22,
@@ -376,6 +395,7 @@ const styles = StyleSheet.create({
     height: 54,
     paddingHorizontal: 8,
     fontSize: 15,
+    fontFamily: 'Poppins-Regular',
   },
   passwordWrapper: {
     height: 54,
@@ -390,6 +410,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingRight: 48,
     fontSize: 15,
+    fontFamily: 'Poppins-Regular',
   },
   eyeButton: {
     position: 'absolute',
