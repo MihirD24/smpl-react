@@ -107,6 +107,7 @@ const s = StyleSheet.create({
   label: {
     fontSize: moderateScale(11),
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
     lineHeight: moderateScale(15),
   },
   clearChip: {

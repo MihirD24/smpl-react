@@ -48,3 +48,37 @@ export const platformFont = Platform.select({
   android: 'Poppins-Regular',
   default: 'Poppins-Regular',
 });
+
+
+export const getBrandTheme = (isDark: boolean) => ({
+  ...BRAND,
+  ...(isDark ? {
+    background: darkBrand.background,
+    surface: darkBrand.surface,
+    surfaceElevated: darkBrand.surfaceElevated,
+    border: darkBrand.border,
+    text: darkBrand.text,
+    muted: darkBrand.muted,
+    inputBackground: '#16181A',
+    inputText: '#F5F5F5',
+    placeholder: '#7F8790',
+    divider: '#303438',
+    tabBar: '#101112',
+    tabInactive: '#9AA3AD',
+    tabActive: BRAND.yellow,
+  } : {
+    background: lightBrand.background,
+    surface: lightBrand.surface,
+    surfaceElevated: lightBrand.surfaceElevated,
+    border: lightBrand.border,
+    text: lightBrand.text,
+    muted: lightBrand.muted,
+    inputBackground: '#FFFFFF',
+    inputText: BRAND.ink,
+    placeholder: '#8A8F98',
+    divider: '#E4E6E8',
+    tabBar: '#FFFFFF',
+    tabInactive: '#64748B',
+    tabActive: BRAND.black,
+  }),
+});

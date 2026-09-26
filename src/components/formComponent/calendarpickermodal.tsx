@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  useColorScheme,
 } from 'react-native';
 
 interface CalendarPickerModalProps {
@@ -25,6 +26,7 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
   minimumDate,
   maximumDate,
 }) => {
+  const isDark = useColorScheme() === 'dark';
   const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date());
   const [tempSelectedDate, setTempSelectedDate] = useState<Date | null>(
     selectedDate || new Date(),
@@ -146,8 +148,8 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
       onRequestClose={onClose}
       statusBarTranslucent={true}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.calendarContainer}>
+      <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.58)' }]}>
+        <View style={[styles.calendarContainer, { backgroundColor: isDark ? '#1A1C1E' : '#FFFFFF', borderColor: isDark ? '#303438' : '#E4E6E8' }]}>
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
@@ -157,7 +159,7 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
               <Text style={styles.navButtonText}>‹</Text>
             </TouchableOpacity>
 
-            <Text style={styles.monthYearText}>
+            <Text style={[styles.monthYearText, { color: isDark ? '#F5F5F5' : '#171717' }]}>
               {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </Text>
 
@@ -173,7 +175,7 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
           <View style={styles.daysOfWeekContainer}>
             {daysOfWeek.map((day, index) => (
               <View key={index} style={styles.dayOfWeekCell}>
-                <Text style={styles.dayOfWeekText}>{day}</Text>
+                <Text style={[styles.dayOfWeekText, { color: isDark ? '#A6ADB5' : '#64748B' }]}>{day}</Text>
               </View>
             ))}
           </View>
@@ -202,6 +204,7 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
                   <Text
                     style={[
                       styles.dayText,
+                      { color: isDark ? '#F5F5F5' : '#171717' },
                       selected && styles.selectedDayText,
                       disabled && styles.disabledDayText,
                     ]}
@@ -271,6 +274,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
   },
   daysOfWeekContainer: {
     flexDirection: 'row',
@@ -285,6 +289,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 11,
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
   },
   calendarGrid: {
     flexDirection: 'row',
@@ -313,6 +318,7 @@ const styles = StyleSheet.create({
   selectedDayText: {
     color: '#FFFFFF',
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
   },
   disabledDayText: {
     color: '#64748B',
@@ -332,6 +338,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
   },
   selectButton: {
     flex: 1,
@@ -344,6 +351,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
   },
 });
 

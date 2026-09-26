@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ViewStyle,
+  useColorScheme,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
@@ -43,6 +44,10 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   withHeader = false,
 }) => {
   const insets = useSafeAreaInsets();
+  const isDark = useColorScheme() === 'dark';
+  const resolvedBackground = backgroundColor ?? (isDark ? '#101112' : '#F5F6F7');
+  const resolvedTopColor = safeAreaTopColor ?? resolvedBackground;
+  const resolvedBottomColor = safeAreaBottomColor ?? resolvedBackground;
 
   const contentStyle: ViewStyle = {
     // flex: 1,
@@ -80,18 +85,18 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         backgroundColor={
           statusBarBackgroundColor ??
           (Platform.OS === 'android' && withHeader
-            ? safeAreaTopColor ?? backgroundColor
+            ? resolvedTopColor
             : 'transparent')
         }
       />
 
-      <View style={{ flex: 1, backgroundColor }}>
+      <View style={{ flex: 1, backgroundColor: resolvedBackground }}>
         {/* Top Safe Area (conditionally rendered) */}
         {!withHeader && safeTop && (
           <View
             style={{
               height: insets.top,
-              backgroundColor: safeAreaTopColor ?? backgroundColor,
+              backgroundColor: resolvedTopColor,
             }}
           />
         )}
@@ -113,7 +118,7 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           <View
             style={{
               height: Platform.OS === 'ios' ? insets.bottom : 0,
-              backgroundColor: safeAreaBottomColor ?? backgroundColor,
+              backgroundColor: resolvedBottomColor,
             }}
           />
         )}

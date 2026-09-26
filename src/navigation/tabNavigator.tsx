@@ -17,7 +17,7 @@ import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import { AuthContext } from '../context/authContext';
 import AppIcon from '../components/appIcon';
 import BrandLogo from '../components/brandLogo';
-import { BRAND, isTabletWidth } from '../assets/style/brandTheme';
+import { BRAND, getBrandTheme, isTabletWidth } from '../assets/style/brandTheme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
@@ -123,13 +123,14 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ navigation }) => {
 export default function TabNavigator() {
   const { userInfo } = useContext(AuthContext);
   const isDarkMode = useColorScheme() === 'dark';
+  const theme = getBrandTheme(isDarkMode);
   const tabTheme = {
-    active: BRAND.black,
-    inactive: isDarkMode ? '#94A3B8' : '#94A3B8',
-    background: isDarkMode ? '#111827' : '#FFFFFF',
-    border: isDarkMode ? '#334155' : '#E5E7EB',
-    headerBackground: isDarkMode ? '#111827' : '#FFFFFF',
-    headerText: isDarkMode ? '#F8FAFC' : '#0F172A',
+    active: theme.tabActive,
+    inactive: theme.tabInactive,
+    background: theme.tabBar,
+    border: theme.border,
+    headerBackground: theme.tabBar,
+    headerText: theme.text,
   };
 
   return (
@@ -149,8 +150,14 @@ export default function TabNavigator() {
           },
           headerTitleStyle: {
             color: tabTheme.headerText,
+            fontFamily: 'Poppins-SemiBold',
+            fontSize: 17,
           },
           headerTintColor: tabTheme.headerText,
+          tabBarLabelStyle: {
+            fontFamily: 'Poppins-Medium',
+            fontSize: 11,
+          },
           tabBarActiveTintColor: tabTheme.active,
           tabBarInactiveTintColor: tabTheme.inactive,
           tabBarStyle: {
@@ -160,6 +167,7 @@ export default function TabNavigator() {
             paddingBottom: 10,
             height: 68,
             paddingTop: 8,
+            paddingHorizontal: 2,
           },
         }}
       >

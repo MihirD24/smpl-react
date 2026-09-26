@@ -6,6 +6,11 @@ const MainStyle = () => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const { colors } = useTheme();
+  const surface = isDarkMode ? '#1A1C1E' : '#FFFFFF';
+  const inputBg = isDarkMode ? '#16181A' : '#FFFFFF';
+  const inputBorder = isDarkMode ? '#303438' : '#E5E7EB';
+  const primaryText = isDarkMode ? '#F5F5F5' : '#171717';
+  const secondaryText = isDarkMode ? '#A6ADB5' : '#5F6368';
   return StyleSheet.create({
     header: {
       flexDirection: 'row',
@@ -96,9 +101,9 @@ const MainStyle = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: inputBg,
       borderWidth: moderateScale(1),
-      borderColor: '#E5E7EB',
+      borderColor: inputBorder,
       borderRadius: moderateScale(8),
       // paddingHorizontal: moderateScale(12),
       paddingVertical: verticalScale(12),
@@ -113,9 +118,9 @@ const MainStyle = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: inputBg,
       borderWidth: moderateScale(1),
-      borderColor: '#E5E7EB',
+      borderColor: inputBorder,
       borderRadius: moderateScale(8),
       // paddingHorizontal: moderateScale(12),
       paddingVertical: verticalScale(12),
@@ -159,9 +164,9 @@ const MainStyle = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: inputBg,
       borderWidth: moderateScale(1),
-      borderColor: '#E5E7EB',
+      borderColor: inputBorder,
       borderRadius: moderateScale(8),
     },
     containerStyle: {
@@ -217,7 +222,7 @@ const MainStyle = () => {
       backgroundColor: colors.background,
     },
     itemTextStyle: {
-      color: '#000000',
+      color: primaryText,
     },
     itemTextWhite: {
       color: '#FFFFFF',
@@ -325,7 +330,7 @@ const MainStyle = () => {
       height: 50,
       flexDirection: 'row',
       borderColor: colors.border,
-      backgroundColor: '#F2F3F5',
+      backgroundColor: isDarkMode ? '#16181A' : '#F2F3F5',
       borderWidth: moderateScale(1),
       borderRadius: moderateScale(8),
       paddingHorizontal: moderateScale(10),

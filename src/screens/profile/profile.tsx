@@ -883,6 +883,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: moderateScale(18),
     fontWeight: '800',
+    fontFamily: 'Poppins-SemiBold',
     color: '#0F172A',
     marginBottom: verticalScale(8),
     letterSpacing: -0.3,
@@ -901,13 +902,14 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(11),
     color: '#111111',
     fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  locationText: { fontSize: moderateScale(11), color: '#64748B' },
+  locationText: { fontSize: moderateScale(11), fontFamily: 'Poppins-Regular', color: '#64748B' },
 
   // ── Employee Info ────────────────────────────────────────────
   infoCard: {
@@ -932,14 +934,14 @@ const styles = StyleSheet.create({
     width: moderateScale(38), height: moderateScale(38), borderRadius: moderateScale(11),
     backgroundColor: '#FFF7CC', alignItems: 'center', justifyContent: 'center', marginRight: moderateScale(10),
   },
-  infoTitle: { fontSize: moderateScale(14), fontWeight: '800' },
-  infoSubtitle: { fontSize: moderateScale(10), marginTop: 2 },
+  infoTitle: { fontSize: moderateScale(14), fontWeight: '800', fontFamily: 'Poppins-SemiBold' },
+  infoSubtitle: { fontSize: moderateScale(10), marginTop: 2, fontFamily: 'Poppins-Regular' },
   infoRow: {
     flexDirection: 'row', alignItems: 'center', minHeight: verticalScale(38),
     paddingVertical: verticalScale(7), borderBottomWidth: 1, borderBottomColor: '#EEEEEE',
   },
-  infoLabel: { width: moderateScale(105), fontSize: moderateScale(11), fontWeight: '600' },
-  infoValue: { flex: 1, textAlign: 'right', fontSize: moderateScale(12), fontWeight: '600' },
+  infoLabel: { width: moderateScale(105), fontSize: moderateScale(11), fontWeight: '600', fontFamily: 'Poppins-Medium' },
+  infoValue: { flex: 1, textAlign: 'right', fontSize: moderateScale(12), fontWeight: '600', fontFamily: 'Poppins-Medium' },
 
   // ── Stats ─────────────────────────────────────────────────────
   statsGrid: {
@@ -991,6 +993,7 @@ const styles = StyleSheet.create({
   statGridNumber: {
     fontSize: moderateScale(16),
     fontWeight: '800',
+    fontFamily: 'Poppins-SemiBold',
     color: '#0F172A',
   },
   statGridUnit: {
@@ -1054,6 +1057,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: moderateScale(11),
     fontWeight: '700',
+    fontFamily: 'Poppins-SemiBold',
     color: '#94A3B8',
     letterSpacing: 1,
   },
@@ -1092,6 +1096,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: moderateScale(14),
     fontWeight: '500',
+    fontFamily: 'Poppins-Medium',
     color: '#1E293B',
   },
   menuBadge: {
@@ -1147,6 +1152,7 @@ const styles = StyleSheet.create({
   signOutText: {
     fontSize: moderateScale(14),
     fontWeight: '700',
+    fontFamily: 'Poppins-SemiBold',
     color: '#5e5c5c',
     letterSpacing: 0.2,
   },

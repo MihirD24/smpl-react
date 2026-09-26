@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { NetInfoContext } from '../context/NetInfoContext';
 
 export default function NetInfoComponent({ onReconnect }) {
+  const isDark = useColorScheme() === 'dark';
   const { isConnected, hasLostConnection, retryConnection } =
     useContext(NetInfoContext);
 
@@ -17,7 +18,7 @@ export default function NetInfoComponent({ onReconnect }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#101112' : '#F5F6F7' }]}>
       {/*  FAST IMAGE OFFLINE ILLUSTRATION */}
       <FastImage
         source={require('../assets/images/offline.png')}
@@ -25,13 +26,13 @@ export default function NetInfoComponent({ onReconnect }) {
         resizeMode={FastImage.resizeMode.contain}
       />
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>No internet connection</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: isDark ? '#F5F5F5' : '#111111' }]}>No internet connection</Text>
+        <Text style={[styles.subtitle, { color: isDark ? '#A6ADB5' : '#666666' }]}>
           Check your connection and try again.
         </Text>
 
-        <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-          <Text style={styles.refreshText}>Retry</Text>
+        <TouchableOpacity style={[styles.refreshButton, { borderColor: '#F9C900' }]} onPress={handleRefresh}>
+          <Text style={[styles.refreshText, { color: isDark ? '#F9C900' : '#111111' }]}>Retry</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -63,13 +64,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#000',
+    fontFamily: 'Poppins-SemiBold',
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    fontFamily: 'Poppins-Regular',
     textAlign: 'center',
     marginBottom: 25,
     lineHeight: 20,
@@ -85,5 +86,6 @@ const styles = StyleSheet.create({
   refreshText: {
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
   },
 });
