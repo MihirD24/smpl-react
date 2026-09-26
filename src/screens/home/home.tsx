@@ -199,6 +199,8 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
     departmentsCount: 0,
     designationsCount: 0,
     employeesCount: 0,
+    isDirector: false,
+    hasCompanyWideAccess: false,
   });
   const [refreshing, setRefreshing] = useState(false);
   const [attendanceSummary, setAttendanceSummary] = useState({
@@ -366,6 +368,8 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
           departmentsCount: response?.departmentsCount ?? response?.departments_count ?? 0,
           designationsCount: response?.designationsCount ?? response?.designations_count ?? 0,
           employeesCount: response?.employeesCount ?? response?.employees_count ?? 0,
+          isDirector: response?.is_director ?? false,
+          hasCompanyWideAccess: response?.hasCompanyWideAccess ?? false,
         }));
       }
     } catch (error) {
@@ -504,95 +508,97 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
               </View>
             </View>
 
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => navigation.navigate('Punch')}
-              style={[styles.attendanceHero, { backgroundColor: isDarkMode ? '#17191D' : '#111214', borderColor: isDarkMode ? '#2A2D30' : '#111214' }]}
-            >
-              <View style={styles.attendanceHeroTop}>
-                <View style={styles.attendanceHeroTitleWrap}>
-                  <View style={styles.attendanceHeroIcon}>
-                    <AppIcon name="CalendarCheck" size={19} color={BRAND.black} />
+            {!dashboardCounts.isDirector && (
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => navigation.navigate('Punch')}
+                style={[styles.attendanceHero, { backgroundColor: isDarkMode ? '#17191D' : '#111214', borderColor: isDarkMode ? '#2A2D30' : '#111214' }]}
+              >
+                <View style={styles.attendanceHeroTop}>
+                  <View style={styles.attendanceHeroTitleWrap}>
+                    <View style={styles.attendanceHeroIcon}>
+                      <AppIcon name="CalendarCheck" size={19} color={BRAND.black} />
+                    </View>
+                    <View>
+                      <Text style={styles.attendanceHeroEyebrow}>TODAY'S ATTENDANCE</Text>
+                      <Text style={styles.attendanceHeroTitle}>
+                        {todayPunch.status === 'AFTER_PUNCH_IN'
+                          ? 'You are working'
+                          : todayPunch.status === 'ON_LEAVE'
+                          ? 'On approved leave'
+                          : todayPunch.inTime
+                          ? 'On break / Ready to resume'
+                          : 'Ready to start'}
+                      </Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={styles.attendanceHeroEyebrow}>TODAY'S ATTENDANCE</Text>
-                    <Text style={styles.attendanceHeroTitle}>
+                  <View style={styles.attendanceStatusBadge}>
+                    <View
+                      style={[
+                        styles.attendanceStatusDot,
+                        {
+                          backgroundColor:
+                            todayPunch.status === 'AFTER_PUNCH_IN'
+                              ? BRAND.success
+                              : todayPunch.status === 'ON_LEAVE'
+                              ? '#F59E0B'
+                              : todayPunch.inTime
+                              ? BRAND.yellow
+                              : '#9CA3AF',
+                        },
+                      ]}
+                    />
+                    <Text style={styles.attendanceStatusText}>
                       {todayPunch.status === 'AFTER_PUNCH_IN'
-                        ? 'You are working'
+                        ? 'WORKING'
                         : todayPunch.status === 'ON_LEAVE'
-                        ? 'On approved leave'
+                        ? 'ON LEAVE'
+                        : todayPunch.attendanceStatus
+                        ? todayPunch.attendanceStatus.toUpperCase()
                         : todayPunch.inTime
-                        ? 'On break / Ready to resume'
-                        : 'Ready to start'}
+                        ? 'ON BREAK'
+                        : 'READY'}
                     </Text>
                   </View>
                 </View>
-                <View style={styles.attendanceStatusBadge}>
-                  <View
-                    style={[
-                      styles.attendanceStatusDot,
-                      {
-                        backgroundColor:
-                          todayPunch.status === 'AFTER_PUNCH_IN'
-                            ? BRAND.success
-                            : todayPunch.status === 'ON_LEAVE'
-                            ? '#F59E0B'
-                            : todayPunch.inTime
-                            ? '#3B82F6'
-                            : BRAND.yellow,
-                      },
-                    ]}
-                  />
-                  <Text style={styles.attendanceStatusText}>
-                    {todayPunch.status === 'AFTER_PUNCH_IN'
-                      ? 'WORKING'
-                      : todayPunch.status === 'ON_LEAVE'
-                      ? 'LEAVE'
-                      : todayPunch.attendanceStatus
-                      ? todayPunch.attendanceStatus.toUpperCase()
-                      : todayPunch.inTime
-                      ? 'BREAK'
-                      : 'READY'}
+
+                <View style={styles.attendanceHeroMiddle}>
+                  <View>
+                    <Text style={styles.attendanceHeroTimeLabel}>PUNCH IN</Text>
+                    <Text style={styles.attendanceHeroTime}>{todayPunch.inTime || '--:--'}</Text>
+                  </View>
+                  <View style={styles.attendanceHeroDivider} />
+                  <View>
+                    <Text style={styles.attendanceHeroTimeLabel}>PUNCH OUT</Text>
+                    <Text style={styles.attendanceHeroTime}>{todayPunch.outTime || '--:--'}</Text>
+                  </View>
+                  {todayPunch.totalWorkFormatted ? (
+                    <>
+                      <View style={styles.attendanceHeroDivider} />
+                      <View>
+                        <Text style={styles.attendanceHeroTimeLabel}>NET WORK</Text>
+                        <Text style={[styles.attendanceHeroTime, { color: BRAND.yellow }]}>
+                          {todayPunch.totalWorkFormatted}
+                        </Text>
+                      </View>
+                    </>
+                  ) : null}
+                  <View style={styles.attendanceHeroCta}>
+                    <Text style={styles.attendanceHeroCtaText}>{todayPunch.label}</Text>
+                    <AppIcon name="ArrowUpRight" size={16} color={BRAND.black} />
+                  </View>
+                </View>
+
+                <View style={styles.attendanceSummaryRow}>
+                  <Text style={styles.attendanceSummaryText}>
+                    {todayPunch.totalBreakFormatted ? `Break: ${todayPunch.totalBreakFormatted}` : 'This month'}
                   </Text>
+                  <Text style={styles.attendanceSummaryValue}>{attendanceSummary.present} Present</Text>
+                  <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.absent} Absent</Text>
+                  <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.paidleave} Leave</Text>
                 </View>
-              </View>
-
-              <View style={styles.attendanceHeroMiddle}>
-                <View>
-                  <Text style={styles.attendanceHeroTimeLabel}>PUNCH IN</Text>
-                  <Text style={styles.attendanceHeroTime}>{todayPunch.inTime || '--:--'}</Text>
-                </View>
-                <View style={styles.attendanceHeroDivider} />
-                <View>
-                  <Text style={styles.attendanceHeroTimeLabel}>PUNCH OUT</Text>
-                  <Text style={styles.attendanceHeroTime}>{todayPunch.outTime || '--:--'}</Text>
-                </View>
-                {todayPunch.totalWorkFormatted ? (
-                  <>
-                    <View style={styles.attendanceHeroDivider} />
-                    <View>
-                      <Text style={styles.attendanceHeroTimeLabel}>NET WORK</Text>
-                      <Text style={[styles.attendanceHeroTime, { color: BRAND.yellow }]}>
-                        {todayPunch.totalWorkFormatted}
-                      </Text>
-                    </View>
-                  </>
-                ) : null}
-                <View style={styles.attendanceHeroCta}>
-                  <Text style={styles.attendanceHeroCtaText}>{todayPunch.label}</Text>
-                  <AppIcon name="ArrowUpRight" size={16} color={BRAND.black} />
-                </View>
-              </View>
-
-              <View style={styles.attendanceSummaryRow}>
-                <Text style={styles.attendanceSummaryText}>
-                  {todayPunch.totalBreakFormatted ? `Break: ${todayPunch.totalBreakFormatted}` : 'This month'}
-                </Text>
-                <Text style={styles.attendanceSummaryValue}>{attendanceSummary.present} Present</Text>
-                <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.absent} Absent</Text>
-                <Text style={styles.attendanceSummaryMuted}>{attendanceSummary.paidleave} Leave</Text>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            )}
 
             <View style={[styles.actionStrip, { backgroundColor: t.card, borderColor: t.border }]}>
               {[
@@ -633,7 +639,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                   <SkeletonBox width="60%" height={24} style={{ marginTop: 12 }} isDark={isDarkMode} />
                   <SkeletonBox width="40%" height={14} style={{ marginTop: 8 }} isDark={isDarkMode} />
                 </View>
-                {loginuserRole !== 'Employee' && (
+                {dashboardCounts.hasCompanyWideAccess && (
                   <>
                     <View style={[styles.card, { width: tabletLayout ? '23.5%' : '48.5%', backgroundColor: t.card, borderColor: t.border }]}>
                       <SkeletonBox width={40} height={40} borderRadius={10} isDark={isDarkMode} />
@@ -683,7 +689,7 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
 
-                {loginuserRole !== 'Employee' && (
+                {dashboardCounts.hasCompanyWideAccess && (
                   <>
                     {/* Departments Card */}
                     <View
