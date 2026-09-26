@@ -43,11 +43,12 @@ const modScaleLocal = (size: number, factor = 0.5): number =>
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PAYMENT_STATUSES = [
-  { label: 'Paid', value: 'PAID', color: '#10B981' },
-  { label: 'Pending', value: 'PENDING', color: '#EF4444' },
+  { label: 'Release', value: 'Release', color: '#10B981' },
+  { label: 'Hold', value: 'Hold', color: '#efbc44' },
+  { label: 'FNF', value: 'FNF', color: '#EF4444' },
 ] as const;
 
-type PaymentStatus = 'PAID' | 'DRAFT' | 'PENDING';
+type PaymentStatus = 'Release' | 'FNF' | 'Hold';
 
 const MONTHS = [
   { abbr: 'JAN', num: '01' },
@@ -87,14 +88,14 @@ interface EmployeeRecord {
 const mapToEmployeeRecord = (rec: any): EmployeeRecord => {
   const workingDays = parseInt(rec?.salary_detail?.working_days || '0', 10);
   const leaveDays = parseInt(rec?.salary_detail?.leave_days || '0', 10);
-  const paidAmount = parseFloat(rec.paid_amount || '0');
-  const salary = parseFloat(rec.salary || '0');
+  const paidAmount = parseFloat(rec.total_amount || '0');
+  const salary = parseFloat(rec?.salary_detail?.gross_salary|| '0');
 
-  const status: PaymentStatus = paidAmount > 0 ? 'PAID' : 'PENDING';
+  const status: PaymentStatus = rec?.status;
 
   return {
-    id: rec?.ledger?.id || '',
-    name: rec?.ledger?.name ?? `Staff #${rec?.ledger?.id}`,
+    id: rec?.employee?.employee_code || '',
+    name: rec?.employee?.name ?? `Staff #${rec?.employee?.employee_code}`,
     amount: salary,
     status,
     entry_date: rec.purchase_date ?? new Date().toISOString(),
@@ -117,8 +118,9 @@ const formatCurrency = (val: number): string =>
 const padTwo = (n: number): string => String(n).padStart(2, '0');
 
 const ALL_STATUS_META = [
-  { label: 'Paid', value: 'PAID', color: '#10B981' },
-  { label: 'Pending', value: 'PENDING', color: '#EF4444' },
+  { label: 'Release', value: 'Release', color: '#10B981' },
+  { label: 'FNF', value: 'FNF', color: '#EF4444' },
+  { label: 'Hold', value: 'Hold', color: '#efbc44' },
 ] as const;
 
 // ─── Pure filter function (no state reads) ────────────────────────────────────
@@ -402,6 +404,7 @@ const StaffSalary = () => {
           year,
           emp_id,
         });
+        console.log('fetchSalary result:', result);
         if (result.success) {
           const mapped = result.data.map(mapToEmployeeRecord);
           setMasterData(mapped);

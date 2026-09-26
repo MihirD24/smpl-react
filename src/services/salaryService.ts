@@ -109,6 +109,7 @@ export const getStaffSalaryList = async (
       API_ENDPOINTS.SALARY_LIST,
       formData,
     );
+    console.log('getStaffSalaryList response:', response);
 
     if (response.success) {
       return { success: true, data: response.data };
@@ -127,7 +128,7 @@ export const getSalaryList = async (): Promise<{
 }> => {
   try {
     const response = await apiPost(API_ENDPOINTS.SALARY_LIST);
-
+    console.log('getSalaryList response:', response);
     if (response.success) {
       return { success: true, data: response.data };
     }

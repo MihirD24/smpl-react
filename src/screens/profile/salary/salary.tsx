@@ -410,7 +410,7 @@ const SalaryCard = ({
               <Text style={styles.salaryMetaLabel}>Deduction</Text>
 
               <Text style={[styles.salaryMetaValue, { color: '#DC2626' }]}>
-                -{formatCurrency(salaryDetail?.deduction_amt || 0)}
+                -{formatCurrency(salaryDetail?.deduction_amount || 0)}
               </Text>
             </View>
           </View>
@@ -429,14 +429,13 @@ const SalaryCard = ({
               <Text style={styles.salaryMetaLabel}>Paid</Text>
 
               <Text style={[styles.salaryMetaValue, { color: '#1164E0' }]}>
-                {formatCurrency(item.paid_amount)}
+                {formatCurrency(item.total_amount)}
               </Text>
             </View>
           </View>
         </View>
 
         {/* DOWNLOAD BUTTON */}
-        {isPaid && (
           <TouchableOpacity
             style={[
               styles.downloadFab,
@@ -458,7 +457,6 @@ const SalaryCard = ({
               />
             )}
           </TouchableOpacity>
-        )}
       </View>
     </View>
   );
@@ -501,7 +499,7 @@ const Salary = () => {
       const formData = new FormData();
       formData.append('id', item.id.toString());
       const response = await getSalaryPdf(formData);
-
+      console.log('getSalaryPdf response:', response);
       if (!response.pdf_url) {
         Alert.alert('Error', 'Unable to fetch PDF');
         return;
