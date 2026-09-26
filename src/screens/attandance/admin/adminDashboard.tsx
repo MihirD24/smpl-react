@@ -631,19 +631,20 @@ const AdminDashboard: React.FC = ({
   ): string => {
     switch (color) {
       case 'yellow':
-        return '#111111';
+        // Keep JCB yellow visible in both themes.
+        return isDark ? '#F9C900' : '#111111';
 
       case 'orange':
-        return '#EA580C';
+        return isDark ? '#FDBA74' : '#EA580C';
 
       case 'red':
-        return '#DC2626';
+        return isDark ? '#FB7185' : '#DC2626';
 
       case 'green':
-        return '#16A34A';
+        return isDark ? '#4ADE80' : '#16A34A';
 
       default:
-        return '#64748B';
+        return isDark ? '#CBD5E1' : '#64748B';
     }
   };
 
