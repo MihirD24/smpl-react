@@ -7,9 +7,6 @@ import Attendancelist from '../screens/attandance/attendanceList';
 import LeaveList from '../screens/leave/leaveList';
 import AddLeave from '../screens/leave/addLeave';
 import AdminAttendancelist from '../screens/attandance/admin/adminAttendance';
-import ProjectList from '../screens/profile/project/projectList';
-import ModuleList from '../screens/profile/project/module/moduleList';
-import AddModule from '../screens/profile/project/module/addModule';
 import NotificationScreen from '../screens/notification/notificationScreen';
 import TabNavigator from './tabNavigator';
 import HolidayList from '../screens/profile/holiday/holidayList';
@@ -19,10 +16,6 @@ import { useAuth } from '../context/authContext';
 import AttendanceFilter from '../screens/attandance/attendanceFilter';
 import performanceReport from '../screens/home/performanceReport';
 import Salary from '../screens/profile/salary/salary';
-import projectReminder from '../screens/profile/projectRemain/projectReminder';
-import addProjectReminder from '../screens/profile/projectRemain/addProjectReminder';
-import AddProjectRemainingScreen from '../screens/profile/projectRemain/addProjectRemainingScreen';
-import ProjectRemainingScreen from '../screens/profile/projectRemain/projectRemainingScreen';
 import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import AddServiceVisit from '../screens/serviceVisit/addServiceVisit';
 import CalculateSalary from '../screens/accounts/calculateSalary';
@@ -144,21 +137,6 @@ const AppStack = ({
         options={detailHeaderOptions('Notifications')}
       />
       <Stack.Screen
-        name="Project"
-        component={ProjectList}
-        options={detailHeaderOptions('Projects')}
-      />
-      <Stack.Screen
-        name="ModuleList"
-        component={ModuleList}
-        options={detailHeaderOptions('Module List')}
-      />
-      <Stack.Screen
-        name="AddModule"
-        component={AddModule}
-        options={detailHeaderOptions('Add New Module')}
-      />
-      <Stack.Screen
         name="HolidayList"
         component={HolidayList}
         options={detailHeaderOptions('Holiday List')}
@@ -174,44 +152,12 @@ const AppStack = ({
         options={detailHeaderOptions('Salary')}
       />
       <Stack.Screen
-        name="ProjectReminder"
-        component={projectReminder}
-        options={{
-          headerShown: true,
-          title: 'Reminders',
-          headerBackTitle: '',
-          headerBackVisible: true,
-        }}
       />
       <Stack.Screen
-        name="AddProjectReminder"
-        component={addProjectReminder}
-        options={{
-          headerShown: true,
-          title: 'Add Reminder',
-          headerBackTitle: '',
-          headerBackVisible: true,
-        }}
       />
       <Stack.Screen
-        name="AddProjectRemainingScreen"
-        component={AddProjectRemainingScreen}
-        options={{
-          headerShown: true,
-          title: 'Add Project Remaining',
-          headerBackTitle: '',
-          headerBackVisible: true,
-        }}
       />
       <Stack.Screen
-        name="ProjectRemainingScreen"
-        component={ProjectRemainingScreen}
-        options={{
-          headerShown: true,
-          title: 'Project Remaining',
-          headerBackTitle: '',
-          headerBackVisible: true,
-        }}
       />
       <Stack.Screen
         name="ServiceVisitList"
