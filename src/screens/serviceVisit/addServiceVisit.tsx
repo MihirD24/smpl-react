@@ -435,6 +435,7 @@ const DRIVER_DESIGNATION_NAMES = ['DRIVER'];
 
   // Form Submit Handler
   const handleFormSubmit = async () => {
+    if (loading) return;
     const currentEmpId = isOwner ? employeeId : (employeeId || loggedInEmployeeId);
 
     // Validate Required parameters
