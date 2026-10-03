@@ -1,0 +1,13 @@
+--- node_modules/react-native-get-location/src/specs/NativeRNGetLocation.ts	2019-01-01 00:00:00.000000000 +0000
++++ node_modules/react-native-get-location/src/specs/NativeRNGetLocation.ts	2023-10-01 00:00:00.000000000 +0000
+@@ -37,6 +37,10 @@
+    * (iOS only) The course of the location in degrees true North. Negative if course is invalid. (0.0 - 359.9 degrees, 0 being true North)
+    */
+   course?: Float;
++  /**
++   * (Android only) Whether the location is from a mock provider
++   */
++  isMocked?: boolean;
+ };
+ 
+ export interface Spec extends TurboModule {

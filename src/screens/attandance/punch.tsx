@@ -267,7 +267,12 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
         timeout: 30000,
       });
 
-      const { latitude, longitude } = location;
+      const { latitude, longitude, isMocked } = location as any;
+
+      if (isMocked) {
+        Alert.alert('Mock Location Detected', 'Please turn off fake GPS to punch in.');
+        return;
+      }
 
       setLat(latitude.toString());
       setLong(longitude.toString());
@@ -286,8 +291,16 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       } else {
         console.warn('No address found');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in checkLocation:', error);
+      if (error.code === 'TIMEOUT') {
+        Alert.alert(
+          'Location Timeout',
+          'Could not get your location. Please ensure your GPS is on, you are under a clear sky, or try again.',
+        );
+      } else {
+        Alert.alert('Location Error', 'Unable to fetch location. Please try again.');
+      }
     } finally {
       isFetchingLocation.current = false;
     }
