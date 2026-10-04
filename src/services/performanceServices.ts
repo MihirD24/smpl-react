@@ -37,7 +37,6 @@ export const getTodayStaffPerformance = async () => {
   }
 };
 
-export const getProjectPerformance = async (days: number) => {
   try {
     const response = await apiPost(API_ENDPOINTS.PROJECT_PERFORMANCE, { days });
     if (response.success) {

@@ -190,6 +190,8 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
         mediaType: 'photo' as const,
         quality: 0.8 as const,
         saveToPhotos: false,
+        maxWidth: 1024,
+        maxHeight: 1024,
       });
 
       if (result.errorCode) {
@@ -215,6 +217,8 @@ const AddLeave: React.FC<AppStackScreenProps<'AddLeave'>> = ({
         mediaType: 'photo' as const,
         quality: 0.8 as const,
         selectionLimit: 1,
+        maxWidth: 1024,
+        maxHeight: 1024,
       });
 
       if (result.errorCode) {

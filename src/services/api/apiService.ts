@@ -50,8 +50,14 @@ const buildApiUrl = (endpoint: string): string => {
   return `${baseUrl}${separator}${endpoint.replace(/^\//, '')}`;
 };
 
-const getUploadPath = (uri: string): string =>
-  uri.startsWith('file://') ? uri.replace('file://', '') : uri;
+const getUploadPath = (uri: string): string => {
+  const path = uri.startsWith('file://') ? uri.replace('file://', '') : uri;
+  try {
+    return decodeURI(path);
+  } catch {
+    return path;
+  }
+};
 
 const formDataToBlobParts = (formData: FormData): MultipartPart[] => {
   const parts = (formData as any)?._parts;
