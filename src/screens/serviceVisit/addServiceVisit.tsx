@@ -408,6 +408,8 @@ const DRIVER_DESIGNATION_NAMES = ['DRIVER'];
     const options = {
       mediaType: 'photo' as const,
       quality: 0.8,
+      maxWidth: 1024,
+      maxHeight: 1024,
     };
     const callback = (res: any) => {
       setShowAttachmentOptions(false);
@@ -446,6 +448,7 @@ const DRIVER_DESIGNATION_NAMES = ['DRIVER'];
     if (userType === 'SERVICE') {
       if (!machineNumber.trim()) return ToastUtil.info('Machine Number is required');
       if (!machineModelId) return ToastUtil.info('Machine Model is required');
+      if (!visitCategory) return ToastUtil.info('Visit Category is required');
     }
 
     // Setup FormData
