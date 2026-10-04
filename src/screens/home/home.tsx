@@ -38,10 +38,6 @@ import {
 import { TabWithStackNavProp } from '../../navigation/navigationTypes';
 import moment from 'moment';
 import AddButton from '../../components/button/addButton';
-import {
-  getPartyLists,
-  getReminderTypeList,
-} from '../../services/projectReminderService';
 import NetInfoComponent from '../../components/netinfoComponent';
 import BrandLogo from '../../components/brandLogo';
 import { BRAND, isTabletWidth, contentMaxWidth } from '../../assets/style/brandTheme';
@@ -408,38 +404,6 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
       setRefreshing(false);
     }
   }, []);
-
-  const openAddReminder = async () => {
-    const [partyRes, typeRes] = await Promise.all([
-      getPartyLists(),
-      getReminderTypeList(),
-    ]);
-    closeQuickActions();
-
-    navigation.navigate('AddProjectReminder', {
-      parties: partyRes.data,
-      reminderTypes: typeRes.data,
-    });
-  };
-
-  // ── Quick Action Items ────────────────────────────────────────────────────
-  const quickActionItems = [
-    {
-      label: 'Add Project Reminder',
-      icon: 'BellPlus' as IconName,
-      iconBg: '#3B6FD4',
-      onPress: openAddReminder,
-    },
-    {
-      label: 'Add Project Remaining',
-      icon: 'ClipboardList' as IconName,
-      iconBg: '#22C55E',
-      onPress: () => {
-        closeQuickActions();
-        navigation.navigate('AddProjectRemainingScreen');
-      },
-    },
-  ];
 
   const pulseAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
@@ -815,39 +779,6 @@ const Home: React.FC<{ navigation: HomeScreenNav }> = ({ navigation }) => {
                   color={isDarkMode ? '#F0F0F0' : '#1A1D2E'}
                 />
               </TouchableOpacity>
-            </View>
-
-            {/* Action Items */}
-            <View style={styles.quickActionsContainer}>
-              {quickActionItems.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.quickActionItem,
-                    { backgroundColor: isDarkMode ? '#2A2D38' : '#F8FAFC' },
-                  ]}
-                  onPress={item.onPress}
-                  activeOpacity={0.75}
-                >
-                  <View
-                    style={[
-                      styles.quickActionIconWrap,
-                      { backgroundColor: item.iconBg },
-                    ]}
-                  >
-                    <AppIcon name={item.icon} size={20} color="#FFFFFF" />
-                  </View>
-                  <Text
-                    style={[
-                      styles.quickActionLabel,
-                      { color: isDarkMode ? '#F0F0F0' : '#1A1D2E' },
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                  <AppIcon name="ChevronRight" size={18} color="#9098B1" />
-                </TouchableOpacity>
-              ))}
             </View>
           </BottomSheetView>
         </BottomSheet>

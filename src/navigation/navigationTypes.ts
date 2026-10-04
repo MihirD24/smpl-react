@@ -59,7 +59,6 @@ export type AppStackParamList = {
     lat: number;
     long: number;
   };
-  PerformanceReport: undefined;
   Salary: undefined;
   ProjectReminder: undefined;
   AddProjectReminderScreen: undefined;

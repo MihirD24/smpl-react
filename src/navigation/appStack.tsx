@@ -14,7 +14,6 @@ import { AppStackParamList } from './navigationTypes';
 import AdminTabNavigator from './adminTabNavigator';
 import { useAuth } from '../context/authContext';
 import AttendanceFilter from '../screens/attandance/attendanceFilter';
-import performanceReport from '../screens/home/performanceReport';
 import Salary from '../screens/profile/salary/salary';
 import ServiceVisitList from '../screens/serviceVisit/serviceVisitList';
 import AddServiceVisit from '../screens/serviceVisit/addServiceVisit';
@@ -141,23 +140,11 @@ const AppStack = ({
         component={HolidayList}
         options={detailHeaderOptions('Holiday List')}
       />
-      <Stack.Screen
-        name="PerformanceReport"
-        component={performanceReport}
-        options={detailHeaderOptions('Performance Report')}
-      />
+   
       <Stack.Screen
         name="Salary"
         component={Salary}
         options={detailHeaderOptions('Salary')}
-      />
-      <Stack.Screen
-      />
-      <Stack.Screen
-      />
-      <Stack.Screen
-      />
-      <Stack.Screen
       />
       <Stack.Screen
         name="ServiceVisitList"

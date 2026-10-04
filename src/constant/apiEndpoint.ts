@@ -22,12 +22,6 @@ export const API_ENDPOINTS = {
   // ================= USER =================
   USER_DETAILS: 'user-details',
 
-  // ================= PERFORMANCE =================
-  STAFF_PERFORMANCE_REPORT: 'get-staff-performance-report',
-  TODAY_STAFF_PERFORMANCE: 'get-today-staff-performance',
-
-  // ================= PROJECT & MODULE =================
-
   // ================= ACCOUNT =================
   ACCOUNT_BOOK_LIST: 'account-book-list',
   PARTY_LIST: 'party-list',
@@ -39,12 +33,6 @@ export const API_ENDPOINTS = {
   SALARY_CALCULATE: 'salary-calculate',
   PRINT_SALARY_SLIP: 'print-salary-slip',
   // ================= PROJECT REMAINING =================
-
-  //=================PROJECT REMINDER=================
-  ADD_REMINDER: 'add-reminder',
-  GET_REMINDER_TYPE: 'get-reminder-type',
-  GET_REMINDER: 'get-reminder',
-  UPDATE_STATUS_BY_TYPE: 'update-status-by-type',
 
   // ================= Developers list =================
 
