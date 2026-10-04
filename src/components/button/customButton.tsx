@@ -39,9 +39,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         MainStyles.button,
         MainStyles.buttonWidth95,
         isDarkMode ? MainStyles.buttonSoftGray : MainStyles.buttonBlack,
-        disabled && MainStyles.disabledButton,
-        style,
         styles.submitButton,
+        style,
+        disabled && { opacity: 0.5 },
+        disabled && MainStyles.disabledButton,
       ]}
     >
       <Text style={[MainStyles.ButtonText, textStyle]}>{label}</Text>

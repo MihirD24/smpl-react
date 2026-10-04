@@ -15,11 +15,14 @@ import staffSalary from '../screens/accounts/staffSalary';
 import moment from 'moment';
 import AdminEmployees from '../screens/attandance/admin/adminEmployees';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 
 export default function AdminTabNavigator() {
   const isDarkMode = useColorScheme() === 'dark';
+  const insets = useSafeAreaInsets();
+  const tabBarBottomInset = Math.max(insets.bottom, 0);
   const tabTheme = {
     active: isDarkMode ? '#F9C900' : '#111111',
     inactive: isDarkMode ? '#94A3B8' : '#999999',
@@ -55,8 +58,8 @@ export default function AdminTabNavigator() {
             backgroundColor: tabTheme.background,
             borderTopColor: tabTheme.border,
             borderTopWidth: 1,
-            paddingBottom: 10,
-            height: 68,
+            paddingBottom: 10 + tabBarBottomInset,
+            height: 68 + tabBarBottomInset,
             paddingTop: 7,
           },
           tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },

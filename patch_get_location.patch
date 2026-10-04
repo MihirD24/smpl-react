@@ -1,0 +1,14 @@
+--- node_modules/react-native-get-location/android/src/main/java/com/github/douglasjunior/reactNativeGetLocation/util/GetLocation.java	2019-01-01 00:00:00.000000000 +0000
++++ node_modules/react-native-get-location/android/src/main/java/com/github/douglasjunior/reactNativeGetLocation/util/GetLocation.java	2023-10-01 00:00:00.000000000 +0000
+@@ -75,6 +75,11 @@
+                         resultLocation.putDouble("speed", location.getSpeed());
+                         resultLocation.putDouble("bearing", location.getBearing());
+                         resultLocation.putDouble("time", location.getTime());
++                        if (android.os.Build.VERSION.SDK_INT >= 31) {
++                            resultLocation.putBoolean("isMocked", location.isMock());
++                        } else if (android.os.Build.VERSION.SDK_INT >= 18) {
++                            resultLocation.putBoolean("isMocked", location.isFromMockProvider());
++                        }
+                         promise.resolve(resultLocation);
+                         stop();
+                         clearReferences();

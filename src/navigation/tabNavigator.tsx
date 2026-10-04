@@ -124,6 +124,8 @@ export default function TabNavigator() {
   const { userInfo } = useContext(AuthContext);
   const isDarkMode = useColorScheme() === 'dark';
   const theme = getBrandTheme(isDarkMode);
+  const insets = useSafeAreaInsets();
+  const tabBarBottomInset = Math.max(insets.bottom, 0);
   const tabTheme = {
     active: theme.tabActive,
     inactive: theme.tabInactive,
@@ -165,8 +167,8 @@ export default function TabNavigator() {
             backgroundColor: tabTheme.background,
             borderTopColor: tabTheme.border,
             borderTopWidth: 1,
-            paddingBottom: 10,
-            height: 68,
+            paddingBottom: 10 + tabBarBottomInset,
+            height: 68 + tabBarBottomInset,
             paddingTop: 8,
             paddingHorizontal: 2,
           },

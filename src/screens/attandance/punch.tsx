@@ -82,6 +82,19 @@ const createPunchPhoto = (photoUri: string) => ({
   name: `punch-${Date.now()}.jpg`,
 });
 
+const getNetworkTime = async (): Promise<moment.Moment> => {
+  try {
+    const response = await fetch('https://timeapi.io/api/Time/current/zone?timeZone=Asia/Kolkata');
+    const data = await response.json();
+    if (data && data.dateTime) {
+      return moment(data.dateTime);
+    }
+  } catch (error) {
+    console.warn('Network time fetch failed', error);
+  }
+  return moment();
+};
+
 const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
   const isFocused = useIsFocused();
   const isDarkMode = useColorScheme() === 'dark';
@@ -254,7 +267,12 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
         timeout: 30000,
       });
 
-      const { latitude, longitude } = location;
+      const { latitude, longitude, isMocked } = location as any;
+
+      if (isMocked) {
+        Alert.alert('Mock Location Detected', 'Please turn off fake GPS to punch in.');
+        return;
+      }
 
       setLat(latitude.toString());
       setLong(longitude.toString());
@@ -273,8 +291,16 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       } else {
         console.warn('No address found');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in checkLocation:', error);
+      if (error.code === 'TIMEOUT') {
+        Alert.alert(
+          'Location Timeout',
+          'Could not get your location. Please ensure your GPS is on, you are under a clear sky, or try again.',
+        );
+      } else {
+        Alert.alert('Location Error', 'Unable to fetch location. Please try again.');
+      }
     } finally {
       isFetchingLocation.current = false;
     }
@@ -386,8 +412,10 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       const photo = createPunchPhoto(photoUri);
       const formData = new FormData();
 
-      formData.append('date', currentDate);
-      formData.append('in_time', moment().format('HH:mm:ss'));
+      const networkTime = await getNetworkTime();
+
+      formData.append('date', networkTime.format('YYYY-MM-DD'));
+      formData.append('in_time', networkTime.format('HH:mm:ss'));
       formData.append('in_location', address);
       formData.append('in_lat', lat);
       formData.append('in_long', long);
@@ -399,7 +427,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       if (success) {
         setDisableBtn(false);
         setAttendanceModalVisible(false);
-        await handlecheckPunch(currentDate);
+        await handlecheckPunch(networkTime.format('YYYY-MM-DD'));
         navigation.navigate('Home');
         ToastUtil.success(message || 'Welcome to office !!');
       } else {
@@ -421,8 +449,11 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       setDisableBtn(true);
       const photo = createPunchPhoto(photoUri);
       const formData = new FormData();
-      formData.append('date', currentDate);
-      formData.append('out_time', moment().format('HH:mm:ss'));
+
+      const networkTime = await getNetworkTime();
+
+      formData.append('date', networkTime.format('YYYY-MM-DD'));
+      formData.append('out_time', networkTime.format('HH:mm:ss'));
       formData.append('out_location', address);
       formData.append('out_lat', lat);
       formData.append('out_long', long);
@@ -433,7 +464,7 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
       if (success) {
         setDisableBtn(false);
         setAttendanceModalVisible(false);
-        await handlecheckPunch(currentDate);
+        await handlecheckPunch(networkTime.format('YYYY-MM-DD'));
         navigation.navigate('Home');
         ToastUtil.success(message || 'See you soon, Take care !!!');
       } else {
@@ -540,6 +571,10 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
   }, []);
 
   const launchCameraHandler = async () => {
+    setDisableBtn(true);
+    await checkLocation(); // Fetch fresh location on punch action
+    setDisableBtn(false);
+
     const cameraGranted = await requestCameraPermission();
     if (!cameraGranted) {
       Alert.alert(
@@ -551,11 +586,14 @@ const Punch: React.FC<BottomTabScreenProps<'Punch'>> = ({ navigation }) => {
     setCameraVisible(true);
   };
 
-  const onPhotoCaptured = (uri: string) => {
+  const onPhotoCaptured = async (uri: string) => {
     setFileUri(uri);
-    setCaptureTime(moment().format('DD/MM/YYYY, hh:mm:ss A'));
     setCameraVisible(false);
     setAttendanceModalVisible(true);
+    
+    // Fetch network time for watermarking and metadata
+    const networkTime = await getNetworkTime();
+    setCaptureTime(networkTime.format('DD/MM/YYYY, hh:mm:ss A'));
   };
 
   const handleRetakePhoto = () => {

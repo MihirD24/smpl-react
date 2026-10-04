@@ -437,6 +437,7 @@ const DRIVER_DESIGNATION_NAMES = ['DRIVER'];
 
   // Form Submit Handler
   const handleFormSubmit = async () => {
+    if (loading) return;
     const currentEmpId = isOwner ? employeeId : (employeeId || loggedInEmployeeId);
 
     // Validate Required parameters
@@ -508,6 +509,7 @@ const DRIVER_DESIGNATION_NAMES = ['DRIVER'];
 
     setLoading(true);
     try {
+      console.log('Submitting form data:', formData);
       const res = await addServiceVisit(formData);
       if (res.success) {
         ToastUtil.success(res.message || 'Service visit form submitted successfully!');
