@@ -20,6 +20,8 @@
     "android:release:aab": "cd android && ENVFILE=.env.production ./gradlew bundleRelease",
     "android:clean": "cd android && ./gradlew clean",
     "ios:release": "cross-env ENVFILE=.env.production react-native run-ios --mode Release",
+    "update:preview": "eas update --channel preview",
+    "update:prod": "eas update --channel production",
     "postinstall": "patch-package"
   },
   "dependencies": {
@@ -40,6 +42,8 @@
     "axios": "^1.16.0",
     "cross-env": "^10.1.0",
     "crypto-js": "^4.2.0",
+    "expo": ">=57.0.0-0 <58.0.0",
+    "expo-updates": "~57.0.25",
     "lucide-react-native": "^0.562.0",
     "moment": "^2.30.1",
     "react": "19.2.3",
@@ -80,6 +84,7 @@
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
+    "babel-preset-expo": "^57.0.14",
     "@react-native-community/cli": "^20.2.0",
     "@react-native-community/cli-platform-android": "^20.2.0",
     "@react-native-community/cli-platform-ios": "^20.2.0",

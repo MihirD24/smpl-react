@@ -1,4 +1,20 @@
 {
   "name": "Smpl",
-  "displayName": "Smpl"
+  "displayName": "Smpl",
+  "expo": {
+    "name": "Smpl",
+    "slug": "smpl",
+    "version": "0.0.1",
+    "updates": {
+      "url": "https://u.expo.dev/56d219fa-3d54-47c4-bb55-e3ee30ff1bba"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "56d219fa-3d54-47c4-bb55-e3ee30ff1bba"
+      }
+    }
+  }
 }
